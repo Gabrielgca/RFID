@@ -20,19 +20,19 @@ YouTube: youtube.com/user/blogdarobotica
 #define SS_PIN 10
 #define RST_PIN 9
 
-struct Tags
+struct Tag
 {
 	String id;
 	String name;
 };
 
-struct Tags registeredTags = {"c73bc34d", "Renato"};
+struct Tag registeredTag = {"c73bc34d", "Renato"};
 String tagID = ""; //Variável que armazenará o ID da Tag
 bool access = false; //Variável que verifica a permissão 
 
 //Vetor responsável por armazenar os ID's das Tag's cadastradas
 /*
-String registeredTags [] = {"4bd8851b",
+String registeredTag [] = {"4bd8851b",
 														"id 2",
 														"id 3"};
 */
@@ -51,7 +51,7 @@ void setup ()
 }
 
 void loop ()
-{  
+{
 	//Inicialmente tagID deve estar vazia.
 	tagID = "";
 	
@@ -68,17 +68,17 @@ void loop ()
 		tagID.concat (String (RFID.uid.uidByte [i], HEX));
 	}
 	
-	//Compara o valor do ID lido com os IDs armazenados no vetor registeredTags.name
-	for (int i = 0; i < (sizeof (registeredTags.id) / sizeof (String)); i++)
+	//Compara o valor do ID lido com os IDs armazenados no vetor registeredTag.name
+	for (int i = 0; i < (sizeof (registeredTag.id) / sizeof (String)); i++)
 	{
-		if (tagID.equalsIgnoreCase (registeredTags.id))
+		if (tagID.equalsIgnoreCase (registeredTag.id))
 		{
-				access = true; //Variável access assume valor verdadeiro caso o ID Lido esteja cadastrado
+			access = true; //Variável access assume valor verdadeiro caso o ID Lido esteja cadastrado
 		}
-	}       
+	}
 	
 	if (access == true)	//Se a variável access for verdadeira será chamada a função accessGranted() 
-		accessGranted ();       
+		accessGranted ();
 	else										//Se não será chamada a função accessDenied()
 		accessDenied ();
 	
@@ -87,17 +87,17 @@ void loop ()
 
 void accessGranted ()
 {
-  Serial.println ("Tag Cadastrada: " + registeredTags.name); //Exibe a mensagem "Tag Cadastrada" e o ID da tag não cadastrada
+  Serial.println ("Tag Cadastrada: " + registeredTag.name); //Exibe a mensagem "Tag Cadastrada" e o ID da tag não cadastrada
   
-	int count = 2; //definindo a quantidade de bips
+	int count = 1; //definindo a quantidade de bips
   for (int j = 0; j < count; j++)
 	{
     //Ligando o buzzer com uma frequência de 1500 hz e ligando o led verde.
-    tone (BUZZER, 1500);
-    digitalWrite (LED_GREEN, HIGH);   
+    tone (BUZZER, 987);
+    digitalWrite (LED_GREEN, HIGH);
     delay (100);   
     
-    //Desligando o buzzer e led verde.      
+    //Desligando o buzzer e led verde.
     noTone (BUZZER);
     digitalWrite (LED_GREEN, LOW);
     delay (100);
@@ -109,17 +109,17 @@ void accessDenied ()
 {
   Serial.println ("Tag NAO Cadastrada: " + tagID); //Exibe a mensagem "Tag NAO Cadastrada" e o ID da tag cadastrada
   
-	int count = 1;  //definindo a quantidade de bips
+	int count = 2;  //definindo a quantidade de bips
   for (int j = 0; j < count; j++)
-	{   
+	{
     //Ligando o buzzer com uma frequência de 500 hz e ligando o led vermelho.
-    tone (BUZZER, 500);
-    digitalWrite (LED_RED, HIGH);   
-    delay (500); 
+    tone (BUZZER, 415);
+    digitalWrite (LED_RED, HIGH);
+    delay (150); 
     
     //Desligando o buzzer e o led vermelho.
     noTone (BUZZER);
     digitalWrite (LED_RED, LOW);
-    delay (500);
+    delay (150);
   }
 }
