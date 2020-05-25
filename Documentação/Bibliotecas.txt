@@ -1,0 +1,31 @@
+MÓDULO RFID RC522
+
+SPI.h - Biblioteca do protocolo SPI
+-> Nativa do Arduino
+
+MFRC522.h v1.4.6 - Biblioteca da placa RC522
+-> Requer instanciação de um objeto do tipo MFRC522
+-> MFRC522 obj (ss pin, rst pin)
+
+* Com estas duas bibliotecas devidamente implementadas o sistema é capaz de ler tags normalmente.
+
+
+
+LORAWAN Módulo SX1276
+
+LoRa.h v0.7.2 - Biblioteca LoRa para Arduino
+-> Só faz P2P
+
+arduinoLoRaWAN v1.3 - Biblioteca LoRaWAN extendida a partir da LoRa nativa
+-> Requer ArduinoAPI: Wire.h, ArduinoUtils.h e ArduinoUART.h
+-> Aparenta não ser compatível com o SX1276
+-> Não ficou clara a configuração da pinagem
+
+LMIC.h - Biblioteca alternativa para LoRaWAN
+-> Requer hal.h (já vem junto)
+-> Carece de testes
+-> Segundo o autor, NÃO FOI TESTADA A FUNÇÃO DOWNLINK
+-> Configuração precária
+-> Ocupa muita memória do Arduino
+
+* Aguardando para iniciar a fase de testes usando LMIC.h

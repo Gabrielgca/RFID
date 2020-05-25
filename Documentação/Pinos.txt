@@ -1,9 +1,9 @@
-Pinos MÃ³dulo RFID RC522 |    Arduino
+Pinos Módulo RFID RC522 |    Arduino
 --------------------------------------------
            3.3          |   Pino 3.3V
            RST          |   Pino 9
            GND          |   Pino GND
-        IRQ ou NC       |   NÃ£o Conectado
+        IRQ ou NC       |   NÃo Conectado
            MISO         |   Pino 12
            MOSI         |   Pino 11
            SCK          |   Pino 13
