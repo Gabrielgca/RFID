@@ -2,6 +2,8 @@ MÓDULO RFID RC522
 
 SPI.h - Biblioteca do protocolo SPI
 -> Nativa do Arduino
+-> Usa para comunicação: SCK, MOSI, MISO, Chip Select (SS ou NSS ou SDA)
+
 
 MFRC522.h v1.4.6 - Biblioteca da placa RC522
 -> Requer instanciação de um objeto do tipo MFRC522
@@ -28,4 +30,5 @@ LMIC.h - Biblioteca alternativa para LoRaWAN
 -> Configuração precária
 -> Ocupa muita memória do Arduino
 
-* Aguardando para iniciar a fase de testes usando LMIC.h
+* Utilizando a biblioteca de "matthijskooijman" com o acréscimo de AU-915
+** Aguardando para iniciar a fase de testes usando LMIC.h
