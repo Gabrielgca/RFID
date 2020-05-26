@@ -4,7 +4,6 @@ SPI.h - Biblioteca do protocolo SPI
 -> Nativa do Arduino
 -> Usa para comunicação: SCK, MOSI, MISO, Chip Select (SS ou NSS ou SDA)
 
-
 MFRC522.h v1.4.6 - Biblioteca da placa RC522
 -> Requer instanciação de um objeto do tipo MFRC522
 -> MFRC522 obj (ss pin, rst pin)
