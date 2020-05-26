@@ -24,10 +24,10 @@ arduinoLoRaWAN v1.3 - Biblioteca LoRaWAN extendida a partir da LoRa nativa
 
 LMIC.h - Biblioteca alternativa para LoRaWAN
 -> Requer hal.h (já vem junto)
--> Carece de testes
+-> Carece de testes na documentação
 -> Segundo o autor, NÃO FOI TESTADA A FUNÇÃO DOWNLINK
 -> Configuração precária
 -> Ocupa muita memória do Arduino
 
 * Utilizando a biblioteca de "matthijskooijman" com o acréscimo de AU-915
-** Aguardando para iniciar a fase de testes usando LMIC.h
+* Primeira fase de testes: sem erros de compilação, mas a conexão não foi bem sucedida
