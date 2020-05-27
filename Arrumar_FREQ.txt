@@ -19,3 +19,10 @@ linha 120
 enum { AU915_125kHz_UPFBASE = 915600000, //APENAS UMA FREQ
 
 - Foi alterado a frequência base para que ficasse compatível com a frequência do gateway
+
+linha 125
+AU915_500kHz_DNFSTEP =    0 // MUDADO
+linha 147
+US915_500kHz_DNFSTEP =    0 // MUDADO
+- Foi fixado o valor da frequência de Rx
+//MUDADO = MUDOU ALGO NO CÓDIGO 
