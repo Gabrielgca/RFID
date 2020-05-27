@@ -1,0 +1,21 @@
+Em ttn-abp
+
+Mudar baudrate de 9600 para 115200 para conseguir ver os dados no monitor serial
+do arduino.
+
+Em lmic.c 
+linha 835
+LMIC.freq = AU915_125kHz_UPFBASE ; // + (chnl % 8) * AU915_125kHz_UPFSTEP;
+
+- Foi comentado para ficar a frequência de operação
+
+linha 797
+LMIC_disableChannel(channel-1); //APENAS UMA FREQ
+
+- Foi fixado o canal de transmissão
+----------------------------------------------------------------------------------------
+Em lorabase.h
+linha 120
+enum { AU915_125kHz_UPFBASE = 915600000, //APENAS UMA FREQ
+
+- Foi alterado a frequência base para que ficasse compatível com a frequência do gateway
