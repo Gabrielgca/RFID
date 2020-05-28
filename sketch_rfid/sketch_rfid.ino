@@ -17,7 +17,7 @@ YouTube: youtube.com/user/blogdarobotica
 #define LED_GREEN 6
 #define LED_RED 7
 #define BUZZER 8
-#define SS_PIN 10
+#define SS_PIN 4
 #define RST_PIN 9
 
 struct Tags
