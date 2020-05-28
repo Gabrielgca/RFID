@@ -3,6 +3,8 @@ MÓDULO RFID RC522
 SPI.h - Biblioteca do protocolo SPI
 -> Nativa do Arduino / WiFi
 -> Usa para comunicação: SCK, MOSI, MISO, Chip Select (SS ou NSS ou SDA)
+-> Para o caso onde é usado duas ou mais SS, usar Pullup (PinMode/digitalWrite) para que 
+um dispositivo não interfira com o outro
 
 MFRC522.h v1.4.6 - Biblioteca da placa RC522
 -> Requer instanciação de um objeto do tipo MFRC522
