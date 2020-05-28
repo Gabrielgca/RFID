@@ -1,7 +1,7 @@
 MÓDULO RFID RC522
 
 SPI.h - Biblioteca do protocolo SPI
--> Nativa do Arduino
+-> Nativa do Arduino / WiFi
 -> Usa para comunicação: SCK, MOSI, MISO, Chip Select (SS ou NSS ou SDA)
 
 MFRC522.h v1.4.6 - Biblioteca da placa RC522
@@ -24,10 +24,25 @@ arduinoLoRaWAN v1.3 - Biblioteca LoRaWAN extendida a partir da LoRa nativa
 
 LMIC.h - Biblioteca alternativa para LoRaWAN
 -> Requer hal.h (já vem junto)
--> Carece de testes na documentação
--> Segundo o autor, NÃO FOI TESTADA A FUNÇÃO DOWNLINK
--> Configuração precária
+-> Configuração por código fonte e header
 -> Ocupa muita memória do Arduino
 
-* Utilizando a biblioteca de "matthijskooijman" com o acréscimo de AU-915
+LMIC.h variação por "matthijskooijman"
+-> Adaptada para AU915 incialmente não implementada
+-> Sucesso na implementação após mudanças no código (i.e. Alterações na Biblioteca LMIC)
+-> Muitas alterações feitas pelo autor da versão em "gambiarras"
+-> Sucesso em testes ABP
+
+LMIC.h atualizada v3.0.2 por "MCCI"
+-> Sucesso em testes OTAA e ABP
+-> Resolve alguns problemas que as versões anteriores apresentam, mas a taxa de transmissão foi anormalmente lenta
+
+LoRaWAN por "MCCI"
+-> Uma extensão da LMIC MCCI para uma implementação mais alto nível
+-> A maior parte de sua configuração é feita pela LMIC.h
+-> Descontinuada assim que a LMIC MCCI foi descartada
+
+* Utilizando a biblioteca de "matthijskooijman" com a adaptação para AU-915
 * Primeira fase de testes: sem erros de compilação, mas a conexão não foi bem sucedida
+* Fases de teste consecutivas: bem sucedidos. Ajustes nas configurações foram feitos e os pacotes de dados chegam na TTN com sucesso usando ABP
+* Todas as iterações da biblioteca LMIC apresentaram algum tipo de problema ou necessidade de alterar seus códigos, então foi produzida uma versão própria da mesma pelo próprio IBTI (i.e. "arduino-lmic-master_AU_mod")

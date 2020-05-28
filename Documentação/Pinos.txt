@@ -3,11 +3,11 @@ Pinos Módulo RFID RC522 |    Arduino
            3.3          |   Pino 3.3V
            RST          |   Pino 9
            GND          |   Pino GND
-        IRQ ou NC       |   NÃo Conectado
+        IRQ ou NC       |   Não Conectado
            MISO         |   Pino 12
            MOSI         |   Pino 11
            SCK          |   Pino 13
-        SDA ou SS       |   Pino 4
+        SDA ou SS       |   Pino 10
 ----------------------------------------------
           BUZZER        |   Pino 8
       LED VERMELHO      |   Pino 7
