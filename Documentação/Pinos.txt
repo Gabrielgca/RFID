@@ -7,7 +7,7 @@ Pinos Módulo RFID RC522 |    Arduino
            MISO         |   Pino 12
            MOSI         |   Pino 11
            SCK          |   Pino 13
-        SDA ou SS       |   Pino 10
+        SDA ou SS       |   Pino 4
 ----------------------------------------------
           BUZZER        |   Pino 8
       LED VERMELHO      |   Pino 7
