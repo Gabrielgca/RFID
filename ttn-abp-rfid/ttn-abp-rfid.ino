@@ -194,8 +194,11 @@ void setup ()
   LMIC_setLinkCheckMode (0);
 
   //configurando downlink para SF9 e uplink para SF7
-  LMIC.dn2Dr = DR_SF9;
+  LMIC.dn2Dr = DR_SF12CR;
   LMIC_setDrTxpow (DR_SF7, 14);
+	
+	//desabilitando modo adr
+	LMIC_setAdrMode (0);
 	//inicialização LMIC / LoRa concluída--
 	
   SPI.begin ();                    									//inicializando comunicação SPI 
