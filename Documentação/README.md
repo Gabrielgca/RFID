@@ -28,15 +28,15 @@ O problema que estávamos enfrentando antes da paralisação do projeto era como
 ---------------------------------
 ### Módulos
 ---------------------------------
-MÓDULO RFID RC522
+* MÓDULO RFID RC522
 
-* SPI.h - Biblioteca do protocolo SPI
-  * Nativa do Arduino / WiFi
-  * Usa para comunicação: SCK, MOSI, MISO, Chip Select (SS ou NSS ou SDA)
+  * SPI.h - Biblioteca do protocolo SPI
+    * Nativa do Arduino / WiFi
+    * Usa para comunicação: SCK, MOSI, MISO, Chip Select (SS ou NSS ou SDA)
 
-MFRC522.h v1.4.6 - Biblioteca da placa RC522
-  * Requer instanciação de um objeto do tipo MFRC522
-  * MFRC522 obj (ss pin, rst pin)
+  * MFRC522.h v1.4.6 - Biblioteca da placa RC522
+    * Requer instanciação de um objeto do tipo MFRC522
+    * MFRC522 obj (ss pin, rst pin)
 
 * Com estas duas bibliotecas devidamente implementadas o sistema é capaz de ler tags normalmente.
 ---------------------------------
@@ -93,7 +93,7 @@ MFRC522.h v1.4.6 - Biblioteca da placa RC522
   * linha 835: LMIC.freq = AU915_125kHz_UPFBASE ; // + (chnl % 8) * AU915_125kHz_UPFSTEP;
   * Foi comentado para fixar a frequência de operação
 
-lorabase.h
+* lorabase.h
   * linha 120: enum { AU915_125kHz_UPFBASE = 915600000, //APENAS UMA FREQ
   * Alterado a frequência base para que ficasse compatível com a frequência do gateway
 
