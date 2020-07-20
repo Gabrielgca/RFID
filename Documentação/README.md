@@ -11,9 +11,11 @@ Para o seu uso adequado, foi necessário fazer alguns ajustes em sua biblioteca,
 
 Na montagem do circuito, é necessário o uso de um conversor de nível lógico, porque enquanto o arduino trabalha com 5V o módulo LoRa trabalha com 3.3V. Se a conexão entre os dois fosse feito diretamente, o módulo LoRa poderia queimar.
 
-No final, foi necessário usar o XAMPP. Este projeto usava um localhost e tinha opção de cadastrar e verificar hora de entrada e saída dos usuários cadastrados.
+Para o dispositivo WiFi, foi seguindo um projeto de controle de acesso na internet, cujo o link está disponível mais abaixo. No final, foi necessário usar o XAMPP. Este projeto usava um localhost e tinha opção de cadastrar e verificar hora de entrada e saída dos usuários cadastrados.
 
-Para dar continuidade a este projeto, é necessário estudar as bibliotecas WiFi para fazer a comunicação com o servidor que será criado.
+Para dar continuidade a este projeto, é necessário estudar as bibliotecas WiFi para fazer a comunicação com o servidor que será criado. 
+
+Além disso, vale a pena resaltar que provavelmente deverá ser usado o conversor de nível lógico para o dispositivo WiFi já que o módulo ESP8266 também trabalha com tensão diferente do arduino.
 
 Para quaisquer outras informações ou dúvidas estamos a disposição da equipe.
 
@@ -55,6 +57,7 @@ MFRC522.h v1.4.6 - Biblioteca da placa RC522
 * Todas as iterações da biblioteca LMIC apresentaram algum tipo de problema ou necessidade de alterar seus códigos, então foi produzida uma versão própria da mesma pelo próprio IBTI (i.e. "arduino-lmic-master_AU_mod")
 * Problema com Downlink - Ao se fazer uplinks para o TTN , downlinks indesejados também são enviados para o dispositivo.
 * Solução Downlink - desabilitar ADR [LMIC_setAdrMode (0)], com o ADR habilitado o Downlink deveria ser enviado após 64 Uplinks, mas por algum motivo o mesmo estava sendo enviado a cada Uplink;
+
 ---------------------------------
 ### Bibliotecas testadas e não utilizadas
 ---------------------------------
@@ -79,3 +82,22 @@ MFRC522.h v1.4.6 - Biblioteca da placa RC522
   * Uma extensão da LMIC MCCI para uma implementação mais alto nível
   * A maior parte de sua configuração é feita pela LMIC.h
   * Descontinuada assim que a LMIC MCCI foi descartada
+
+---------------------------------
+### Alterações na biblioteca LMIC
+---------------------------------
+* No código para o dispositivo LoRa
+  * Mudar baudrate de 9600 para 115200 para conseguir ver os dados no monitor serial do arduino
+
+* lmic.c
+  * linha 835: LMIC.freq = AU915_125kHz_UPFBASE ; // + (chnl % 8) * AU915_125kHz_UPFSTEP;
+  * Foi comentado para fixar a frequência de operação
+
+lorabase.h
+  * linha 120: enum { AU915_125kHz_UPFBASE = 915600000, //APENAS UMA FREQ
+  * Alterado a frequência base para que ficasse compatível com a frequência do gateway
+
+  * linha 125: AU915_500kHz_DNFSTEP =    0 // MUDADO
+  * linha 147: US915_500kHz_DNFSTEP =    0 // MUDADO
+  * Fixado o valor da frequência de Rx
+* //MUDADO = MUDOU ALGO NO CÓDIGO 
