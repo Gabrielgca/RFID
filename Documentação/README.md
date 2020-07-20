@@ -20,19 +20,21 @@ Para quaisquer outras informações ou dúvidas estamos a disposição da equipe
 ---------------------------------
 ### Problemas ou dificuldades atuais
 ---------------------------------
+
 O problema que estávamos enfrentando antes da paralisação do projeto era como poderíamos aumentar o alcance do leitor RFID. Para isso, provavelmente será necessário mudar a tecnologia que utilizamos na leitura, mas as opções ainda precisam ser pesquisadas. Não encontramos nenhuma viável. Penso que para uma primeira versão, podemos continuar usando a tecnologia disponível, por isso não estimarei um prazo para este problema.
+
 ---------------------------------
 ### Módulos
 ---------------------------------
 MÓDULO RFID RC522
 
-SPI.h - Biblioteca do protocolo SPI
--> Nativa do Arduino / WiFi
--> Usa para comunicação: SCK, MOSI, MISO, Chip Select (SS ou NSS ou SDA)
+*SPI.h - Biblioteca do protocolo SPI
+  * Nativa do Arduino / WiFi
+  * Usa para comunicação: SCK, MOSI, MISO, Chip Select (SS ou NSS ou SDA)
 
 MFRC522.h v1.4.6 - Biblioteca da placa RC522
--> Requer instanciação de um objeto do tipo MFRC522
--> MFRC522 obj (ss pin, rst pin)
+  * Requer instanciação de um objeto do tipo MFRC522
+  * MFRC522 obj (ss pin, rst pin)
 
 * Com estas duas bibliotecas devidamente implementadas o sistema é capaz de ler tags normalmente.
 ---------------------------------
