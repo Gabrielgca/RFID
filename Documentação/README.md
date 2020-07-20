@@ -28,7 +28,7 @@ O problema que estávamos enfrentando antes da paralisação do projeto era como
 ---------------------------------
 MÓDULO RFID RC522
 
-*SPI.h - Biblioteca do protocolo SPI
+* SPI.h - Biblioteca do protocolo SPI
   * Nativa do Arduino / WiFi
   * Usa para comunicação: SCK, MOSI, MISO, Chip Select (SS ou NSS ou SDA)
 
