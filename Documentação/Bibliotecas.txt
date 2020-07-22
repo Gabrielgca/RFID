@@ -3,6 +3,8 @@ MÓDULO RFID RC522
 SPI.h - Biblioteca do protocolo SPI
 -> Nativa do Arduino / WiFi
 -> Usa para comunicação: SCK, MOSI, MISO, Chip Select (SS ou NSS ou SDA)
+-> Para o caso onde é usado duas ou mais SS, usar Pullup (PinMode/digitalWrite) para que 
+um dispositivo não interfira com o outro
 
 MFRC522.h v1.4.6 - Biblioteca da placa RC522
 -> Requer instanciação de um objeto do tipo MFRC522
@@ -46,6 +48,3 @@ LoRaWAN por "MCCI"
 * Primeira fase de testes: sem erros de compilação, mas a conexão não foi bem sucedida
 * Fases de teste consecutivas: bem sucedidos. Ajustes nas configurações foram feitos e os pacotes de dados chegam na TTN com sucesso usando ABP
 * Todas as iterações da biblioteca LMIC apresentaram algum tipo de problema ou necessidade de alterar seus códigos, então foi produzida uma versão própria da mesma pelo próprio IBTI (i.e. "arduino-lmic-master_AU_mod")
-* Problema com Downlink - Ao se fazer uplinks para o TTN , downlinks indesejados também são enviados para o dispositivo.
-* Solução Downlink - desabilitar ADR [LMIC_setAdrMode (0)], com o ADR habilitado o Downlink deveria ser enviado após 64 Uplinks, mas por algum motivo o mesmo estava sendo enviado a cada Uplink;
-* Percebeu-se que os Uplinks feitos para o TTN estão sempre com SF fixado em 8 independente das configurações usadas. No Monitor Serial do arduino é printado o SF configurado, mas não se transmite no mesmo.
