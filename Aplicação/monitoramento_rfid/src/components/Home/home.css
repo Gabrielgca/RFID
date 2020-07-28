@@ -1,0 +1,49 @@
+section#rooms{
+  width: 100%;
+  max-width: 930px;
+  margin: 0 auto;
+  padding: 0 30px;
+  padding-top: 2em;
+}
+
+section#rooms article{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #FFF;
+  border: 1px solid #DDD;
+  margin-top: 30px;
+  margin-bottom: 10px;
+  padding: 1em;
+  border-radius: 5px;
+}
+
+section#rooms article header{
+  padding: 20px;
+  display: flex;
+  align-items: center;
+}
+
+section#rooms article header .title{
+  display: flex;
+  flex-direction: column;
+}
+
+section#rooms article header span{
+  font-size: 13px;
+  padding-top: 5px
+}
+
+section#rooms article > img{
+  width: 100%;
+  max-height: 539px;
+}
+
+section#rooms article footer{
+  padding: 20px;
+  word-wrap: break-word;
+}
+
+section#rooms h1{
+  color: #FFF;
+}
