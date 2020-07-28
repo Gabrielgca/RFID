@@ -48,12 +48,12 @@ CREATE UNIQUE INDEX `id_dispositivo_UNIQUE` ON `tb_dispositivo` (`id_dispositivo
 -- Table `tb_ocorrencia`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `tb_ocorrencia` (
-  `id_ocorrencia` INT UNSIGNED NOT NULL COMMENT 'Identificador da ocorrência.',
+  `id_ocorrencia` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Identificador da ocorrência.',
   `id_dispositivo` INT UNSIGNED NOT NULL COMMENT 'Identificador do dispositivo.',
   `id_cadastro` INT UNSIGNED NOT NULL COMMENT 'Identificador do cadastro.',
   `dt_ocorrencia` DATE NOT NULL COMMENT 'Data em que houve a detecção de um movimento.',
   `hr_ocorrencia` TIME NOT NULL COMMENT 'Hora em que houve a detecção de um movimento.',
-  `st_ocorrencia` CHAR(1) NOT NULL COMMENT 'Se o movimento foi de \'entrada\' ou \'saída\'.',
+  `st_ocorrencia` CHAR(1) NOT NULL DEFAULT 'S' COMMENT 'Se o movimento foi de \'entrada\' ou \'saída\'.',
   PRIMARY KEY (`id_ocorrencia`),
   CONSTRAINT `fk_tb_ocorrencia_tb_dispositivo1`
     FOREIGN KEY (`id_dispositivo`)
