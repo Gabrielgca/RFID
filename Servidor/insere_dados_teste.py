@@ -107,8 +107,8 @@ def generateCadastros (nomes,cards,qtde):
         nomes = np.delete(nomes,currRand,0)
         cardUsua = cards[currRand]
         cards = np.delete(cards,currRand)
-        cadastro = Cadastro(noUsuario = nnoUsua+' '+snoUsua,
-                            cdCartao = cardUsua)
+        cadastro = Cadastro(noUsuario = str(nnoUsua)+' '+str(snoUsua),
+                            cdCartao = str(cardUsua))
         cadastros.append(cadastro)
     return cadastros
 
@@ -124,7 +124,7 @@ dbAux.dbInit("root:@localhost/db_auxiliar")
 
 sel = CarregaDadosAux(dbAux)
 
-#ins.insertDispositivos()
+ins.insertDispositivos()
 
 nomes = sel.selectNomes()
 sobrenomes = sel.selectSobrenomes()

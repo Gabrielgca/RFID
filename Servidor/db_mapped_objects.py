@@ -11,7 +11,7 @@ class Dispositivo (Base):
     stAtivo = Column("st_ativo",String(1), nullable=False, default='A')
 
     def __repr__ (self):
-        return """<Cadastro
+        return """<Dispositivo
     (id_cadastro='%d',
      no_dispositivo='%s',
      no_localizacao='%s',
