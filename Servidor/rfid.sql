@@ -10,7 +10,8 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 -- Database `db_rfid`
 -- -----------------------------------------------------
-CREATE OR REPLACE DATABASE `db_rfid`;
+DROP DATABASE `db_rfid`;
+CREATE DATABASE `db_rfid`;
 USE `db_rfid`;
 
 -- -----------------------------------------------------
