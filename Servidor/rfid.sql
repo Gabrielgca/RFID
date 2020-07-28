@@ -6,6 +6,7 @@
 -- -----------------------------------------------------
 -- Database `db_rfid`
 -- -----------------------------------------------------
+USE `db_rfid`;
 DROP DATABASE `db_rfid`;
 CREATE DATABASE `db_rfid`;
 USE `db_rfid`;
