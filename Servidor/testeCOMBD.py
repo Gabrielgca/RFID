@@ -8,7 +8,9 @@ from flask import Flask, jsonify, request
 import base64
 #from flask_ngrok import run_with_ngrok
 
+#Instância para controle do banco de dados
 dbRfid = DbControl()
+#Instância para inserir dados no banco
 
 dbRfid.dbInit("root:@localhost/db_rfid")
 
@@ -35,15 +37,21 @@ def uplinkCallback (msg, client):
         online = True
         break
           
-
-
+'''def answer (app, http_code, json):
+  responseServer = app.response_class (
+    response = json,
+    status = http_code,
+    mimetype = 'application/json'
+  )
+  return responseServer
+'''
 
 def mqttClientSetup (handler):
   client = handler.data ()
   client.set_uplink_callback (uplinkCallback)
   return client
 
-# connect to ttn iot platform
+#--------------------connect to ttn iot platform---------------------#
 print('PROGRAMA RODANDO..')
 try:
   handler = ttn.HandlerClient (appId, accessKey)
@@ -56,12 +64,39 @@ try:
   print ('Connected to TTN.')
 except:
   print ('Failed to connect to TTN.')
-
+#------------------------------------------------------------------#
+#rotas utilizadas
 @app.route ('/IDlora')
 def IDlora():
     global online
     return jsonify(online)
 
+@app.route ('/cadastro', methods = ['GET','POST'])
+def cadastro():
+  if request.method == 'POST':
+    try:
+      data = request.get_json ()
+    except (KeyError, TypeError, ValueError):
+      resp = jsonify ('success = False')
+      return util.answer (app, 204, resp)
+
+    nome_cadastro = data['nome']
+    cod_cartao = data['cartao']
+    print(type(data))
+    print(nome_cadastro)
+    print(cod_cartao)
+    cadastro = Cadastro(noUsuario = nome_cadastro, cdCartao = cod_cartao)
+    dbRfid.session.add(cadastro)
+    dbRfid.session.commit()          
+    return jsonify(success = True)
+
+  if request.method == 'GET':
+    return 'TESTE'
+
+
+@app.route ('/consulta')
+def consulta():
+  return '0'
 
 # online
 if __name__ == '__main__':
