@@ -126,6 +126,7 @@ sel = CarregaDadosAux(dbAux)
 
 ins.insertDispositivos()
 
+'''
 nomes = sel.selectNomes()
 sobrenomes = sel.selectSobrenomes()
 
@@ -148,7 +149,7 @@ ins.insereCadastros(cadastros)
 #print(nnoArr)
 
 #print(snoArr)
-
+'''
 
 
 """
