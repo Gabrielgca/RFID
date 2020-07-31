@@ -7,7 +7,6 @@
 
 body{
   height: 100vh;
-  background-repeat: repeat;
   background: linear-gradient(to bottom right, #03a63c, #00ab95);
   font: 14px sans-serif;
   -webkit-font-smoothing: antialiased !important;

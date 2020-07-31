@@ -32,10 +32,19 @@ header#new{
   form#new-post input{
     margin-bottom: 10px;
   }
+
+  form#new-post input[type=file]{
+    margin-bottom: 0;
+  }
+
+  form#new-post .image-input{
+    color: #FAFAFA;
+    display: none;
+  }
   
   form#new-post span{
     text-align: center;
-    color: #FF0000;
+    color: #000;
     font-size: 15px;
   }
   
@@ -43,10 +52,12 @@ header#new{
     margin-bottom: 15px;
   }
   
-  form#new-post img {
+  img {
     width: 200px;
-    height: 100px;
+    height: 200px;
     margin-bottom: 15px;
+    border-radius: 100%;
+    border: 1px solid rgba(0, 0, 0, .5);
   }
   
   form#new-post progress{
@@ -85,15 +96,15 @@ header#new{
   }
 
   .check-area{
-    margin-top: 1em;
     height: 20em;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
   }
 
   .check-area .check{
-    height: 100%;
+    height: 70%;
     width: 30%;
     background-color: green;
     border-radius: 1em;
@@ -102,6 +113,10 @@ header#new{
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  .image-input-button{
+    background-color: #FAFAFA;
   }
 
 
@@ -295,4 +310,23 @@ form#new-post h4{
   text-align: center;
   color: #FFF;
   margin-bottom: 2em;
+}
+
+#alert-dialog-description{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-check{
+  border: 1px solid black;
+  height: 70%;
+    width: 30%;
+    background-color: transparent;
+    border-radius: 1em;
+    margin-top: 1.75em;
+    margin-bottom: 3em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

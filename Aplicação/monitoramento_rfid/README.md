@@ -1,12 +1,5 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Dentro desta pasta, rodar o comando yarn ou npm install para instalar todas as dependências necessárias
-Obs: Caso deseje fazer separadamente: 
-  1 - yarn add react-router-dom
-  2 - yarn add firebase
-  3 - yarn add react-icons
-  4 - yarn start (executa o aplicativo em servidor de desenvolvimento: http://localhost:3000)
-
 ## Available Scripts
 
 In the project directory, you can run:

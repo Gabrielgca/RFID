@@ -1,15 +1,28 @@
 import React, { Component } from 'react';
-import { Link, withRouter } from 'react-router-dom';
+import { Link, withRouter, Redirect } from 'react-router-dom';
 import firebase from '../../firebase';
 import { FaCaretRight, FaPlus, FaSignOutAlt } from 'react-icons/fa';
 import './dashboard.css';
 import Header from '../Header';
+
+import SpeedDial from '@material-ui/lab/SpeedDial';
+import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon';
+import SpeedDialAction from '@material-ui/lab/SpeedDialAction';
+import AddIcon from '@material-ui/icons/Add';
+import ExitToApp from '@material-ui/icons/ExitToApp';
+
+const actions = [
+  { icon: <AddIcon />, name: 'Novo RFID', action: 1 },
+  { icon: <ExitToApp />, name: 'Sair', action: 2 }
+];
 
 class Dashboard extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
+      hidden: false,
+      open: false,
       nome: localStorage.nome,
       rooms: [ //Armazenará as salas cadastradas no sistema
         { id: 1, name: "Sala IBTI", occupation: 0 },
@@ -41,8 +54,6 @@ class Dashboard extends Component {
       localStorage.nome = info.val().nome;
       this.setState({ nome: localStorage.nome });
     })
-
-
   }
 
   logout = async () => {
@@ -59,21 +70,64 @@ class Dashboard extends Component {
     alert("View Sector Details");
   }
 
+
+  handleVisibility = () => {
+    this.setState({ hidden: false });
+    //setHidden((prevHidden) => !prevHidden);
+  };
+
+  handleOpen = () => {
+    this.setState({ open: true });
+  };
+
+  handleClose = (action) => {
+    if (action === 1) {
+      this.setState({ open: false });
+      this.props.history.push("/dashboard/new");
+      //alert("Função Novo RFID");
+    }
+    else {
+      if (action === 2) {
+        this.logout();
+        //alert("Função Sair");
+      }
+    }
+  };
+
   render() {
     const { rooms, personsInSelectedRoom } = this.state;
     return (
       <div id="dashboard">
         <div className="user-info">
-          <h1 style={{ color: "#FFF" }}>Olá, {this.state.nome}</h1>
-          <Link to="/dashboard/new"><FaPlus style={{ marginRight: 10 }} /> RFID</Link>
-          <button style={{ backgroundColor: "red" }} className="sign-out-button" onClick={() => this.logout()}><FaSignOutAlt style={{ marginRight: 10 }} /> Sair</button>
+          <h1 style={{ color: "#FFF", marginRight: 20 }}>Olá, {this.state.nome}</h1>
+          { /* <Link to="/dashboard/new"><FaPlus style={{ marginRight: 10 }} /> RFID</Link> */}
+          {/* <button style={{ backgroundColor: "red" }} className="sign-out-button" onClick={() => this.logout()}><FaSignOutAlt style={{ marginRight: 10 }} /> Sair</button> */}
+
+          <SpeedDial
+            ariaLabel="SpeedDial tooltip example"
+            hidden={this.state.hidden}
+            icon={<SpeedDialIcon />}
+            onClose={() => { this.setState({ open: false }) }}
+            onOpen={this.handleOpen}
+            open={this.state.open}
+            direction={"right"}
+          >
+            {actions.map((action) => (
+              <SpeedDialAction
+                key={action.name}
+                icon={action.icon}
+                tooltipTitle={action.name}
+                onClick={() => { this.handleClose(action.action) }}
+                tooltipPlacement={"bottom"}
+              />
+            ))}
+          </SpeedDial>
         </div>
         <p style={{ color: "#FFF" }}>Email: {firebase.getCurrent()}</p><br />
         <div className="rooms">
-
           <div className="rooms-list">
             <h2 className="sector-title">Setores</h2>
-            {this.state.rooms.map((room) => {
+            {rooms.map((room) => {
               return (
                 <article key={room.id}>
                   <strong>Nome: {room.name}</strong>
