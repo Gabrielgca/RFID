@@ -1,0 +1,52 @@
+REQUISIÇÃO NÚMERO 1:
+
+Envio: N/A
+
+Recebimento:
+
+{
+    "salas": [
+        {"idSala": 1, "nomeSala": "Sala 1", "qtdOcupantes": 2}
+    ]
+}
+
+REQUISIÇÃO NÚMERO 2:
+
+Envio:
+
+{
+    "idSala": 1
+}
+
+Recebimento:
+
+{
+    "salas": [
+        {"idSala": 1, "nomeSala": "Sala 1", "qtdOcupantes": 2}
+    ],
+
+    "salaSelecionada": [
+        {"idSala": 1, "nomeSala": "Sala 1", "ocupantes": {"nomeOcupante": "Silvio Júnior... E todos os demais campos do usuário", "imgPerfil": "caminho/da/imagem/no/servidor"}, "imgMapaSala": "caminho/da/imagem/no/servidor"}
+    ]
+}
+
+REQUISIÇÃO NÚMERO 3:
+
+Envio: N/A
+
+Recebimento: 
+
+{
+    "statusCartao": true, //true se o cartão estiver disponível e false se já estiver em uso
+    "codigoRFIDCartao": "111222333444"
+}
+
+REQUISIÇÃO NÚMERO 4:
+
+Envio:
+
+{
+    "codigoRFIDCartao": "111222333444",
+    "nomeUsuario": "Silvio Júnior",
+    "imgPerfil": "string em base64"
+}
