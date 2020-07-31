@@ -35,7 +35,7 @@ class Dashboard extends Component {
         { id: 8, name: "Sala 8", occupation: 6 },
         { id: 9, name: "Sala 9", occupation: 8 }
       ],
-      personsInSelectedRoom: [ //Armazenará as pessoas que estão na sala selecionada
+      peopleInSelectedRoom: [ //Armazenará as pessoas que estão na sala selecionada
         { name: "Silvio", sector: "IBTI", email: "silvio_junior96@hotmail.com" },
         { name: "Júnior", sector: "IBTI", email: "junior96@hotmail.com" }
       ]
@@ -95,7 +95,7 @@ class Dashboard extends Component {
   };
 
   render() {
-    const { rooms, personsInSelectedRoom } = this.state;
+    const { rooms, peopleInSelectedRoom } = this.state;
     return (
       <div id="dashboard">
         <div className="user-info">
@@ -140,7 +140,7 @@ class Dashboard extends Component {
 
           <div className="room-details">
             <div className="occupants">
-              {personsInSelectedRoom.map((person) => {
+              {peopleInSelectedRoom.map((person) => {
                 return (
                   <div className="person-avatar">
                     <img className="person-avatar" src={"https://cdn.icon-icons.com/icons2/1879/PNG/512/iconfinder-3-avatar-2754579_120516.png"}></img>
