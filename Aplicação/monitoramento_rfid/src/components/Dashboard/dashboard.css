@@ -137,11 +137,14 @@ div#dashboard .rooms{
 }
 
 .person-avatar{
+  cursor: pointer;
   width: 90px;
   height: 90px;
   background-color: thistle;
   border-radius: 100%;
   margin: 0.5em auto;
+  margin-bottom: 0.75em;
+  border: 0;
 }
 
 .button-room-details{
@@ -151,4 +154,21 @@ div#dashboard .rooms{
 
 .button-room-details:hover{
   cursor: pointer;
+}
+
+/* ESTILIZAÇÃO DO MODAL DE DETALHES DO USUÁRIO */
+
+#alert-dialog-title{
+  text-align: center;
+}
+
+#alert-dialog-description{
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+#alert-dialog-description p{
+  min-width: 300px;
 }

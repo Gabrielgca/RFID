@@ -12,6 +12,9 @@ import NewRFID from './components/NovoRFID';
 import './global.css';
 import './App.css';
 
+import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
+import Loader from 'react-loader-spinner';
+
 class App extends Component {
 
   state = {
@@ -39,7 +42,15 @@ class App extends Component {
       </BrowserRouter>
     ) : (
         <div id="loading">
-          <h1>Carregando...</h1>
+          <Loader
+            type="Oval"
+            //color="#ffa200"
+            color="#FFF"
+            height={100}
+            width={100}
+            //timeout={3000} //3 secs
+
+          />
         </div>
       );
   }

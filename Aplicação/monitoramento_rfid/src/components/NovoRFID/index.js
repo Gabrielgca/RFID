@@ -10,10 +10,9 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { IconButton } from '@material-ui/core';
-import InsertPhotoIcon from '@material-ui/icons/InsertPhoto';
 
 const fileUpload = require('fuctbase64');
+const baseURL = 'http://192.168.2.196:5000/';
 
 class NewRFID extends Component {
 
@@ -32,12 +31,10 @@ class NewRFID extends Component {
       fileResult: ''
     };
 
-    this.cadastrar = this.cadastrar.bind(this);
+    this.register = this.register.bind(this);
     this.handleFile = this.handleFile.bind(this);
-    this.handleUpload = this.handleUpload.bind(this);
     this.handleClickOpen = this.handleClickOpen.bind(this);
     this.handleClose = this.handleClose.bind(this);
-    this.testeEnvioImagem = this.testeEnvioImagem.bind(this);
   }
 
   componentDidMount() {
@@ -45,6 +42,28 @@ class NewRFID extends Component {
       this.props.history.replace('/');
       return null;
     }
+
+    this.getCardCodeStatus();
+  }
+
+  getCardCodeStatus = async () => {
+    //Resposta 0 = cartão já cadastrado
+    //Resposta 1 = cartão disponível para cadastro
+    await axios.get(baseURL + "/statusIdcard")
+      .then(response => {
+        //alert(JSON.stringify(response));
+        if (response.data === 0) {
+          this.setState({ cardStatus: false });
+        }
+        else {
+          if (response.data === 1) {
+            this.setState({ cardStatus: true });
+          }
+        }
+      })
+      .catch(error => {
+        alert("Error: " + JSON.stringify(error));
+      })
   }
 
   handleClickOpen = () => {
@@ -57,14 +76,28 @@ class NewRFID extends Component {
     this.setState({ open: false });
   };
 
-  cadastrar = async (e) => {
+  register = async (e) => {
     e.preventDefault();
 
     if (this.state.name !== '' &&
-      this.state.RFIDCode !== '') {
+      this.state.RFIDCode !== '' &&
+      this.state.fileResult !== '') {
+
+      const params = {
+        codigoRFIDCartao: this.state.RFIDCode,
+        nomeUsuario: this.state.name,
+        imgPerfil: this.state.fileResult
+      }
 
       //Se todos os dados necessários existirem, envia os dados para o servidor salvar no banco
-
+      await axios.post("http://192.168.2.196:5000/register", params)
+        .then(response => {
+          //alert("Sucesso! " + JSON.stringify(response));
+          alert("Usuário cadastrado com sucesso!");
+        })
+        .catch(error => {
+          alert("Erro: " + JSON.stringify(error));
+        })
       //Após enviar os dados pro banco, reencaminhar para a Dashboard
       this.props.history.push('/dashboard');
     } else {
@@ -74,27 +107,13 @@ class NewRFID extends Component {
 
   }
 
-  testeEnvioImagem = async (e) => {
-    fileUpload(e).then(result => {
-      this.setState ({fileResult: result});
-      alert(JSON.stringify(result));
-    });
-    
-    if (e.target.files[0]) {
-      const image = e.target.files[0];
-      if (image.type === "image/png" || image.type === "image/jpeg") {
-        await axios.post("http://192.168.2.196:5000/testeimagem", { img: this.fileResult })
-          .then((response) => {
-            alert(JSON.stringify(response));
-          })
-          .catch((error) => {
-            alert("Erro: " + JSON.stringify(error));
-          })
-      }
-    }
-  }
-
   handleFile = async (e) => {
+
+    fileUpload(e).then(result => {
+      //this.fileResult = result;
+      this.setState({ fileResult: result.base64 });
+      //alert("Result: " + JSON.stringify(result));
+    });
 
     if (e.target.files[0]) {
 
@@ -104,7 +123,8 @@ class NewRFID extends Component {
 
       if ((image.type === 'image/png' || image.type === 'image/jpeg') && image.size <= 1048576) {
         await this.setState({ imagem: image });
-        await this.handleUpload();
+        //await this.handleUpload();
+        this.handleClickOpen();
       } else {
         alert('Envie uma imagem do tipo PNG ou JPG com tamanho máximo de 1MB');
         this.setState({ imagem: null });
@@ -114,46 +134,14 @@ class NewRFID extends Component {
     }
   }
 
-  handleUpload = async () => {
-    const { imagem } = this.state;
-    const currentUid = firebase.getCurrentUid();
-
-    const uploadTaks = firebase.storage
-      .ref(`images/${currentUid}/${imagem.name}`)
-      .put(imagem);
-
-    await uploadTaks.on('state_changed',
-      (snapshot) => {
-        //progress
-        const progress = Math.round(
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-        );
-        this.setState({ progress });
-      },
-      (error) => {
-        //error
-        console.log('Error imagem: ' + error);
-      },
-      () => {
-        //sucessO!
-        firebase.storage.ref(`images/${currentUid}`)
-          .child(imagem.name).getDownloadURL()
-          .then(url => {
-            this.setState({ url: url });
-            this.handleClickOpen();
-          })
-      })
-  }
-
   render() {
     return (
       <div className="new-rfid-body">
         <header id="new">
           <Link to="/dashboard">Voltar</Link>
         </header>
-        <form onSubmit={this.cadastrar} id="new-post">
+        <form onSubmit={this.register} id="new-post">
           <h1>Cadastrar Novo Usuário</h1>
-
           <div className="check-area">
             {this.state.cardStatus === true ? (
               <div className="check">
@@ -167,17 +155,23 @@ class NewRFID extends Component {
                 </div>
               </div>
             ) : (
-                <div className="empty-check"></div>
+                <div className="empty-check">
+                  <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130.2 130.2">
+                    <circle class="path circle" fill="none" stroke="#D06079" stroke-width="6" stroke-miterlimit="10" cx="65.1" cy="65.1" r="62.1" />
+                    <line class="path line" fill="none" stroke="#D06079" stroke-width="6" stroke-linecap="round" stroke-miterlimit="10" x1="34.4" y1="37.9" x2="95.8" y2="92.3" />
+                    <line class="path line" fill="none" stroke="#D06079" stroke-width="6" stroke-linecap="round" stroke-miterlimit="10" x1="95.8" y1="38" x2="34.4" y2="92.2" />
+                  </svg>
+                </div>
               )}
             {/* <h4>Status: {this.state.cardStatus === true ? "Cartão disponível" : "Cartão já utilizado!"}</h4> */}
           </div>
 
           <input type="file" placeholder="Imagem de Perfil"
-            onChange={this.testeEnvioImagem} required/><br />
-          <progress value={this.state.progress} max="100" />
+            onChange={this.handleFile} required /><br />
+          {/* <progress value={this.state.progress} max="100" /> */}
 
           <input type="text" placeholder="Nome Completo..." value={this.state.titulo} autoFocus
-            onChange={(e) => this.setState({ name: e.target.value })} required/><br />
+            onChange={(e) => this.setState({ name: e.target.value })} required /><br />
 
           <input type="text" placeholder="Código do Cartão RFID" value={this.state.descricao}
             onChange={(e) => this.setState({ RFIDCode: e.target.value })}></input>
@@ -195,8 +189,8 @@ class NewRFID extends Component {
             <DialogTitle id="alert-dialog-title">{"Esta foi a imagem que você selecionou"}</DialogTitle>
             <DialogContent>
               <DialogContentText id="alert-dialog-description">
-                {this.state.url !== '' ?
-                  <img className="img" src={this.state.url} width="250" height="150" alt="Capa do post" />
+                {this.state.fileResult !== '' ?
+                  <img src={"data:image/png;base64, " + this.state.fileResult} />
                   :
                   <progress value={this.state.progress} max="100" />
                 }
