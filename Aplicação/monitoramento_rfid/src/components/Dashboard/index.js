@@ -3,7 +3,6 @@ import { Link, withRouter, Redirect } from 'react-router-dom';
 import firebase from '../../firebase';
 import { FaCaretRight, FaPlus, FaSignOutAlt } from 'react-icons/fa';
 import './dashboard.css';
-import Header from '../Header';
 
 import SpeedDial from '@material-ui/lab/SpeedDial';
 import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon';
@@ -30,7 +29,7 @@ const actions = [
   { icon: <ExitToApp />, name: 'Sair', action: 2 }
 ];
 
-const baseURL = 'http://192.168.2.196:5000/';
+const baseURL = 'http://172.20.10.2:5000/';
 
 class Dashboard extends Component {
 

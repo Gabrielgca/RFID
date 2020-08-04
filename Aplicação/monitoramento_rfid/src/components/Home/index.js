@@ -4,7 +4,7 @@ import './home.css';
 import Header from '../Header';
 import axios from 'axios';
 
-const baseURL = 'http://192.168.2.196:5000/';
+const baseURL = 'http://172.20.10.2:5000/';
 
 
 class Home extends Component {

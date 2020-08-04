@@ -11,24 +11,27 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
+import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
+import Loader from 'react-loader-spinner';
+
 const fileUpload = require('fuctbase64');
-const baseURL = 'http://192.168.2.196:5000/';
+const baseURL = 'http://172.20.10.2:5000/';
 
 class NewRFID extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      name: '',
-      RFIDCode: '',
-      imagem: null,
-      url: '',
+      name: '', //Armazenará o nome do usuário logado, que virá do Firebase Auth
+      RFIDCode: '', //Armazenará o código 
+      imagem: null, //Armazenará a imagem que o usuário selecionou
       alert: '',
       progress: 0,
       open: false,
       cardStatus: false,
       cardCodeRFID: 8524253658,
-      fileResult: ''
+      fileResult: '',
+      loading: false,
     };
 
     this.register = this.register.bind(this);
@@ -42,28 +45,39 @@ class NewRFID extends Component {
       this.props.history.replace('/');
       return null;
     }
-
-    this.getCardCodeStatus();
   }
 
   getCardCodeStatus = async () => {
     //Resposta 0 = cartão já cadastrado
     //Resposta 1 = cartão disponível para cadastro
+    this.setState({ loading: true });
+
     await axios.get(baseURL + "/statusIdcard")
       .then(response => {
-        //alert(JSON.stringify(response));
+        alert(JSON.stringify(response));
         if (response.data === 0) {
-          this.setState({ cardStatus: false });
+          //this.setState({ cardStatus: false });
+          alert("Por favor, passe um cartão e tente novamente!");
+          this.setState({ loading: false });
         }
         else {
-          if (response.data === 1) {
-            this.setState({ cardStatus: true });
-          }
+          this.setState({ loading: false });
+          this.setState({ cardStatus: response.data.cartaoStatus });
+          this.setState({ cardStatus: response.data.cardRFIDcode });
         }
       })
       .catch(error => {
         alert("Error: " + JSON.stringify(error));
+        this.setState({ loading: false });
       })
+  }
+
+  handleLoadingOn = async () => {
+    this.setState({ loading: true });
+  }
+
+  handleLoadingOff = async () => {
+    this.setState({ loading: false });
   }
 
   handleClickOpen = () => {
@@ -80,11 +94,11 @@ class NewRFID extends Component {
     e.preventDefault();
 
     if (this.state.name !== '' &&
-      this.state.RFIDCode !== '' &&
+      this.state.cardCodeRFID !== '' &&
       this.state.fileResult !== '') {
 
       const params = {
-        codigoRFIDCartao: this.state.RFIDCode,
+        codigoRFIDCartao: this.state.cardCodeRFID,
         nomeUsuario: this.state.name,
         imgPerfil: this.state.fileResult
       }
@@ -114,24 +128,6 @@ class NewRFID extends Component {
       this.setState({ fileResult: result.base64 });
       //alert("Result: " + JSON.stringify(result));
     });
-
-    if (e.target.files[0]) {
-
-      const image = e.target.files[0];
-      this.setState({ progress: 0 });
-      this.setState({ url: '' });
-
-      if ((image.type === 'image/png' || image.type === 'image/jpeg') && image.size <= 1048576) {
-        await this.setState({ imagem: image });
-        //await this.handleUpload();
-        this.handleClickOpen();
-      } else {
-        alert('Envie uma imagem do tipo PNG ou JPG com tamanho máximo de 1MB');
-        this.setState({ imagem: null });
-        return null;
-      }
-
-    }
   }
 
   render() {
@@ -145,6 +141,11 @@ class NewRFID extends Component {
           <div className="check-area">
             {this.state.cardStatus === true ? (
               <div className="check">
+                {this.state.fileResult !== '' ?
+                  <img className="img-to-send" src={"data:image/png;base64, " + this.state.fileResult} />
+                  :
+                  <progress value={this.state.progress} max="100" />
+                }
                 <div class="success-checkmark">
                   <div class="check-icon">
                     <span class="icon-line line-tip"></span>
@@ -156,25 +157,45 @@ class NewRFID extends Component {
               </div>
             ) : (
                 <div className="empty-check">
-                  <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130.2 130.2">
-                    <circle class="path circle" fill="none" stroke="#D06079" stroke-width="6" stroke-miterlimit="10" cx="65.1" cy="65.1" r="62.1" />
-                    <line class="path line" fill="none" stroke="#D06079" stroke-width="6" stroke-linecap="round" stroke-miterlimit="10" x1="34.4" y1="37.9" x2="95.8" y2="92.3" />
-                    <line class="path line" fill="none" stroke="#D06079" stroke-width="6" stroke-linecap="round" stroke-miterlimit="10" x1="95.8" y1="38" x2="34.4" y2="92.2" />
-                  </svg>
+                  {this.state.fileResult !== '' ?
+                    <div className="imgPerfil">
+                      <img className="img-to-send" src={"data:image/png;base64, " + this.state.fileResult} />
+                    </div>
+                    :
+                    <progress value={this.state.progress} max="100" />
+                  }
+                  {this.state.cardStatus === false ? (
+                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130.2 130.2">
+                      <circle class="path circle" fill="none" stroke="#FFA200" stroke-width="6" stroke-miterlimit="10" cx="65.1" cy="65.1" r="62.1" />
+                      <line class="path line" fill="none" stroke="#FFA200" stroke-width="6" stroke-linecap="round" stroke-miterlimit="10" x1="34.4" y1="37.9" x2="95.8" y2="92.3" />
+                      <line class="path line" fill="none" stroke="#FFA200" stroke-width="6" stroke-linecap="round" stroke-miterlimit="10" x1="95.8" y1="38" x2="34.4" y2="92.2" />
+                    </svg>
+                  ) : (
+                      <div></div>
+                    )}
                 </div>
               )}
             {/* <h4>Status: {this.state.cardStatus === true ? "Cartão disponível" : "Cartão já utilizado!"}</h4> */}
           </div>
 
-          <input type="file" placeholder="Imagem de Perfil"
-            onChange={this.handleFile} required /><br />
+          <div className="get-code-div">
+            <div class='input-wrapper'>
+              <label for='input-file'>
+                Selecionar um arquivo
+              </label>
+              <input type="file" id="input-file" placeholder="Imagem de Perfil"
+                onChange={this.handleFile} required />
+              <span id='file-name'></span>
+            </div>
+            <button type="button" onClick={() => { this.getCardCodeStatus() }}>Ler Cartão</button>
+          </div>
+
           {/* <progress value={this.state.progress} max="100" /> */}
 
           <input type="text" placeholder="Nome Completo..." value={this.state.titulo} autoFocus
             onChange={(e) => this.setState({ name: e.target.value })} required /><br />
 
-          <input type="text" placeholder="Código do Cartão RFID" value={this.state.descricao}
-            onChange={(e) => this.setState({ RFIDCode: e.target.value })}></input>
+          <input type="text" placeholder="Código do Cartão RFID" value={this.state.cardCodeRFID} disabled={true} />
 
           <button type="submit">Cadastrar</button>
         </form>
@@ -201,6 +222,27 @@ class NewRFID extends Component {
                 Ok
               </Button>
             </DialogActions>
+          </Dialog>
+        </div>
+
+        <div>
+          <Dialog
+            PaperComponent={() => (
+              <Loader
+                type="Oval"
+                //color="#ffa200"
+                color="#FFF"
+                height={100}
+                width={100}
+              //timeout={3000} //3 secs
+
+              />
+            )}
+            disableBackdropClick={true}
+            disableEscapeKeyDown={true}
+            open={this.state.loading}
+            onClose={() => { this.handleLoadingOff() }}
+          >
           </Dialog>
         </div>
       </div>
