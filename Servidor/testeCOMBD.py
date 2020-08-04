@@ -99,24 +99,38 @@ except:
 #------------------------------------------------------------------#
 #rotas utilizadas
 
+def is_available(RFID):
+  global available
+  available = True
 
-@app.route('/teste', methods=['GET', 'POST','OPTIONS'])
+  for u in dbRfid.session.query(Cartao):
+    if RFID == u.noCartao:
+        #Verifica se o card está ativo
+        for k in dbRfid.session.query(CadastroCartao):
+          #print(k.idCartao)
+          if k.idCartao == u.idCartao:
+            if k.stEstado == 'A':
+              available = False
+              break
+  return available
+
+@app.route('/teste')
 def teste():
-
-    if request.method == 'POST':
-        try:
-            data = request.get_json()
-        except (KeyError, TypeError, ValueError):
-            resp = jsonify ('success = False')
-            return answer (app, 204, resp)
-        print ("Imprimindo o dado recebido: ", data)
-    return '0'
-
+  try:
+    RFID = request.args.get('RFID')
+    RFID = RFID.upper()
+    status = is_available(RFID)
+    return str(status)
+  except:
+    return 'Nenhuma mensagem lida.'
+  
+'''
 #Tag cadastrada??
 @app.route ('/IDlora')
 def IDlora():
     global online
     return jsonify(online)
+
 #Cadastro de novo usuário
 @app.route ('/cadastro', methods = ['GET','POST'])
 def cadastro():
@@ -140,7 +154,21 @@ def cadastro():
 
   if request.method == 'GET':
     return 'TESTE'
-
+'''
+@app.route ('/WiFiRFID')
+def WiFIRFID ():
+  global uplink
+  global idrfid
+  global available
+  try:
+    idrfid = request.args.get('RFID')
+    idrfid = idrfid.upper()
+    available = is_available(idrfid)
+    uplink = True
+    return jsonify(success = True)
+  except:
+    uplink = False
+    return jsonify (success = False)
 
 @app.route ('/statusIdcard')
 def statusIdcard():
@@ -148,6 +176,7 @@ def statusIdcard():
   global idrfid
   global available
   cardinfo = {}
+
   if uplink == False:
     return '0'
   uplink = False
@@ -274,16 +303,17 @@ def roominfo():
   lista_ocupantes = []
 
   for i in range(len(users_inside)):
-    try:
-      with open(f"C:/Users/DELL/Documents/IBTI/RFID/imagens/{users_inside[i]}.jpeg","rb") as image_file:
-        img_perfil = b64.b64encode(image_file.read())
-        dict_ocupante = dict (nomeOcupante = info_users[i], idOcupante = users_inside[i], imgPerfil = img_perfil)
+      try:
+        with open(f"C:/Users/DELL/Documents/IBTI/RFID/imagens/{users_inside[i]}.png","rb") as image_file: 
+          img_perfil = str(base64.b64encode(image_file.read()))
+          img_perfil = img_perfil.replace("b'", "")
+          img_perfil = img_perfil.replace("'", "")
+          dict_ocupante = dict (nomeOcupante = info_users[i], idOcupante = users_inside[i], imgPerfil = img_perfil)
+          lista_ocupantes.append(dict_ocupante)
+          image_file.close()
+      except:
+        dict_ocupante = dict (nomeOcupante = info_users[i], idOcupante = users_inside[i], imgPerfil = 'NULL')
         lista_ocupantes.append(dict_ocupante)
-        img_perfil.close()
-    except:
-      dict_ocupante = dict (nomeOcupante = info_users[i], idOcupante = users_inside[i], imgPerfil = 'NULL')
-      lista_ocupantes.append(dict_ocupante)
-      image_file.close()
 
   sala = dict( idSala = id_sala, nomeSala = room['salas'][int(id_sala)-1]['nomeSala'], imgMapaSala = 'NULL' ,ocupantes = lista_ocupantes)
   room['salaSelecionada'] = sala
