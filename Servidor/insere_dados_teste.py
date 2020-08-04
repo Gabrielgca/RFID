@@ -42,6 +42,7 @@ class InsereDados():
     def __init__ (self,parent = None):
         self.parent = parent
         self.session = parent.session
+        self.engine = parent.engine
         self.dp = aliased(Dispositivo,name="dp")
         self.cd = aliased(Cadastro,name="cd")
         self.ct = aliased(Cartao,name="ct")
@@ -84,7 +85,7 @@ class InsereDados():
 
     def selectAllDisps(self):
         dp = self.dp
-        return self.session.query(dp,dp.idDispositivo,dp.noDispositivo)
+        return self.session.query(dp)
     
     def selectAllCadastrosIds(self):
         cd = self.cd
@@ -95,6 +96,66 @@ class InsereDados():
         ct = self.ct
         return self.session.query(ct.idCartao)\
                            .order_by(asc(ct.idCartao)).all()
+
+    def selectCadastrosCartoes(self):
+        cd = self.cd
+        ct = self.ct
+        cdct = self.cdct
+        return self.session.query(cd.noUsuario,ct.noCartao,cdct.stEstado)\
+                           .join(cd,cd.idCadastro == cdct.idCadastro)\
+                           .join(ct,ct.idCartao == cdct.idCartao)
+
+    def deleteAll(self):
+        self.session.query(Ocorrencia).delete()
+        self.session.commit()
+        self.engine.execute("ALTER TABLE {} AUTO_INCREMENT = 0".format(Ocorrencia.__tablename__))
+        
+        self.session.query(Dispositivo).delete()
+        self.session.commit()
+        self.engine.execute("ALTER TABLE {} AUTO_INCREMENT = 0".format(Dispositivo.__tablename__))
+        
+        self.session.query(CadastroCartao).delete()
+        self.session.commit()
+        self.engine.execute("ALTER TABLE {} AUTO_INCREMENT = 0".format(CadastroCartao.__tablename__))
+
+        self.session.query(Cadastro).delete()
+        self.session.commit()
+        self.engine.execute("ALTER TABLE {} AUTO_INCREMENT = 0".format(Cadastro.__tablename__))
+        
+        self.session.query(Cartao).delete()
+        self.session.commit()
+        self.engine.execute("ALTER TABLE {} AUTO_INCREMENT = 0".format(Cartao.__tablename__))
+    
+    def gerenateOcorrencias (self, qtde):
+        entarr = np.array(['13:00:00','13:10:00','13:20:00','13:30:00','13:40:00','13:50:00'])
+        saiarr = np.array(['18:00:00','18:10:00','18:20:00','18:30:00','18:40:00','18:50:00'])
+        if qtde % 2 == 0:
+            entrada = random.randint(qtde/2, qtde)
+        else:
+            entrada = random.randint((qtde-1)/2,qtde)
+        saida = qtde - entrada
+        list_id = []
+        for i in range(entrada):
+            id_disp =random.randint(3)+1
+            while True:
+                id_cad = random.randint(200)+1
+                if id_cad not in list_id:
+                    break
+            list_id.append(id_cad)
+            hr_ent = random.randint(5)
+            hr_said = random.randint(5)
+
+            ocorr_ent = Ocorrencia (idDispositivo = id_disp,
+            idCadastro = id_cad,
+            dtOcorrencia = func.current_date(),
+            hrOcorrencia = str(entarr[hr_ent]))
+
+            self.session.add(ocorr_ent)
+            self.session.commit()
+
+
+def generateOcorrencias2(self):
+    pass
                            
 
 def generateNomes (nomes,sobrenomes):
@@ -162,8 +223,52 @@ def generateCadastroCartaoArr(qtde,cadastrosIds,cartoesIds):
             cadastrosCartoes = np.concatenate((cadastrosCartoes,newArray))
             cartoesIds = np.delete(cartoesIds,np.where(cartoesIds == randCartaoId))
         i += 1
-    cadastrosCartoes = cadastrosCartoes.reshape(qtde,2)
+    cadastrosCartoes = cadastrosCartoes.reshape(int(len(cadastrosCartoes))//2,2)
     return cadastrosCartoes
+
+def generateDict(res,dictHeader = None):
+    dicti = {}
+    dicti[dictHeader] = {}
+    arr = np.array(res.all())
+    #print(arr.ndim)
+    for dit in res.column_descriptions:
+        print(dit['name'])
+
+    for row in res:
+        i = 0
+        if arr.ndim > 1:
+            for col in row:
+                #print(type(col))
+                if isinstance(type(col),type(Base)):
+                    #print(col.getDict())
+                    print("Objeto detectado")
+                    objDict = col.getDict()
+                    for key in col.getDict():           
+                        dicti[dictHeader][key] = objDict[key]
+                    i += 1
+                else:
+                    z = 0
+                    for dicti in res.column_descriptions:       
+                        if z == i:
+                            dicti[dictHeader][dicti['name']] = col
+                            i += 1
+                        z += 1
+        else:
+            if isinstance(type(row),type(Base)):
+                #print(row.getDict())
+                print("Objeto detectado")
+                objDict = row.getDict()
+                for key in row.getDict():           
+                    dicti[dictHeader][key] = objDict[key]
+                i += 1
+            else:
+                z = 0
+                for dictio in res.column_descriptions:
+                    if z == i:       
+                        dicti[dictHeader][dictio['name']] = row[i]
+                        i += 1
+                    z += 1
+    return dicti
 
 dbRfid = DbControl()
 
@@ -176,6 +281,8 @@ dbAux = DbControl()
 dbAux.dbInit("root:@localhost/db_auxiliar")
 
 sel = CarregaDadosAux(dbAux)
+
+ins.deleteAll()
 
 ins.insertDispositivos()
 
@@ -209,56 +316,24 @@ cartoesId = ins.selectAllCartoesIds()
 cadastrosCartoes = generateCadastroCartaoArr(200,cadastrosId,cartoesId)
 
 ins.insereCadastrosCartoes(cadastrosCartoes)
+
+#ins.gerenateOcorrencias(20)
 #print(nnoArr)
 
 #print(snoArr)
-'''
-res = ins.selectAllDisps()
-#print(vars(res[0]))
-dicti = {}
-dictHeader = 'Dispositivos'
-arr = np.array(res.all())
-print(arr.ndim)
-for dit in res.column_descriptions:
-    print(dit['name'])
 
-for row in res:
-    i = 0
-    if arr.ndim > 1:
-        for col in row:
-            newDict = {}
-            #print(type(col))
-            if (issubclass(type(col),Base)):
-                #print(col.getDict())
-                #print("Objeto detectado")
-                objDict = col.getDict()
-                for key in col.getDict():           
-                    dicti[dictHeader][key] = objDict[key]
-                i += 1
-            else:
-                z = 0
-                for dicti in res.column_descriptions:       
-                    if z == i:
-                        dicti[dictHeader][dicti['name']] = col
-                        i += 1
-                    z += 1
-    else:
-        newDict = {}
-        #print(type(row))
-        if (issubclass(type(row),Base)):
-            #print(row.getDict())
-            #print("Objeto detectado")
-            objDict = row.getDict()
-            for key in row.getDict():           
-                dicti[dictHeader][key] = objDict[key]
-            i += 1
-        else:
-            z = 0
-            for dictio in res.column_descriptions:
-                if z == i:       
-                    dicti[dictHeader][dictio['name']] = row[i]
-                    i += 1
-                z += 1
+'''
+res = ins.selectCadastrosCartoes()
+
+#print(res)
+
+dicti = generateDict(res,"CadastrosCartoes")
+
+print(dicti)
+
+
+#res = ins.selectAllDisps()
+#print(vars(res[0]))
 #print(dicti)
 
 js = json.dumps(dicti,indent=4,separators=(',',':'))

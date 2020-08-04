@@ -12,6 +12,7 @@ from sqlalchemy import between,func,text,asc,desc,case
 from sqlalchemy.orm import sessionmaker,relationship,aliased
 from sqlalchemy.sql.functions import Function
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.declarative.api import DeclarativeMeta
 
 #Criando objeto de controle do banco de dados
 class DbControl:          
