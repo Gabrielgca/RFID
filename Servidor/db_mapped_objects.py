@@ -89,7 +89,7 @@ class Ocorrencia (Base):
     idCadastro = Column("id_cadastro",Integer, ForeignKey('tb_cadastro.id_cadastro'), nullable=False)
     dtOcorrencia = Column("dt_ocorrencia",Date,nullable=False)
     hrOcorrencia = Column("hr_ocorrencia",Time,nullable=False)
-    stOcorrencia = Column("st_ocorrencia",String(1),nullable=False)
+    stOcorrencia = Column("st_ocorrencia",String(1),nullable=True)
 
     dispositivo = relationship(Dispositivo, back_populates = "ocorrencias")
     cadastro = relationship(Cadastro, back_populates = "ocorrencias")

@@ -10,15 +10,11 @@ CREATE OR REPLACE TRIGGER set_new_status
     BEFORE INSERT
     ON tb_ocorrencia FOR EACH ROW
 BEGIN
-    DECLARE st_oc CHAR(1);
-
     IF EXISTS (SELECT * FROM tb_ocorrencia
                WHERE id_cadastro = NEW.id_cadastro) THEN
 
         SET @ocorrencia_exists = TRUE;
-        SET @new_id_ocorrencia = NEW.id_ocorrencia;
-        SET @curr_id_cadastro = NEW.id_cadastro;
-        
+
         SELECT st_ocorrencia
         INTO @curr_st_ocorrencia
         FROM tb_ocorrencia

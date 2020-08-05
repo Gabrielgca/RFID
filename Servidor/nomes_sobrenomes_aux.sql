@@ -23,18 +23,25 @@ CREATE TABLE IF NOT EXISTS `tb_sobrenomes`(
 );
 
 INSERT INTO `tb_nomes`(`no_nome`) 
-VALUES("Abel"),("Abelardo"),("Adílio"),("Ada"),("Ana"),("Arley"),("Bianca"),("Bruna"),
-      ("Bruno"),("Camila"),("Carla"),("Carlos"),("Cida"),("Diego"),("Ezequiel"),("Fernanda"),
-      ("Fernando"),("Gabriel"),("Gustavo"),("Hamilton"),("Helena"),("Irina"),("Irineu"),
-      ("Joao"),("Jose"),("Leandro"),("Lucas"),("Lucia"),("Lucio"),("Maicon"),("Marcos"),
-      ("Maria"),("Natalia"),("Nathalia"),("Paula"),("Paulo"),("Patricia"),("Pedro"),("Quenia"),
-      ("Renato"),("Roberta"),("Roberto"),("Rodrigo"),("Sabrina"),("Saulo"),("Savio"),
-      ("Silvana"),("Silvio"),("Thiago"),("Ulysses"),("Vitor"),("Victor"),("Ze");
+VALUES("Abel"),("Abelardo"),("Adílio"),("Ada"),("Alice"),("Ana"),("Ana Clara"),("Ana Julia"),
+      ("Ana Luiza"),("Antonella"),("Anthony"),("Antonio"),("Arley"),("Arthur"),("Bernardo"),
+      ("Benjamin"),("Bianca"),("Bruna"),("Bruno"),("Caio"),("Camila"),("Carla"),("Carlos"),
+      ("Cecilha"),("Cida"),("Clara"),("Daniel"),("Diego"),("Ezequiel"),("Fernanda"),("Fernando"),
+      ("Gabriel"),("Gustavo"),("Hamilton"),("Helena"),("Irina"),("Irineu"),("Joao"),("Jose"),
+      ("Leandro"),("Lucas"),("Lucia"),("Lucio"),("Maicon"),("Marcos"),("Maria"),("Natalia"),
+      ("Nathalia"),("Paula"),("Paulo"),("Patricia"),("Pedro"),("Quenia"),("Renato"),("Roberta"),
+      ("Roberto"),("Rodrigo"),("Sabrina"),("Saulo"),("Savio"),("Silvana"),("Silvio"),("Thiago"),
+      ("Ulysses"),("Vitor"),("Victor"),("Ze");
 
 INSERT INTO `tb_sobrenomes`(`no_sobrenome`)
-VALUES("Assuncao"),("Almeida"),("Alves"),("Amaral"),("Amaro"),("Arakaki"),("Araujo"),("Augusto"),("Bastos"),
-      ("Bezerra"),("Borges"),("Cavalcanti"),("Camoes"),("Carvalho"),("Correa"),("Costa"),("Coutinho"),
-      ("Elmiro"),("Emanuel"),("Ferreira"),("Galvao"),("Gomes"),("Jesus"),("Junior"),("Kawano"),
-      ("Lazaro"),("Lima"),("Macedo"),("Martins"),("Medeiros"),("Monteiro"),("Nascimento"),("Neto"),("Neves"),
-      ("Oliveira"),("Pereira"),("Pessanha"),("Ribeiro"),("Rocha"),("Rodrigues"),("Santos"),("Saraiva"),("Silveira"),
-      ("Siqueira"),("Souto"),("Souza"),("Teixeira"),("Vasconcelos"),("Vieira"),("Vitorassi"),("Zanetti");
+VALUES("Assuncao"),("Abreu"),("Albuquerque"),("Almeida"),("Alvares"),("Alvarenga"),("Alves"),("Alexandreli"),("Amaral"),
+      ("Amaro"),("Ambrosio"),("Amorim"),("Arakaki"),("Araujo"),("Arruda"),("Assis"),("Aguiar"),("Augusto"),("Azevedo"),
+      ("Barbosa"),("Barcelos"),("Barreto"),("Barros"),("Barroso"),("Bastos"),("Bernardes"),("Bezerra"),("Bicalho"),
+      ("Bispo"),("Borges"),("Brito"),("Cavalcanti"),("Camoes"),("Campos"),("Cardoso"),("Carvalho"),("Cervantes"),
+      ("Chagas"),("Chaves"),("Coelho"),("Correa"),("Correia"),("Costa"),("Coutinho"),("Dantas"),("Dias"),("Domingues"),
+      ("Duarte"),("Dutra"),("Elmiro"),("Emanuel"),("Farias"),("Feitosa"),("Fernandez"),("Ferreira"),("Figueira"),
+      ("Fonsceca"),("Fontes"),("Freitas"),("Galvao"),("Gaspar"),("Gomes"),("Guedes"),("Guerra"),("Jesus"),("Junior"),
+      ("Kawano"),("Lacerda"),("Lazaro"),("Lemos"),("Lima"),("Lisboa"),("Lopes"),("Lorenzoni"),("Loureiro"),("Macedo"),
+      ("Machado"),("Madureira"),("Malta"),("Manoel"),("Marinho"),("Martins"),("Medeiros"),("Monteiro"),("Nascimento"),
+      ("Neto"),("Neves"),("Oliveira"),("Pereira"),("Pessanha"),("Ribeiro"),("Rocha"),("Rodrigues"),("Santos"),("Saraiva"),
+      ("Silveira"),("Siqueira"),("Souto"),("Souza"),("Teixeira"),("Vasconcelos"),("Vieira"),("Vitorassi"),("Zanetti");

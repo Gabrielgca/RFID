@@ -3,6 +3,7 @@ from db_mapped_aux_objects import *
 import numpy as np
 from numpy import random
 import json
+import behaviors as bh
 
 #Banco de Nomes
 nomes = [[]]
@@ -11,6 +12,8 @@ nomes = [[]]
 class MySqlFunc:
     def timediff(self,col1,col2):
         return Function("TIMEDIFF",col1,col2)
+    def adddate (self,col,add):
+        return Function("ADDDATE",col,add)
     def addtime (self,col,add):
         return Function("ADDTIME",col,add)
     def timestamp (self,col1,col2):
@@ -19,6 +22,8 @@ class MySqlFunc:
         return Function("DATE_FORMAT",col,formatation)
     def time_format(self,col,formatation):
         return Function("TIME_FORMAT",col,formatation)
+    def strtodate(self,col,formatation):
+        return Function("STR_TO_DATE",col,formatation)
     def converte_mes(self,col):
         return Function("CONVERTE_MES",self.date_format(col,"%m"))
 mysql_func = MySqlFunc()
@@ -50,18 +55,10 @@ class InsereDados():
         self.oc = aliased(Ocorrencia,name="oc")
 
     def insertDispositivos (self):
-        newDisp1 = Dispositivo(noDispositivo = "ttn1",
-                               noLocalizacao = "IBTI - Sala Principal",
-                               vlAndar = 1)
-        newDisp2 = Dispositivo(noDispositivo = "ttn2",
-                               noLocalizacao = "IBTI - Sala da Administração",
-                               vlAndar = 1)
-        newDisp3 = Dispositivo(noDispositivo = "wifi1",
-                               noLocalizacao = "IBTI - Sala de Reuniões",
-                               vlAndar = 1)
-        self.session.add(newDisp1)
-        self.session.add(newDisp2)
-        self.session.add(newDisp3)
+        newDisp = Dispositivo(noDispositivo = "wifi",
+                              noLocalizacao = "IBTI - Sala Principal",
+                              vlAndar = 1)
+        self.session.add(newDisp)
 
         self.session.commit()
 
@@ -83,6 +80,13 @@ class InsereDados():
             self.session.add(newCadastroCartao)
         self.session.commit()
 
+    def insereOcorrencias (self,ocorrencias):
+        for ocorrencia in ocorrencias:
+            #print(type(ocorrencia))
+            if ocorrencia.hrOcorrencia is not None:
+                self.session.add(ocorrencia)
+        self.session.commit()
+    
     def selectAllDisps(self):
         dp = self.dp
         return self.session.query(dp)
@@ -153,11 +157,58 @@ class InsereDados():
             self.session.add(ocorr_ent)
             self.session.commit()
 
+class Funcionario ():
+    def __init__(self,idCad = None,behavior = None):
+        self.idCad = idCad
+        self.behavior = behavior
 
-def generateOcorrencias2(self):
-    pass
-                           
+def sortOcorrencias (ocorrencias):
+    for i in range(0,len(ocorrencias)):
+        if ocorrencias[i].hrOcorrencia is not None:
+            for z in range(i,len(ocorrencias)):
+                if ocorrencias[z] is not None:
+                    if ocorrencias[i].hrOcorrencia > ocorrencias[z].hrOcorrencia:
+                        oldOcorrencia = ocorrencias[i]
+                        ocorrencias[i] = ocorrencias[z]
+                        ocorrencias[z] = oldOcorrencia 
 
+def setBehaviors (cadastrosIds):
+    funcionarios = []
+    for ids in cadastrosIds:
+        for id in ids:
+            funcionarios.append(Funcionario(idCad = id,
+                                            behavior = bh.generateNewBehavior()))
+    return funcionarios
+
+def generateOcorrencias2(cadastrosIds,days):
+    finalOcorrencias = []
+    funcionarios = setBehaviors(cadastrosIds)
+    for i in range(days,0,-1):
+        currOcorrencias = []
+        for funcionario in funcionarios:
+            currDate = text("ADDDATE(CURRENT_DATE,INTERVAL "+str(-i)+" DAY)")
+            hrOc = funcionario.behavior.getHrEntrada()
+            if hrOc is not None:
+                newOcorrencia = Ocorrencia(idDispositivo = 1,
+                                            idCadastro = funcionario.idCad,
+                                            dtOcorrencia = currDate,
+                                            hrOcorrencia = str(hrOc),
+                                            stOcorrencia = 'E')
+                currOcorrencias.append(newOcorrencia)
+        for funcionario in funcionarios:
+            currDate = text("ADDDATE(CURRENT_DATE,INTERVAL "+str(-i)+" DAY)")
+            hrOc = funcionario.behavior.getHrSaida()
+            if hrOc is not None:
+                newOcorrencia = Ocorrencia(idDispositivo = 1,
+                                        idCadastro = funcionario.idCad,
+                                        dtOcorrencia = currDate,
+                                        hrOcorrencia = str(hrOc))
+                currOcorrencias.append(newOcorrencia)
+        sortOcorrencias(currOcorrencias)
+        for currOcorrencia in currOcorrencias:
+            finalOcorrencias.append(currOcorrencia)
+    return finalOcorrencias
+    
 def generateNomes (nomes,sobrenomes):
     i = 0
     for x in nomes:
@@ -188,7 +239,7 @@ def generateCards (qtdeDigitos,qtdeRegistros):
 def generateCadastros (nomes,qtde):
     cadastros = []
     for i in range(0,qtde):
-        currRand = random.randint(qtde - i)
+        currRand = random.randint(len(nomes) - 1)
         nnoUsua = nomes[currRand][0]
         snoUsua = nomes[currRand][1]
         nomes = np.delete(nomes,currRand,0)
@@ -299,13 +350,16 @@ snoArr = snoArr.reshape(-1)
 
 nomesArr = generateNomes(nnoArr,snoArr)
 
-cardsArr = generateCards(8,200)
+print("Informe a quantidade de inserções de cadastro e cartões: ")
+qtde = int(input())
 
-cadastros = generateCadastros(nomesArr,200)
+cardsArr = generateCards(8,qtde)
+
+cadastros = generateCadastros(nomesArr,qtde)
 
 ins.insereCadastros(cadastros)
 
-cartoes = generateCartoes(cardsArr,200)
+cartoes = generateCartoes(cardsArr,qtde)
 
 ins.insereCartoes(cartoes)
 
@@ -313,9 +367,15 @@ cadastrosId = ins.selectAllCadastrosIds()
 
 cartoesId = ins.selectAllCartoesIds()
 
-cadastrosCartoes = generateCadastroCartaoArr(200,cadastrosId,cartoesId)
+cadastrosCartoes = generateCadastroCartaoArr(qtde,cadastrosId,cartoesId)
 
 ins.insereCadastrosCartoes(cadastrosCartoes)
+
+print("Informe a quantidade de dias de ocorrências a serem gerados: ")
+qtdeDias = input()
+ocorrencias = generateOcorrencias2(cadastrosId,int(qtdeDias))
+
+ins.insereOcorrencias(ocorrencias)
 
 #ins.gerenateOcorrencias(20)
 #print(nnoArr)
