@@ -7,7 +7,7 @@ import ttn
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import base64
-#from flask_ngrok import run_with_ngrok
+from flask_ngrok import run_with_ngrok
 
 #Instância para controle do banco de dados
 dbRfid = DbControl()
@@ -19,6 +19,7 @@ dbRfid.dbInit("root:@localhost/db_rfid")
 # flask namespace
 app = Flask (__name__)
 CORS(app)
+run_with_ngrok (app)
 app.config['JSON_AS_ASCII'] = True
 
 #Variáveis Globais
