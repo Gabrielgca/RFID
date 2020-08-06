@@ -104,6 +104,13 @@ class Dashboard extends Component {
       idSala: roomId //Aqui vai o ID da sala que desejamos obter os detalhes
     }
     //alert("Room Id: " + roomId);
+    let newSelectedRoom = {
+      idSala: -1,
+      nomeSala: '',
+      imgMapaSala: '',
+      ocupantes: [],
+    }
+    this.setState({ selectedRoom: newSelectedRoom });
 
     await axios.post(baseURL + 'roominfo', params)
       .then(response => {
@@ -184,20 +191,35 @@ class Dashboard extends Component {
         <div className="rooms">
           <div className="rooms-list">
             <h2 className="sector-title">Setores</h2>
-            {rooms.map((room) => {
-              return (
-                <article key={room.idSala}>
-                  <strong>Nome: {room.nomeSala}</strong>
-                  <p>Pessoas no Setor: {room.qtdOcupantes}</p>
-                  <button type="button" className="button-room-details" onClick={() => { this.getRoomDetails(room.idSala) }}><FaCaretRight style={{ fontSize: 20 }} /></button>
-                </article>
-              );
-            })}
+            {rooms.length > 0 ? (
+              rooms.map((room) => {
+                return (
+                  <article key={room.idSala}>
+                    <strong>Nome: {room.nomeSala}</strong>
+                    <p>Pessoas no Setor: {room.qtdOcupantes}</p>
+                    <button type="button" className="button-room-details" onClick={() => { this.getRoomDetails(room.idSala) }}><FaCaretRight style={{ fontSize: 20 }} /></button>
+                  </article>
+                );
+              })
+            ) : (
+                <div className="div-loader">
+                  <Loader
+                    type="Oval"
+                    //color="#ffa200"
+                    color="#FFF"
+                    height={100}
+                    width={100}
+                  //timeout={3000} //3 secs
+
+                  />
+                </div>
+              )}
           </div>
 
           <div className="room-details">
+
             <div className="occupants">
-              {selectedRoom.idSala !== 0 ? (
+              {selectedRoom.idSala > 0 ? (
                 selectedRoom.ocupantes.map((person) => {
                   return (
                     <div className="person-avatar" onClick={() => { this.getSelectedPerson(person.idOcupante) }}>
@@ -208,12 +230,28 @@ class Dashboard extends Component {
               ) : (
                   <div></div>
                 )}
+
+              {selectedRoom.idSala === -1 ? (
+                <div className="people-loading-div">
+                  <Loader
+                    type="Oval"
+                    //color="#ffa200"
+                    color="#000"
+                    height={50}
+                    width={50}
+                  //timeout={3000} //3 secs
+                  />
+                </div>
+              ) : (
+                  <div></div>
+                )}
             </div>
+
             <div className="room-map">
               {selectedRoom.imgMapaSala !== '' ? (
-                <img className="img-to-send" src={"data:image/png;base64, " + selectedRoom.imgMapaSala} />
+                <img className="img-mapa-sala" src={"data:image/png;base64, " + selectedRoom.imgMapaSala} />
               ) : (
-                  <div>Nenhuma sala selecionada...</div>
+                  <div className="sem-sala">Nenhuma sala selecionada...</div>
                 )}
             </div>
           </div>
@@ -247,7 +285,7 @@ class Dashboard extends Component {
             </DialogActions>
           </Dialog>
         </div>
-      </div>
+      </div >
     );
   }
 }

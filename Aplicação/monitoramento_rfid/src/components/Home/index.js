@@ -5,6 +5,7 @@ import Header from '../Header';
 import axios from 'axios';
 
 import baseURL from "../../service";
+import Loader from 'react-loader-spinner';
 
 
 class Home extends Component {
@@ -33,14 +34,28 @@ class Home extends Component {
     return (
       <section id="rooms">
         <h1>Salas</h1>
-        {rooms.map((room) => {
-          return (
-            <article key={room.idSala}>
-              <strong>Nome: {room.nomeSala}</strong>
-              <p>Ocupantes: {room.qtdOcupantes}</p>
-            </article>
-          );
-        })}
+        {rooms.length > 0 ? (
+          rooms.map((room) => {
+            return (
+              <article key={room.idSala}>
+                <strong>Nome: {room.nomeSala}</strong>
+                <p>Ocupantes: {room.qtdOcupantes}</p>
+              </article>
+            );
+          })
+        ) : (
+            <div className="div-loader">
+              <Loader
+                type="Oval"
+                //color="#ffa200"
+                color="#FFF"
+                height={100}
+                width={100}
+              //timeout={3000} //3 secs
+
+              />
+            </div>
+          )}
       </section>
     );
   }

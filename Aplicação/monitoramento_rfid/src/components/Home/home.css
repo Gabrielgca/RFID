@@ -49,3 +49,11 @@ section#rooms article footer{
 section#rooms h1{
   color: #FFF;
 }
+
+.div-loader{
+  display: flex;
+  flex: row;
+  justify-content: center;
+  background-color: transparent;
+  padding-top: 10%;
+}
