@@ -15,7 +15,8 @@ import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 import Loader from 'react-loader-spinner';
 
 const fileUpload = require('fuctbase64');
-const baseURL = 'http://172.20.10.2:5000/';
+const baseURL = 'http://10.8.49.49:5000/'; //iPhone de Gabriel
+//const baseURL = 'http://192.168.2.196:5000/'; //Rede do IBTI
 
 class NewRFID extends Component {
 
@@ -29,7 +30,7 @@ class NewRFID extends Component {
       progress: 0,
       open: false,
       cardStatus: false,
-      cardCodeRFID: 8524253658,
+      cardCodeRFID: '',
       fileResult: '',
       loading: false,
     };
@@ -62,8 +63,8 @@ class NewRFID extends Component {
         }
         else {
           this.setState({ loading: false });
-          this.setState({ cardStatus: response.data.cartaoStatus });
-          this.setState({ cardStatus: response.data.cardRFIDcode });
+          this.setState({ cardStatus: response.data.statusCartao });
+          this.setState({ cardCodeRFID: response.data.codigoRFIDCartao });
         }
       })
       .catch(error => {
@@ -104,7 +105,7 @@ class NewRFID extends Component {
       }
 
       //Se todos os dados necessários existirem, envia os dados para o servidor salvar no banco
-      await axios.post("http://192.168.2.196:5000/register", params)
+      await axios.post(baseURL + "register", params)
         .then(response => {
           //alert("Sucesso! " + JSON.stringify(response));
           alert("Usuário cadastrado com sucesso!");
@@ -114,6 +115,7 @@ class NewRFID extends Component {
         })
       //Após enviar os dados pro banco, reencaminhar para a Dashboard
       this.props.history.push('/dashboard');
+
     } else {
       //Caso algum campo não tenha sido preenchido, mostra mensagem de erro
       this.setState({ alert: 'Preencha todos os campos!' });
@@ -139,42 +141,26 @@ class NewRFID extends Component {
         <form onSubmit={this.register} id="new-post">
           <h1>Cadastrar Novo Usuário</h1>
           <div className="check-area">
-            {this.state.cardStatus === true ? (
-              <div className="check">
-                {this.state.fileResult !== '' ?
-                  <img className="img-to-send" src={"data:image/png;base64, " + this.state.fileResult} />
-                  :
-                  <progress value={this.state.progress} max="100" />
-                }
-                <div class="success-checkmark">
-                  <div class="check-icon">
-                    <span class="icon-line line-tip"></span>
-                    <span class="icon-line line-long"></span>
-                    <div class="icon-circle"></div>
-                    <div class="icon-fix"></div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-                <div className="empty-check">
-                  {this.state.fileResult !== '' ?
-                    <div className="imgPerfil">
-                      <img className="img-to-send" src={"data:image/png;base64, " + this.state.fileResult} />
-                    </div>
-                    :
-                    <progress value={this.state.progress} max="100" />
-                  }
-                  {this.state.cardStatus === false ? (
-                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130.2 130.2">
-                      <circle class="path circle" fill="none" stroke="#FFA200" stroke-width="6" stroke-miterlimit="10" cx="65.1" cy="65.1" r="62.1" />
-                      <line class="path line" fill="none" stroke="#FFA200" stroke-width="6" stroke-linecap="round" stroke-miterlimit="10" x1="34.4" y1="37.9" x2="95.8" y2="92.3" />
-                      <line class="path line" fill="none" stroke="#FFA200" stroke-width="6" stroke-linecap="round" stroke-miterlimit="10" x1="95.8" y1="38" x2="34.4" y2="92.2" />
-                    </svg>
-                  ) : (
-                      <div></div>
-                    )}
-                </div>
-              )}
+            <div className="empty-check">
+              {this.state.fileResult !== '' ?
+                <img className="img-to-send" src={"data:image/png;base64, " + this.state.fileResult} />
+                :
+                <div></div>
+              }
+
+              {this.state.cardStatus === true ? (
+                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130.2 130.2">
+                  <circle class="path circle" fill="none" stroke="#318a04" stroke-width="6" stroke-miterlimit="10" cx="65.1" cy="65.1" r="62.1" />
+                  <polyline class="path check" fill="none" stroke="#318a04" stroke-width="6" stroke-linecap="round" stroke-miterlimit="10" points="100.2,40.2 51.5,88.8 29.8,67.5 " />
+                </svg>
+              ) : (
+                  <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130.2 130.2">
+                    <circle class="path circle" fill="none" stroke="#FFA200" stroke-width="6" stroke-miterlimit="10" cx="65.1" cy="65.1" r="62.1" />
+                    <line class="path line" fill="none" stroke="#FFA200" stroke-width="6" stroke-linecap="round" stroke-miterlimit="10" x1="34.4" y1="37.9" x2="95.8" y2="92.3" />
+                    <line class="path line" fill="none" stroke="#FFA200" stroke-width="6" stroke-linecap="round" stroke-miterlimit="10" x1="95.8" y1="38" x2="34.4" y2="92.2" />
+                  </svg>
+                )}
+            </div>
             {/* <h4>Status: {this.state.cardStatus === true ? "Cartão disponível" : "Cartão já utilizado!"}</h4> */}
           </div>
 

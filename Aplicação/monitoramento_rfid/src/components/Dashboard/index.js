@@ -17,8 +17,6 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import * as dataRoomDetails from '../../JSONs/salaDetalhes.json';
-
 import axios from 'axios';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 import Loader from 'react-loader-spinner';
@@ -29,7 +27,8 @@ const actions = [
   { icon: <ExitToApp />, name: 'Sair', action: 2 }
 ];
 
-const baseURL = 'http://172.20.10.2:5000/';
+const baseURL = 'http://10.8.49.49:5000/'; //iPhone de Gabriel
+//const baseURL = 'http://192.168.2.196:5000/'; //Rede do IBTI
 
 class Dashboard extends Component {
 
@@ -41,15 +40,14 @@ class Dashboard extends Component {
       nome: localStorage.nome, //Armazenará o nome do Usuário logado
       rooms: [], //Armazenará as salas cadastradas no sistema
       selectedPerson: {
-        name: "Silvio",
-        sector: "IBTI",
-        email: "silvio_junior96@hotmail.com"
+        name: "",
+        imgPerfil: ''
       },
       selectedRoom: {
-        roomId: 0,
-        roomName: '',
-        roomImgMap: '',
-        roomOccupants: [],
+        idSala: 0,
+        nomeSala: '',
+        imgMapaSala: '',
+        ocupantes: [],
       }
     };
 
@@ -102,21 +100,22 @@ class Dashboard extends Component {
 
   getRoomDetails = async (roomId) => {
     const params = {
-      roomId: roomId //Aqui vai o ID da sala que desejamos obter os detalhes
+      idSala: roomId //Aqui vai o ID da sala que desejamos obter os detalhes
     }
-    alert("Room Id: " + roomId);
+    //alert("Room Id: " + roomId);
 
-    /*await axios.post('http://192.168.2.196:5000/roomDetails', params)
+    await axios.post(baseURL + 'roominfo', params)
       .then(response => {
-        alert("Sucesso na requisição");
-        this.setState({ selectedRoom: response.selectedRoom[0] });
+        //alert("Sucesso na requisição: \n" + JSON.stringify(response.data.salaSelecionada));
+        this.setState({ selectedRoom: response.data.salaSelecionada });
       })
       .catch(error => {
         alert("Erro: " + JSON.stringify(error));
-      });*/
+      });
 
     //A linha abaixo o simula o retorno dos dados que virão do servidor, utilizando os dados do JSON local
-    this.setState({ selectedRoom: dataRoomDetails.selectedRoom[0] });
+    //this.setState({ selectedRoom: dataRoomDetails.selectedRoom[0] });
+
   }
 
   handleOpen = () => {
@@ -136,6 +135,20 @@ class Dashboard extends Component {
       }
     }
   };
+
+  getSelectedPerson = async (personId) => {
+    const { selectedRoom } = this.state;
+    selectedRoom.ocupantes.map((ocupante) => {
+      if (ocupante.idOcupante === personId) {
+        let newSelectedPerson = {
+          name: ocupante.nomeOcupante,
+          imgPerfil: ocupante.imgPerfil
+        }
+        this.setState({ selectedPerson: newSelectedPerson });
+        this.modalOpen();
+      }
+    })
+  }
 
   render() {
     const { rooms, selectedRoom } = this.state;
@@ -183,17 +196,21 @@ class Dashboard extends Component {
 
           <div className="room-details">
             <div className="occupants">
-              {selectedRoom.roomOccupants.map((person) => {
-                return (
-                  <div className="person-avatar" onClick={() => { this.modalOpen() }}>
-                    <img className="person-avatar" src={"https://cdn.icon-icons.com/icons2/1879/PNG/512/iconfinder-3-avatar-2754579_120516.png"}></img>
-                  </div>
-                );
-              })}
+              {selectedRoom.idSala !== 0 ? (
+                selectedRoom.ocupantes.map((person) => {
+                  return (
+                    <div className="person-avatar" onClick={() => { this.getSelectedPerson(person.idOcupante) }}>
+                      <img className="person-avatar" src={"https://cdn.icon-icons.com/icons2/1879/PNG/512/iconfinder-3-avatar-2754579_120516.png"}></img>
+                    </div>
+                  );
+                })
+              ) : (
+                  <div></div>
+                )}
             </div>
             <div className="room-map">
-              {selectedRoom.roomImgMap !== '' ? (
-                <img src={selectedRoom.roomImgMap}></img>
+              {selectedRoom.imgMapaSala !== '' ? (
+                <img className="img-to-send" src={"data:image/png;base64, " + selectedRoom.imgMapaSala} />
               ) : (
                   <div>Nenhuma sala selecionada...</div>
                 )}
@@ -214,10 +231,12 @@ class Dashboard extends Component {
             <DialogTitle id="alert-dialog-title">{"Detalhes do usuário"}</DialogTitle>
             <DialogContent>
               <DialogContentText id="alert-dialog-description">
-                <img className="person-avatar" src="https://cdn.icon-icons.com/icons2/1879/PNG/512/iconfinder-3-avatar-2754579_120516.png"></img>
+                {this.state.selectedPerson.imgPerfil !== '' ? (
+                  <img className="img-to-send" src={"data:image/png;base64, " + this.state.selectedPerson.imgPerfil} />
+                ) : (
+                    <img className="person-avatar" src="https://cdn.icon-icons.com/icons2/1879/PNG/512/iconfinder-3-avatar-2754579_120516.png"></img>
+                  )}
                 <p><b>Nome: </b>{this.state.selectedPerson.name}</p>
-                <p><b>Email: </b>{this.state.selectedPerson.email}</p>
-                <p><b>Setor: </b>{this.state.selectedPerson.sector}</p>
               </DialogContentText>
             </DialogContent>
             <DialogActions>
