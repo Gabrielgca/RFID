@@ -22,29 +22,26 @@ CORS(app)
 app.config['JSON_AS_ASCII'] = True
 
 #Variáveis Globais
-global online
-global available
-global idrfid
-global uplink
+global online, available, idrfid, uplink, Fregister
+
 
 online = False
 available = True
 uplink = False
+Fregister = False
 
 # ttn variables
 appId = 'ibti-rfid'
 accessKey = 'ttn-account-v2.b5HZHWeC3DyZCA6XqT9_VpWuhmjJDEmdMrLNd50O13o'
 
 def uplinkCallback (msg, client):
-  global online
-  global idrfid
-  global available
-  global uplink
+  global online, idrfid, available, uplink, noDevice
 
   online = False
   available = True
   uplink = True
 
+  noDevice = msg.dev_id
   idrfid = msg.payload_raw
   idrfid = base64.b64decode(idrfid).hex().upper()
   
@@ -160,6 +157,35 @@ def WiFIRFID ():
   global uplink
   global idrfid
   global available
+
+  try:
+    idrfid = request.args.get('RFID')
+    idrfid = idrfid.upper()
+    available = is_available(idrfid)
+    print(idrfid)
+    print(available)
+    if not available:
+      for cartao in dbRfid.session.query(Cartao).filter_by(noCartao = idrfid):
+        IDcartao = cartao.idCartao
+      for i in dbRfid.session.query(CadastroCartao):
+        if i.idCartao == IDcartao and i.stEstado == 'A':
+          idusuario = i.idCadastro
+          break
+      
+      ocorr = Ocorrencia (idDispositivo = 3,
+              idCadastro = idusuario,
+              dtOcorrencia = func.current_date(),
+              hrOcorrencia = func.current_time())
+      dbRfid.session.add(ocorr)
+      dbRfid.session.commit()
+      return jsonify (success = True)
+    else:
+      return jsonify (success = False)
+
+  except:
+    return jsonify(answer = 'cannot read any ID')
+
+'''
   try:
     idrfid = request.args.get('RFID')
     idrfid = idrfid.upper()
@@ -169,7 +195,7 @@ def WiFIRFID ():
   except:
     uplink = False
     return jsonify (success = False)
-
+'''
 @app.route ('/statusIdcard')
 def statusIdcard():
   global uplink
@@ -177,7 +203,7 @@ def statusIdcard():
   global available
   cardinfo = {}
 
-  if uplink == False:
+  if uplink == False or not noDevice == 'teste2':
     return '0'
   uplink = False
   cardinfo['statusCartao'] = available
@@ -211,7 +237,7 @@ def register():
           return jsonify(success = False)
 
         
-        id_cadastro = dbRfid.session.query(Cadastro).filter_by(noUsuario= str_user).first()
+        id_cadastro = dbRfid.session.query(Cadastro).filter_by(noUsuario= str_user).order_by (Cadastro.idCadastro.desc()).first()
         id_cartao = dbRfid.session.query(Cartao).filter_by(noCartao= str_card).first()
         id_cadastro = id_cadastro.idCadastro
         id_cartao = id_cartao.idCartao
@@ -225,6 +251,7 @@ def register():
 
         return jsonify(success = True)
 
+        
         if request.method == 'GET':
             return jsonify(get = True)
 
@@ -259,12 +286,6 @@ def rooms():
   room = findrooms()
 
   return jsonify(room)  
-  '''
-  print(id_disp)
-  print(no_disp)
-  print(local)
-  print(dispositivo)
-  '''
 
 @app.route ('/roominfo', methods = ['GET', 'POST'])
 def roominfo():
@@ -312,19 +333,13 @@ def roominfo():
           lista_ocupantes.append(dict_ocupante)
           image_file.close()
       except:
-        dict_ocupante = dict (nomeOcupante = info_users[i], idOcupante = users_inside[i], imgPerfil = 'NULL')
+        dict_ocupante = dict (nomeOcupante = info_users[i], idOcupante = users_inside[i], imgPerfil = '')
         lista_ocupantes.append(dict_ocupante)
 
-  sala = dict( idSala = id_sala, nomeSala = room['salas'][int(id_sala)-1]['nomeSala'], imgMapaSala = 'NULL' ,ocupantes = lista_ocupantes)
+  sala = dict( idSala = id_sala, nomeSala = room['salas'][int(id_sala)-1]['nomeSala'], imgMapaSala = '' ,ocupantes = lista_ocupantes)
   room['salaSelecionada'] = sala
 
   return room
-  '''
-  info_users = str (info_users)
-  return info_users
-  '''
-
-
 '''
 @app.route ('/get_image')
 def get_image():
