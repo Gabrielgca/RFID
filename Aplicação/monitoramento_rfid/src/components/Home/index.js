@@ -4,8 +4,7 @@ import './home.css';
 import Header from '../Header';
 import axios from 'axios';
 
-const baseURL = 'http://10.8.49.49:5000/'; //SEBRAELAB
-//const baseURL = 'http://192.168.2.196:5000/'; //Rede do IBTI
+import baseURL from "../../service";
 
 
 class Home extends Component {

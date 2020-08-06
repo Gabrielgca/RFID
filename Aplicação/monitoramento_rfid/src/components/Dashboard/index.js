@@ -20,6 +20,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import axios from 'axios';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 import Loader from 'react-loader-spinner';
+import baseURL from "../../service";
 
 
 const actions = [
@@ -27,7 +28,7 @@ const actions = [
   { icon: <ExitToApp />, name: 'Sair', action: 2 }
 ];
 
-const baseURL = 'http://10.8.49.49:5000/'; //iPhone de Gabriel
+
 //const baseURL = 'http://192.168.2.196:5000/'; //Rede do IBTI
 
 class Dashboard extends Component {
