@@ -9,6 +9,7 @@
 #include "MFRC522.h"
 #include "WiFiEsp.h"
 #include <SoftwareSerial.h>
+#include <ArduinoJson.h>
 //-----------------------------------------------------------------//
 
 //Leitura do RFID defines
@@ -43,10 +44,16 @@ SoftwareSerial wifi(6, 7);//conexão com wifi
   noTone(buzz);
  }
 
+
+
 void setup() {
   //Esses dois comando tem que estar a cima de todos os sendData
   Serial.begin(9600);//executa o monitor serial
   wifi.begin(9600);//monitora o wifi pelo monitor serial
+  while(!Serial) continue;
+  
+  
+  
   
   //Lista as oonexoes disponiveis
   sendData("AT+CWLAP\r\n", 2000, DEBUG);
@@ -67,6 +74,7 @@ void setup() {
   // Configura para multiplas conexoes
   sendData("AT+CIPMUX=1\r\n", 2000, DEBUG);                 
 
+ 
   
 
   //LED_BUILTIN está localizado na porta 13 do arduino UNO
@@ -111,6 +119,10 @@ void loop() {
   
   //Dados que serão enviados
   String get = "GET " + uri + dado + " HTTP/1.0\r\n" + "Host:" + servidor +"\r\n" + "Connection: close\r\n\r\n"; 
+
+ 
+
+
   
   //Envia Dados
   String cipSend = "AT+CIPSEND=";
@@ -127,8 +139,20 @@ void loop() {
   //envia primeiro o tamanho dos dados, e depois os dados
   sendData(cipSend, 3000, DEBUG);
   sendData(get, 3000, DEBUG);
-  strID="";
   
+  StaticJsonDocument<200> doc;//inicializa a biblioteca
+  char json[] = "{\"resposta\":\"teste""\"}";
+  DeserializationError error = deserializeJson(doc, json);
+  if(error){
+    Serial.print(F("Deserialization() failed(): "));
+    Serial.println(error.c_str());
+    return;
+  }
+
+  bool resposta = doc[DEBUG];
+  Serial.print(resposta);
+  
+  strID="";
   
   //Encerra o comando
   String closeCommand = "AT+CIPCLOSE=";
