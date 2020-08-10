@@ -1,5 +1,5 @@
 /*
--------- CONTROLE DE ACESSO VIA RFID E COMUNICAÇÃO COM O SERVIDOR------------
+-------- CADASTRO------------
 Autora: Luiza Cezario
 */
 
@@ -27,19 +27,19 @@ String sendData(String command, const int timeout, boolean debug);
 
 struct Tags
 {
-	String id;
-	String name;
+  String id;
+  String name;
 };
 
 struct Tags registeredTags = {"dbd543a", "Renato"};
 String tagID = ""; //Variável que armazenará o ID da Tag
-bool access = false; //Variável que verifica a permissão 
+bool cadastrado = false; //Variável que verifica o cadastro
 
 //Vetor responsável por armazenar os ID's das Tag's cadastradas
 /*
 String registeredTags [] = {"4bd8851b",
-														"id 2",
-														"id 3"};
+                            "id 2",
+                            "id 3"};
 */
 
 MFRC522 RFID (SS_PIN, RST_PIN);    // Cria uma nova instância para o leitor e passa os pinos como parâmetro
@@ -47,13 +47,13 @@ SoftwareSerial wifi(6, 7);//conexão com wifi
 
 void setup ()
 {
-	Serial.begin (9600);             // Inicializa a comunicação Serial
-	SPI.begin ();                    // Inicializa comunicacao SPI 
-	RFID.PCD_Init ();          			 // Inicializa o leitor RFID
-	pinMode (led_green, OUTPUT);     // Declara o pino do led verde como saída
-	pinMode (led_red, OUTPUT);  // Declara o pino do led vermelho como saída
-	pinMode (BUZZER, OUTPUT);        // Declara o pino do buzzer como saída
-	RFID.PCD_SetAntennaGain(RFID.RxGain_max);
+  Serial.begin (9600);             // Inicializa a comunicação Serial
+  SPI.begin ();                    // Inicializa comunicacao SPI 
+  RFID.PCD_Init ();                // Inicializa o leitor RFID
+  pinMode (led_green, OUTPUT);     // Declara o pino do led verde como saída
+  pinMode (led_red, OUTPUT);  // Declara o pino do led vermelho como saída
+  pinMode (BUZZER, OUTPUT);        // Declara o pino do buzzer como saída
+  RFID.PCD_SetAntennaGain(RFID.RxGain_max);
 
  Serial.begin(9600);//executa o monitor serial
   wifi.begin(9600);//monitora o wifi pelo monitor serial
@@ -83,42 +83,47 @@ void setup ()
 
 void loop ()
 {  
-	//Inicialmente tagID deve estar vazia.
-	tagID = "";
-	
-	// Verifica se existe uma Tag presente
-	if (!RFID.PICC_IsNewCardPresent () || !RFID.PICC_ReadCardSerial ())
-	{
-		delay (100);
-		return;
-	}
-	
-	// Pega o ID da Tag através da função RFID.uid e Armazena o ID na variável tagID        
-	for (byte i = 0; i < RFID.uid.size; i++)
-	{
-		tagID.concat (String (RFID.uid.uidByte [i], HEX));
-	}
-	
-	//Compara o valor do ID lido com os IDs armazenados no vetor registeredTags.name
-	for (int i = 0; i < (sizeof (registeredTags.id) / sizeof (String)); i++)
-	{
-		if (tagID.equalsIgnoreCase (registeredTags.id))
-		{
-				access = true; //Variável access assume valor verdadeiro caso o ID Lido esteja cadastrado
-		}
-	}       
+  //Inicialmente tagID deve estar vazia.
+  tagID = "";
+  
+  // Verifica se existe uma Tag presente
+  if (!RFID.PICC_IsNewCardPresent () || !RFID.PICC_ReadCardSerial ())
+  {
+    delay (100);
+    return;
+  }
+  
+  // Pega o ID da Tag através da função RFID.uid e Armazena o ID na variável tagID        
+  for (byte i = 0; i < RFID.uid.size; i++)
+  {
+    tagID.concat (String (RFID.uid.uidByte [i], HEX));
+  }
+  
+  //Compara o valor do ID lido com os IDs armazenados no vetor registeredTags.name
+  for (int i = 0; i < (sizeof (registeredTags.id) / sizeof (String)); i++)
+  {
+    if (tagID.equalsIgnoreCase (registeredTags.id))
+    {
+        cadastrado = true; //Variável access assume valor verdadeiro caso o ID Lido esteja cadastrado
+    }else
+    {
+      cadastrado = false;
+    }
+  }       
 
   String dado = "";
   
-	if (access == true)	//Se a variável access for verdadeira será chamada a função accessGranted() 
+  if (cadastrado == true) //Se a variável access for verdadeira será chamada a função accessGranted() 
   {
-		accessGranted ();       
+    accessGranted ();       
+    Serial.println("Tag já Cadastrada: " + registeredTags.name);
     dado.concat("TagCadastrada" + registeredTags.name);
-  }else{									//Se não será chamada a função accessDenied()
-		accessDenied ();
+  }else{                  //Se não será chamada a função accessDenied()
+    accessDenied ();
+    Serial.println("Cadastro Realizado");
     dado.concat("TagNaoCadastrada" + tagID);}
   
-	delay (1000);						//aguarda 2 segundos para efetuar uma nova leitura
+  delay (1000);           //aguarda 2 segundos para efetuar uma nova leitura
 
   //String dado = tagID;//variavel que recebe o HEX em String
   Serial.println("\n"+ dado );//mostrao HEX que do RFID
@@ -161,9 +166,9 @@ void accessGranted ()
 {
   Serial.println ("Tag Cadastrada: " + registeredTags.name); //Exibe a mensagem "Tag Cadastrada" e o ID da tag não cadastrada
   
-	int count = 2; //definindo a quantidade de bips
+  int count = 2; //definindo a quantidade de bips
   for (int j = 0; j < count; j++)
-	{
+  {
     //Ligando o buzzer com uma frequência de 1500 hz e ligando o led verde.
     tone (BUZZER, 1500);
     digitalWrite (led_green, HIGH);   
@@ -174,16 +179,16 @@ void accessGranted ()
     digitalWrite (led_green, LOW);
     delay (100);
   }
-	access = false;  //Seta a variável access como false novamente
+  cadastrado = false;  //Seta a variável access como false novamente
 }
 
 void accessDenied ()
 {
   Serial.println ("Tag NAO Cadastrada: " + tagID); //Exibe a mensagem "Tag NAO Cadastrada" e o ID da tag cadastrada
   
-	int count = 1;  //definindo a quantidade de bips
+  int count = 1;  //definindo a quantidade de bips
   for (int j = 0; j < count; j++)
-	{   
+  {   
     //Ligando o buzzer com uma frequência de 500 hz e ligando o led vermelho.
     tone (BUZZER, 500);
     digitalWrite (led_red, HIGH);   
@@ -213,4 +218,3 @@ void accessDenied ()
     return response;
   }
 
-  
