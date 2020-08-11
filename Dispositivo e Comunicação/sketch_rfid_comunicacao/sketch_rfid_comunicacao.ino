@@ -26,18 +26,19 @@ YouTube: youtube.com/user/blogdarobotica
 String ssid = "Inst Brasilia de Tec e Inov 2G";
 String pass = "#ibti@2019";
 String strID = "";
-String servidor = "192.168.2.113";
+String servidor = "192.168.2.196";
 String uri = "/WiFiRFID?RFID=";
 String sendData(String command, const int timeout, boolean debug);
 
-
+/*
 struct Tags
 {
 	String id;
 	String name;
 };
+*/
 
-struct Tags registeredTags = {"dbd543a", "Renato"};
+//struct Tags registeredTags = {"dbd543a", "Renato"};
 String tagID = ""; //Variável que armazenará o ID da Tag
 bool access = false; //Variável que verifica a permissão 
 
@@ -119,10 +120,11 @@ void loop ()
 	if (access == true)	//Se a variável access for verdadeira será chamada a função accessGranted() 
   {
 		accessGranted ();       
-    dado.concat("TagCadastrada" + registeredTags.name);
+    dado.concat(registeredTags.name);//foi retirado as strings
   }else{									//Se não será chamada a função accessDenied()
 		accessDenied ();
-    dado.concat("TagNaoCadastrada" + tagID);}
+    dado.concat(tagID);//foi retirado as string
+    }
   
 	delay (1000);						//aguarda 2 segundos para efetuar uma nova leitura
 
