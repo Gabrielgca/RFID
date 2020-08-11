@@ -44,7 +44,12 @@
 ---------------------------------
 ### Problemas encontrados
 ---------------------------------
+ * Nos primeiros testes ao se comunicar com a aplicação, o servidor não recebia o método HTTP esperado, ou seja, GET ou POST. Sempre era recebido da aplicação o método OPTIONS. Depois de pesquisar sobre o problema, percebeu-se que se tratava do uso de um mecanismo chamado "Cross-Origin Resource Sharing"(CORS) o qual adiciona um cabeçalho HTTP que diz para os navegadores dar para uma aplicação web rodando em uma origem, acesso para selecionar recursos de diferentes origens. A grosso modo, a aplicação envia para o servidor primeiramente uma requisição solicitando quais os métodos que o servidor suporta naquela rota, para então, depois da aprovação do servidor, envia o requisição de verdade. Desta forma, utilizou-se da biblioteca "flask_cors" que trás este mecanismo para o flask.
 
 ---------------------------------
 ### Links auxiliares
 ---------------------------------
+ * Mecanismo CORS
+   * https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+ * Download biblioteca flask_cors
+   * https://pypi.org/project/Flask-Cors/1.10.3/
