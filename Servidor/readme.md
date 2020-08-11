@@ -24,7 +24,7 @@
 ### Arquivos desenvolvidos
 ---------------------------------
  * serverRFID.py
-   * Arquivo final com os próprios 
+   * Servidor em si com as rotas de comunicação com o dispositivo e aplicação. Utilizando o SQLAlchemy para se comunicar com o banco de dados já mapeado.
  * db_commands.py
    * Não utilizado. Retirar. (?)
  * db_control.py
