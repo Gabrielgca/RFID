@@ -1,0 +1,19 @@
+{
+    "selectedRoom": [
+        {
+            "roomId": 1,
+            "roomName": "Sala 1",
+            "roomImgMap": "caminho/da/imagem/no/servidor",
+            "roomOccupants": [
+                {
+                    "occupantName": "Silvio Júnior... E todos os demais campos do usuário",
+                    "imgPerfil": "caminho/da/imagem/no/servidor"
+                },
+                {
+                    "occupantName": "Alguém ... E todos os demais campos do usuário",
+                    "imgPerfil": "caminho/da/imagem/no/servidor"
+                }
+            ]
+        }
+    ]
+}

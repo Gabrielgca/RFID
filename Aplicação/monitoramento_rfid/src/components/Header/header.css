@@ -1,0 +1,24 @@
+header#main-header{
+  background: transparent;
+  height: 52px;
+  border-bottom: 1px solid #FAFAFA;
+}
+
+header#main-header .header-content{
+  width: 100%;
+  max-width: 930px;
+  margin: 0 auto;
+  padding: 0 30px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+header#main-header .header-content a{
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 23px;
+  display: flex;
+  align-items: center;
+}
