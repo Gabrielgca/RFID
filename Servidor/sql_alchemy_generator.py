@@ -162,7 +162,10 @@ class PythonSQLAFile():
 
             def getDefault(self):
                 if self.default is not None:
-                    return 'default = ' + self.default
+                    if str(self.default) == 'NULL':
+                        return 'default = None'
+                    else:
+                        return 'default = ' + self.default 
                 else:
                     return ''
             
@@ -403,7 +406,7 @@ class PythonSQLAFile():
             return "\t__tablename__ = "+"'"+self.tablename+"' \n"
 
         def getObjName(self):
-            return "\n\nclass "+self.getName()+"(Base)\n"
+            return "\n\nclass "+self.getName()+"(Base):\n"
         
         def getRelationships(self):
             referenceList = []
@@ -482,11 +485,11 @@ class PythonSQLAFile():
                 self.mappedObjects.append(newMappedObj)
     
     def openFiles(self):
-        self.dbControl = open(self.fileDest+"db_control.py","a")
+        self.dbControl = open(self.fileDest+"db_control.py","a",encoding="utf-8")
         self.dbControl.truncate(0)
-        self.dbMappedObjects = open(self.fileDest+"db_mapped_objects.py","a")
+        self.dbMappedObjects = open(self.fileDest+"db_mapped_objects.py","a",encoding="utf-8")
         self.dbMappedObjects.truncate(0)
-        self.dbCommands = open(self.fileDest+"db_commands.py","a")
+        self.dbCommands = open(self.fileDest+"db_commands.py","a",encoding="utf-8")
         self.dbCommands.truncate(0)
 
     def closeFiles(self):
@@ -529,6 +532,7 @@ class PythonSQLAFile():
 
         self.writeDbMappedObjects("from db_control import *\n")
         self.writeDbMappedObjects("\nBase = declarative_base()\n\n")
+        self.sortMappedObjects()
         for mappedObject in self.mappedObjects:
             self.writeDbMappedObjects(mappedObject.getObjName())
             self.writeDbMappedObjects(mappedObject.getTablename())
@@ -548,7 +552,7 @@ class PythonSQLAFile():
             for reference in mappedObject.getRelationships():
                 self.writeDbMappedObjects("\n"+reference.relatedObj.getName()+"."+
                                           reference.thisObj.getName().casefold() + "_s" +" = "+
-                                          "('"+reference.thisObj.getName()+"',"+
+                                          "relationship('"+reference.thisObj.getName()+"',"+
                                           "back_populates = '"+reference.relatedObj.getName().casefold()+"')")
         self.writeDbCommands("from db_mapped_objects import *\n\n")
         self.writeDbCommands("class DbCommands():")
@@ -556,6 +560,17 @@ class PythonSQLAFile():
         self.writeDbCommands("\n\t\tpass")
 
         self.closeFiles()
+
+    def sortMappedObjects (self):
+        for i in range(0,len(self.mappedObjects)):
+            for u in range(i + 1,len(self.mappedObjects)):
+                for relationship in self.mappedObjects[i].getRelationships():
+                    if type(relationship.relatedObj) == type(self.mappedObjects[u]):
+                        tempMappedObj = self.mappedObjects[i]
+                        self.mappedObjects[i] = self.mappedObjects[u]
+                        self.mappedObjects[u] = tempMappedObj
+                        break 
+                        
 
 print("Informe o destino dos arquivos: ")
 sqlAFile = PythonSQLAFile(fileDest = input())
