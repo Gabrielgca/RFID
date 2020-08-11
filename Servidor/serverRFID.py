@@ -141,6 +141,7 @@ def WiFIRFID ():
       dbRfid.session.commit()
       return jsonify (success = True)
     else:
+      uplink = True
       return jsonify (success = False)
 
   except:
@@ -154,7 +155,7 @@ def statusIdcard():
   global available
   cardinfo = {}
 
-  if uplink == False or not noDevice == 'teste2':
+  if uplink == False: #or not noDevice == 'teste2':
     return '0'
   uplink = False
   cardinfo['statusCartao'] = available
