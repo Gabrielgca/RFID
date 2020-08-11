@@ -54,7 +54,7 @@ class NewRFID extends Component {
 
     await axios.get(baseURL + "/statusIdcard")
       .then(response => {
-        alert(JSON.stringify(response));
+        //alert("getCardStatus: " + JSON.stringify(response));
         if (response.data === 0) {
           //this.setState({ cardStatus: false });
           alert("Por favor, passe um cartão e tente novamente!");

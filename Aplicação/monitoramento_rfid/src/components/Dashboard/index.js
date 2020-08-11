@@ -66,6 +66,12 @@ class Dashboard extends Component {
       this.setState({ nome: localStorage.nome });
     });
 
+    /*
+    setInterval(() => {
+      this.getRooms();
+    }, 60000); //60.000ms equivalem a 1 minuto
+    */
+
     this.getRooms();
   }
 
@@ -275,7 +281,9 @@ class Dashboard extends Component {
                 ) : (
                     <img className="person-avatar" src="https://cdn.icon-icons.com/icons2/1879/PNG/512/iconfinder-3-avatar-2754579_120516.png"></img>
                   )}
-                <p><b>Nome: </b>{this.state.selectedPerson.name}</p>
+                <div className="person-details">
+                  <p><b>Nome: </b>{this.state.selectedPerson.name}</p>
+                </div>
               </DialogContentText>
             </DialogContent>
             <DialogActions>

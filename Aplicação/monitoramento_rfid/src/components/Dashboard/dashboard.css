@@ -207,3 +207,7 @@ div#dashboard .rooms{
   align-items: center;
   justify-content: center;
 }
+
+.person-details p{
+  text-align: center;
+}
