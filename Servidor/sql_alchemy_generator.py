@@ -129,6 +129,8 @@ class PythonSQLAFile():
             def getTypeObj(self):
                 if self.dataType == 'int':
                     return 'Integer'
+                elif self.dataType == 'tinyint':
+                    return 'Boolean'
                 elif self.dataType in ['char','varchar','nchar','nvarchar']:
                     if self.charMaxLength is not None:
                         return 'String('+str(self.charMaxLength)+')'
@@ -144,6 +146,10 @@ class PythonSQLAFile():
                     return retStr
                 elif self.dataType == 'date' or self.dataType == 'time':
                     return self.dataType.capitalize()
+                elif self.dataType == 'datetime':
+                    dateStr = self.dataType[0:4]
+                    timeStr = self.dataType[4:]
+                    return dateStr.capitalize()+timeStr.capitalize() 
                 else:
                     return ''
 
@@ -438,7 +444,7 @@ class PythonSQLAFile():
             self.imports.append(self.Import('sqlalchemy'))
             self.imports.append(self.Import('sqlalchemy.ext.declarative','declarative_base'))
             self.imports.append(self.Import('sqlalchemy','create_engine,ForeignKey'))
-            self.imports.append(self.Import('sqlalchemy','Column,Integer,Numeric,String,Date,Time,TIMESTAMP'))
+            self.imports.append(self.Import('sqlalchemy','Column,Integer,Boolean,SmallInteger,Numeric,String,Date,DateTime,Time,TIMESTAMP'))
             self.imports.append(self.Import('sqlalchemy','between,func,text,asc,desc,case'))
             self.imports.append(self.Import('sqlalchemy.orm','sessionmaker,relationship,aliased'))
             self.imports.append(self.Import('sqlalchemy.sql.functions','Function'))
