@@ -105,22 +105,23 @@ void loop ()
 	{
 		tagID.concat (String (RFID.uid.uidByte [i], HEX));
 	}
-	
+/*	
 	//Compara o valor do ID lido com os IDs armazenados no vetor registeredTags.name
-	for (int i = 0; i < (sizeof (registeredTags.id) / sizeof (String)); i++)
+	for (int i = 0; i < (sizeof (tagID) / sizeof (String)); i++)
 	{
 		if (tagID.equalsIgnoreCase (registeredTags.id))
 		{
 				access = true; //Variável access assume valor verdadeiro caso o ID Lido esteja cadastrado
 		}
-	}       
+	}   
+  */    
 
   String dado = "";
   
 	if (access == true)	//Se a variável access for verdadeira será chamada a função accessGranted() 
   {
 		accessGranted ();       
-    dado.concat(registeredTags.name);//foi retirado as strings
+    dado.concat(tagID);//foi retirado as strings
   }else{									//Se não será chamada a função accessDenied()
 		accessDenied ();
     dado.concat(tagID);//foi retirado as string
@@ -167,7 +168,7 @@ void loop ()
 
 void accessGranted ()
 {
-  Serial.println ("Tag Cadastrada: " + registeredTags.name); //Exibe a mensagem "Tag Cadastrada" e o ID da tag não cadastrada
+ // Serial.println ("Tag Cadastrada: " + registeredTags.name); //Exibe a mensagem "Tag Cadastrada" e o ID da tag não cadastrada
   
 	int count = 2; //definindo a quantidade de bips
   for (int j = 0; j < count; j++)
