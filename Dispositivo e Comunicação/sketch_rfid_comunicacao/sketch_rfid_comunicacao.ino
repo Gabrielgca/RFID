@@ -1,13 +1,8 @@
 /*
--------- CONTROLE DE ACESSO VIA RFID ------------
-=================================================
-==   BLOG DA ROBOTICA - www.blogdarobotica.com ==
-=================================================
-Autor: Kleber Bastos
-E-mail: contato@blogdarobotica.com
-Fanpage: facebook.com/blogdarobotica
-YouTube: youtube.com/user/blogdarobotica
-*/
+ * Autor: Arley Souto, Luiza Cezario e Majid
+ * Data:31/07/2020
+ * Projeto: Conexão e validação com RFID
+ */
 
 //Bibliotecas
 #include "SPI.h"
@@ -30,24 +25,12 @@ String servidor = "192.168.2.196";
 String uri = "/WiFiRFID?RFID=";
 String sendData(String command, const int timeout, boolean debug);
 
-/*
-struct Tags
-{
-	String id;
-	String name;
-};
-*/
 
 //struct Tags registeredTags = {"dbd543a", "Renato"};
 String tagID = ""; //Variável que armazenará o ID da Tag
 bool access = false; //Variável que verifica a permissão 
 
 //Vetor responsável por armazenar os ID's das Tag's cadastradas
-/*
-String registeredTags [] = {"4bd8851b",
-														"id 2",
-														"id 3"};
-*/
 
 MFRC522 RFID (SS_PIN, RST_PIN);    // Cria uma nova instância para o leitor e passa os pinos como parâmetro
 SoftwareSerial wifi(6, 7);//conexão com wifi
@@ -105,16 +88,7 @@ void loop ()
 	{
 		tagID.concat (String (RFID.uid.uidByte [i], HEX));
 	}
-/*	
-	//Compara o valor do ID lido com os IDs armazenados no vetor registeredTags.name
-	for (int i = 0; i < (sizeof (tagID) / sizeof (String)); i++)
-	{
-		if (tagID.equalsIgnoreCase (registeredTags.id))
-		{
-				access = true; //Variável access assume valor verdadeiro caso o ID Lido esteja cadastrado
-		}
-	}   
-  */    
+
 
   String dado = "";
   
@@ -129,11 +103,8 @@ void loop ()
   
 	delay (1000);						//aguarda 2 segundos para efetuar uma nova leitura
 
-  //String dado = tagID;//variavel que recebe o HEX em String
   Serial.println("\n"+ dado );//mostrao HEX que do RFID
   dado.toUpperCase();//passa de letra minuscula para mauscula antes de enviar
-  //rfid.PICC_HaltA();
-  //rfid.PCD_StopCrypto1();
   
   
   //Dados que serão enviados
