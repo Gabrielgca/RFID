@@ -1,6 +1,6 @@
 /*
 -------- CONTROLE DE ACESSO VIA RFID E COMUNICAÇÃO COM O SERVIDOR------------
-Autora: Luiza Cezario
+Autores: Luiza Cezario, Arley Souto, Majid Rezaee
 */
 
 //Bibliotecas
@@ -20,9 +20,10 @@ Autora: Luiza Cezario
 String ssid = "Inst Brasilia de Tec e Inov 2G";
 String pass = "#ibti@2019";
 String strID = "";
-String servidor = "192.168.2.196";
+String servidor = "192.168.2.211";
 String uri = "/WiFiRFID?RFID=";
 String sendData(String command, const int timeout, boolean debug);
+String teste;
 
 /*
 struct Tags
@@ -112,14 +113,7 @@ void loop ()
 
   String dado = "";
   
-	if (access == true)	//Se a variável access for verdadeira será chamada a função accessGranted() 
-  {
-		accessGranted ();       
-    dado.concat(tagID);//foi retirado as strings
-  }else{									//Se não será chamada a função accessDenied()
-		accessDenied ();
-    dado.concat(tagID);//foi retirado as string
-    }
+	
   
 	delay (1000);						//aguarda 2 segundos para efetuar uma nova leitura
 
@@ -143,20 +137,33 @@ void loop ()
 
   // Escolhe entre conexão TCP ou UDP com o servidor.
   // Id identificador, endereço do servidos e porta 
-  sendData("AT+CIPSTART=2,\"TCP\",\"" + servidor + "\",5000\r\n",5000,DEBUG);
+  sendData("AT+CIPSTART=2,\"TCP\",\"" + servidor + "\",4002\r\n",4002,DEBUG);
 
   //envia primeiro o tamanho dos dados, e depois os dados
   sendData(cipSend, 3000, DEBUG);
   sendData(get, 3000, DEBUG);
   tagID="";
-  
+ 
   
   //Encerra o comando
   String closeCommand = "AT+CIPCLOSE=";
   closeCommand+=2;
   closeCommand+="\r\n";
   //envia os comandos de encerramento
-  sendData(closeCommand, 2000, false);//esta linha está como false porem é certo é o DEBUG
+  sendData(closeCommand, 2000, DEBUG);//esta linha está como false porem é certo é o DEBUG
+
+
+   Serial.println("aqui esta" + teste);
+ 
+
+  if (access == true)  //Se a variável access for verdadeira será chamada a função accessGranted() 
+  {
+    accessGranted ();       
+    dado.concat(tagID);//foi retirado as strings
+  }else{                  //Se não será chamada a função accessDenied()
+    accessDenied ();
+    dado.concat(tagID);//foi retirado as string
+    }
   
 }
 
@@ -212,6 +219,7 @@ void accessDenied ()
     }
     if(debug){
       Serial.print(response);
+      teste = response;
     }
     return response;
   }
