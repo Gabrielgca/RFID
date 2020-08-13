@@ -25,24 +25,10 @@ String servidor = "192.168.2.196";
 String uri = "/WiFiRFID?RFID=";
 String sendData(String command, const int timeout, boolean debug);
 
-/*
-struct Tags
-{
-	String id;
-	String name;
-};
-*/
-
-//struct Tags registeredTags = {"dbd543a", "Renato"};
 String tagID = ""; //Variável que armazenará o ID da Tag
 bool access = false; //Variável que verifica a permissão 
 
-//Vetor responsável por armazenar os ID's das Tag's cadastradas
-/*
-String registeredTags [] = {"4bd8851b",
-														"id 2",
-														"id 3"};
-*/
+
 
 MFRC522 RFID (SS_PIN, RST_PIN);    // Cria uma nova instância para o leitor e passa os pinos como parâmetro
 SoftwareSerial wifi(6, 7);//conexão com wifi
@@ -100,16 +86,7 @@ void loop ()
 	{
 		tagID.concat (String (RFID.uid.uidByte [i], HEX));
 	}
-/*	
-	//Compara o valor do ID lido com os IDs armazenados no vetor registeredTags.name
-	for (int i = 0; i < (sizeof (tagID) / sizeof (String)); i++)
-	{
-		if (tagID.equalsIgnoreCase (registeredTags.id))
-		{
-				access = true; //Variável access assume valor verdadeiro caso o ID Lido esteja cadastrado
-		}
-	}   
-  */    
+
 
   String dado = "";
   
@@ -127,9 +104,7 @@ void loop ()
   //String dado = tagID;//variavel que recebe o HEX em String
   Serial.println("\n"+ dado );//mostrao HEX que do RFID
   dado.toUpperCase();//passa de letra minuscula para mauscula antes de enviar
-  //rfid.PICC_HaltA();
-  //rfid.PCD_StopCrypto1();
-  
+
   
   //Dados que serão enviados
   String get = "GET " + uri + dado + " HTTP/1.0\r\n" + "Host:" + servidor +"\r\n" + "Connection: close\r\n\r\n"; 
@@ -163,8 +138,7 @@ void loop ()
 
 void accessGranted ()
 {
- // Serial.println ("Tag Cadastrada: " + registeredTags.name); //Exibe a mensagem "Tag Cadastrada" e o ID da tag não cadastrada
-  
+
 	int count = 2; //definindo a quantidade de bips
   for (int j = 0; j < count; j++)
 	{
