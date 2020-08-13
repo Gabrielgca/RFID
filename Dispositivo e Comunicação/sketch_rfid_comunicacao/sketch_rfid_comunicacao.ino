@@ -1,13 +1,8 @@
 /*
--------- CONTROLE DE ACESSO VIA RFID ------------
-=================================================
-==   BLOG DA ROBOTICA - www.blogdarobotica.com ==
-=================================================
-Autor: Kleber Bastos
-E-mail: contato@blogdarobotica.com
-Fanpage: facebook.com/blogdarobotica
-YouTube: youtube.com/user/blogdarobotica
-*/
+ * Autor: Arley Souto, Luiza Cezario e Majid
+ * Data:31/07/2020
+ * Projeto: Conexão e validação com RFID
+ */
 
 //Bibliotecas
 #include "SPI.h"
