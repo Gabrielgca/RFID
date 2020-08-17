@@ -66,13 +66,11 @@ class Dashboard extends Component {
       this.setState({ nome: localStorage.nome });
     });
 
-    /*
     setInterval(() => {
       this.getRooms();
-    }, 60000); //60.000ms equivalem a 1 minuto
-    */
+    }, 30000); //60.000ms equivalem a 1 minuto
 
-    this.getRooms();
+    //this.getRooms(); RODA UMA VEZ SÓ A REQUISIÇÃO
   }
 
   modalOpen = async () => {
@@ -227,11 +225,20 @@ class Dashboard extends Component {
             <div className="occupants">
               {selectedRoom.idSala > 0 ? (
                 selectedRoom.ocupantes.map((person) => {
-                  return (
-                    <div className="person-avatar" onClick={() => { this.getSelectedPerson(person.idOcupante) }}>
-                      <img className="person-avatar" src={"https://cdn.icon-icons.com/icons2/1879/PNG/512/iconfinder-3-avatar-2754579_120516.png"}></img>
-                    </div>
-                  );
+                  if (person.imgPerfil != "") {
+                    return (
+                      <div className="person-avatar" onClick={() => { this.getSelectedPerson(person.idOcupante) }}>
+                        <img className="person-avatar" src={"data:image/png;base64, " + person.imgPerfil} />
+                      </div>
+                    )
+                  }
+                  else {
+                    return (
+                      <div className="person-avatar" onClick={() => { this.getSelectedPerson(person.idOcupante) }}>
+                        <img className="person-avatar" src={"https://cdn.icon-icons.com/icons2/1879/PNG/512/iconfinder-3-avatar-2754579_120516.png"}></img>
+                      </div>
+                    )
+                  }
                 })
               ) : (
                   <div></div>
@@ -277,7 +284,7 @@ class Dashboard extends Component {
             <DialogContent>
               <DialogContentText id="alert-dialog-description">
                 {this.state.selectedPerson.imgPerfil !== '' ? (
-                  <img className="img-to-send" src={"data:image/png;base64, " + this.state.selectedPerson.imgPerfil} />
+                  <img className="person-avatar" src={"data:image/png;base64, " + this.state.selectedPerson.imgPerfil} />
                 ) : (
                     <img className="person-avatar" src="https://cdn.icon-icons.com/icons2/1879/PNG/512/iconfinder-3-avatar-2754579_120516.png"></img>
                   )}
