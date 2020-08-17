@@ -45,12 +45,11 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    /*
     setInterval(() => {
       this.getRooms();
-    }, 60000); //60.000ms equivalem a 1 minuto
-    */
-    this.getRooms();
+    }, 30000); //60.000ms equivalem a 1 minuto
+
+    //this.getRooms(); RODA UMA VEZ SÓ A REQUISIÇÃO
   }
 
   render() {

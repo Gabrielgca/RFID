@@ -142,7 +142,9 @@ class NewRFID extends Component {
           <div className="check-area">
             <div className="empty-check">
               {this.state.fileResult !== '' ?
-                <img className="img-to-send" src={"data:image/png;base64, " + this.state.fileResult} />
+                <div className="div-img-perfil">
+                  <img className="img-to-send" src={"data:image/png;base64, " + this.state.fileResult} />
+                </div>
                 :
                 <div></div>
               }
@@ -182,7 +184,7 @@ class NewRFID extends Component {
 
           <input type="text" placeholder="Código do Cartão RFID" value={this.state.cardCodeRFID} disabled={true} />
 
-          <button type="submit">Cadastrar</button>
+          <button type="submit" disabled={this.state.cardStatus === true ? false : true}>Cadastrar</button>
         </form>
 
         <div>

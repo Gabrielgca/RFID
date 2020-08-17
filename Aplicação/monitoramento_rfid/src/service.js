@@ -1,3 +1,3 @@
- const baseURL = "http://9197a1b057d8.ngrok.io/";
+ const baseURL = "http://192.168.2.196:5000/";
 
  export default baseURL;
