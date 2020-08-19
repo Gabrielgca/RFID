@@ -43,7 +43,7 @@ void setup ()
 	pinMode (BUZZER, OUTPUT);        // Declara o pino do buzzer como saída
 	RFID.PCD_SetAntennaGain(RFID.RxGain_max);
 
- Serial.begin(9600);//executa o monitor serial
+ 
   wifi.begin(9600);//monitora o wifi pelo monitor serial
   
   //Lista as oonexoes disponiveis
@@ -157,7 +157,6 @@ void accessGranted ()
 
 void accessDenied ()
 {
-  Serial.println ("Tag NAO Cadastrada: " + tagID); //Exibe a mensagem "Tag NAO Cadastrada" e o ID da tag cadastrada
   
 	int count = 1;  //definindo a quantidade de bips
   for (int j = 0; j < count; j++)
