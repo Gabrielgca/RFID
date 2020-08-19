@@ -42,7 +42,6 @@ class DbControl:
 			raise
 		finally:
 			self.session.close()
-			print('Seção encerrada!')
 
 	def dbConnTest (self):
 		try:
