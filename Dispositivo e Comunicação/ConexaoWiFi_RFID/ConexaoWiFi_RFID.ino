@@ -23,7 +23,7 @@
 String ssid = "Inst Brasilia de Tec e Inov 2G";
 String pass = "#ibti@2019";
 String strID = "";
-String servidor = "192.168.2.196";
+String servidor = "192.168.2.211";
 String uri = "/WiFiRFID?RFID=";
 String sendData(String command, const int timeout, boolean debug);
 
@@ -134,7 +134,7 @@ void loop() {
 
   // Escolhe entre conexão TCP ou UDP com o servidor.
   // Id identificador, endereço do servidos e porta 
-  sendData("AT+CIPSTART=2,\"TCP\",\"" + servidor + "\",5000\r\n",5000,DEBUG);
+  sendData("AT+CIPSTART=2,\"TCP\",\"" + servidor + "\",4002\r\n",5000,DEBUG);
 
   //envia primeiro o tamanho dos dados, e depois os dados
   sendData(cipSend, 3000, DEBUG);
