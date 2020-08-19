@@ -45,17 +45,18 @@ def uplinkCallback (msg, client):
   idrfid = base64.b64decode(idrfid).hex().upper()
   
   #Verifica se o card lido está no banco 
-  for u in dbRfid.session.query(Cartao):
-    if idrfid == u.noCartao:
-        #Verifica se o card está ativo
-        for k in dbRfid.session.query(CadastroCartao):
-          #print(k.idCartao)
-          if k.idCartao == u.idCartao:
-            if k.stEstado == 'A':
-              available = False
-              break
+  with dbRfid.sessionQueryScope() as session:
+      for u in session.query(Cartao):
+        if idrfid == u.noCartao:
+            #Verifica se o card está ativo
+            for k in session.query(CadastroCartao):
+              #print(k.idCartao)
+              if k.idCartao == u.idCartao:
+                if k.stEstado == 'A':
+                  available = False
+                  break
 
-        break
+            break
 
 #função que manda resposta para a aplicação
 def answer (app, http_code, json):
@@ -92,15 +93,16 @@ def is_available(RFID):
   global available
   available = True
 
-  for u in dbRfid.session.query(Cartao):
-    if RFID == u.noCartao:
-        #Verifica se o card está ativo
-        for k in dbRfid.session.query(CadastroCartao):
-          #print(k.idCartao)
-          if k.idCartao == u.idCartao:
-            if k.stEstado == 'A':
-              available = False
-              break
+  with dbRfid.sessionQueryScope() as session:
+      for u in session.query(Cartao):
+        if RFID == u.noCartao:
+            #Verifica se o card está ativo
+            for k in session.query(CadastroCartao):
+              #print(k.idCartao)
+              if k.idCartao == u.idCartao:
+                if k.stEstado == 'A':
+                  available = False
+                  break
   return available
 
 @app.route('/teste')
@@ -126,19 +128,20 @@ def WiFIRFID ():
     print(idrfid)
     print(available)
     if not available:
-      for cartao in dbRfid.session.query(Cartao).filter_by(noCartao = idrfid):
-        IDcartao = cartao.idCartao
-      for i in dbRfid.session.query(CadastroCartao):
-        if i.idCartao == IDcartao and i.stEstado == 'A':
-          idusuario = i.idCadastro
-          break
+      with dbRfid.sessionQueryScope() as session:
+          for cartao in session.query(Cartao).filter_by(noCartao = idrfid):
+            IDcartao = cartao.idCartao
+          for i in session.query(CadastroCartao):
+            if i.idCartao == IDcartao and i.stEstado == 'A':
+              idusuario = i.idCadastro
+              break
       
       ocorr = Ocorrencia (idDispositivo = 3,
               idCadastro = idusuario,
               dtOcorrencia = func.current_date(),
               hrOcorrencia = func.current_time())
-      dbRfid.session.add(ocorr)
-      dbRfid.session.commit()
+      with dbRfid.sessionTransactionScope() as session:
+        session.add(ocorr)
       return jsonify (success = True)
     else:
       uplink = True
@@ -180,24 +183,30 @@ def register():
 
         cartao = Cartao (noCartao = str_card)
         usuario = Cadastro (noUsuario = str_user)
-        dbRfid.session.add(cartao)
-        dbRfid.session.add(usuario)
+
 
         try:
-          dbRfid.session.commit()
+          with dbRfid.sessionTransactionScope() as session:
+              session.add(cartao)
+              session.add(usuario)
         except:
           return jsonify(success = False)
 
         
-        id_cadastro = dbRfid.session.query(Cadastro).filter_by(noUsuario= str_user).order_by (Cadastro.idCadastro.desc()).first()
-        id_cartao = dbRfid.session.query(Cartao).filter_by(noCartao= str_card).first()
+        with dbRfid.sessionQueryScope() as session:
+            id_cadastro = session.query(Cadastro).filter_by(noUsuario= str_user).order_by (Cadastro.idCadastro.desc()).first()
+            id_cartao = session.query(Cartao).filter_by(noCartao= str_card).first()
         id_cadastro = id_cadastro.idCadastro
         id_cartao = id_cartao.idCartao
 
         card_user = CadastroCartao (idCartao = id_cartao, idCadastro = id_cadastro)
-        dbRfid.session.add(card_user)
-        dbRfid.session.commit()
-
+        
+        try:
+            with dbRfid.sessionTransactionScope() as session:
+                session.add(card_user)
+        except:
+            return jsonify(success = False)
+            
         #VERIFICAR CAMINHO NA RASP
         with open(f"C:/Users/DELL/Documents/IBTI/RFID/imagens/{id_cadastro}.png","wb") as png2:
             png2.write(base64.b64decode(str_img))
@@ -212,23 +221,24 @@ def findrooms():
   dispositivo = []
   t_pess = 0
 
-  for i in dbRfid.session.query(Dispositivo):
-      dict_disp = i.getDict()
-      dict_disp.pop('noDispositivo')
-      dict_disp.pop('vlAndar')
-      dict_disp.pop('stAtivo')
-      dict_disp['idSala'] = dict_disp.pop('idDispositivo')
-      dict_disp['nomeSala'] = dict_disp.pop('noLocalizacao')
-      for j in dbRfid.session.query(Ocorrencia):
-          if i.idDispositivo == j.idDispositivo:
-              if j.stOcorrencia == 'E':
-                  t_pess += 1
-              if j.stOcorrencia == 'S':
-                  t_pess -= 1
-          dict_disp["qtdOcupantes"] = t_pess
-          
-      t_pess = 0
-      dispositivo.append(dict_disp)
+  with dbRfid.sessionQueryScope() as session:
+      for i in session.query(Dispositivo):
+          dict_disp = i.getDict()
+          dict_disp.pop('noDispositivo')
+          dict_disp.pop('vlAndar')
+          dict_disp.pop('stAtivo')
+          dict_disp['idSala'] = dict_disp.pop('idDispositivo')
+          dict_disp['nomeSala'] = dict_disp.pop('noLocalizacao')
+          for j in session.query(Ocorrencia):
+              if i.idDispositivo == j.idDispositivo:
+                  if j.stOcorrencia == 'E':
+                      t_pess += 1
+                  if j.stOcorrencia == 'S':
+                      t_pess -= 1
+              dict_disp["qtdOcupantes"] = t_pess
+              
+          t_pess = 0
+          dispositivo.append(dict_disp)
   
   room = {}
   room['salas'] = dispositivo
@@ -259,19 +269,21 @@ def roominfo():
   users_inside = []
 
   #Verifica o id dos usuários dentro da 'id_sala'
-  for i in dbRfid.session.query(Ocorrencia):
-    if int(id_sala) == i.idDispositivo:
-      if i.stOcorrencia == 'E':
-        users_inside.append(i.idCadastro)
-      if i.stOcorrencia == 'S':
-        users_inside.remove(i.idCadastro)
+  with dbRfid.sessionQueryScope() as session:
+      for i in session.query(Ocorrencia):
+        if int(id_sala) == i.idDispositivo:
+          if i.stOcorrencia == 'E':
+            users_inside.append(i.idCadastro)
+          if i.stOcorrencia == 'S':
+            users_inside.remove(i.idCadastro)
   
   users_inside.sort()
   print(users_inside)
   #Verifica o nome da pessoa que está dentro da 'id_sala'
-  for i in dbRfid.session.query(Cadastro):
-    if i.idCadastro in users_inside:
-      info_users.append(i.noUsuario)
+  with dbRfid.sessionQueryScope() as session:
+      for i in session.query(Cadastro):
+        if i.idCadastro in users_inside:
+          info_users.append(i.noUsuario)
   print(info_users)
   
   lista_ocupantes = []
