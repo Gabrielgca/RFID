@@ -7,19 +7,19 @@ import ttn
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import base64
-from flask_ngrok import run_with_ngrok
+#from flask_ngrok import run_with_ngrok
 
 #Instância para controle do banco de dados
 dbRfid = DbControl()
 #Instância para inserir dados no banco
 
-dbRfid.dbInit("root:@localhost/db_rfid")
+dbRfid.dbInit("root:#IBTI@2019@localhost/db_rfid")
 
 
 # flask namespace
 app = Flask (__name__)
 CORS(app)
-run_with_ngrok (app)
+#run_with_ngrok (app)
 app.config['JSON_AS_ASCII'] = True
 
 #Variáveis Globais
@@ -208,7 +208,7 @@ def register():
             return jsonify(success = False)
             
         #VERIFICAR CAMINHO NA RASP
-        with open(f"C:/Users/DELL/Documents/IBTI/RFID/imagens/{id_cadastro}.png","wb") as png2:
+        with open(f"/home/pi/Documents/imagensRFID/{id_cadastro}.png","wb") as png2:
             png2.write(base64.b64decode(str_img))
 
         return jsonify(success = True)
@@ -291,7 +291,7 @@ def roominfo():
   for i in range(len(users_inside)):
       try:
         #VERIFICAR CAMINHO NA RASP
-        with open(f"C:/Users/DELL/Documents/IBTI/RFID/imagens/{users_inside[i]}.png","rb") as image_file: 
+        with open(f"/home/pi/Documents/imagensRFID/{users_inside[i]}.png","rb") as image_file: 
           img_perfil = str(base64.b64encode(image_file.read()))
           img_perfil = img_perfil.replace("b'", "")
           img_perfil = img_perfil.replace("'", "")
@@ -302,7 +302,7 @@ def roominfo():
         dict_ocupante = dict (nomeOcupante = info_users[i], idOcupante = users_inside[i], imgPerfil = '')
         lista_ocupantes.append(dict_ocupante)
   #VERIFICAR CAMINHO NA RASP
-  with open(f"C:/Users/DELL/Documents/IBTI/RFID/imagens/SalaIBTI.png","rb") as imgsala:
+  with open(f"/home/pi/Documents/imagensRFID/S{id_sala}.png","rb") as imgsala:
     img_sala = str(base64.b64encode(imgsala.read()))
     img_sala = img_sala.replace("b'", "")
     img_sala = img_sala.replace("'", "")
@@ -310,7 +310,7 @@ def roominfo():
     imgsala.close()
   room['salaSelecionada'] = sala
 
-  return room
+  return jsonify(room)
 
 
 if __name__ == '__main__':
