@@ -253,7 +253,7 @@ def generateCartoes(cards,qtde):
         currRand = random.randint(qtde - i)
         card = cards[currRand]
         cards = np.delete(cards,currRand)
-        cartao = Cartao(noCartao = card) 
+        cartao = Cartao(noCartao = str(card)) 
         cartoes.append(cartao)
     return cartoes
 
@@ -323,13 +323,13 @@ def generateDict(res,dictHeader = None):
 
 dbRfid = DbControl()
 
-dbRfid.dbInit("root:@localhost/db_rfid")
+dbRfid.dbInit("root:#IBTI@2019@localhost/db_rfid")
 
 ins = InsereDados(dbRfid)
 
 dbAux = DbControl()
 
-dbAux.dbInit("root:@localhost/db_auxiliar")
+dbAux.dbInit("root:#IBTI@2019@localhost/db_auxiliar")
 
 sel = CarregaDadosAux(dbAux)
 
