@@ -15,14 +15,16 @@
 #define RST_PIN 9
 #define DEBUG true
 #define BUZZER 3
-#define led_green 4
-#define led_red 5
 
 String ssid = "Inst Brasilia de Tec e Inov 2G";
 String pass = "#ibti@2019";
 String strID = "";
 String servidor = "192.168.2.211";
 String uri = "/WiFiRFID?RFID=";
+
+//ID do dispositivo no Banco de dados
+String loca = "1"
+
 String sendData(String command, const int timeout, boolean debug);
 
 String tagID = ""; //Variável que armazenará o ID da Tag
@@ -38,8 +40,6 @@ void setup ()
 	Serial.begin (9600);             // Inicializa a comunicação Serial
 	SPI.begin ();                    // Inicializa comunicacao SPI 
 	RFID.PCD_Init ();          			 // Inicializa o leitor RFID
-	pinMode (led_green, OUTPUT);     // Declara o pino do led verde como saída
-	pinMode (led_red, OUTPUT);  // Declara o pino do led vermelho como saída
 	pinMode (BUZZER, OUTPUT);        // Declara o pino do buzzer como saída
 	RFID.PCD_SetAntennaGain(RFID.RxGain_max);
 
@@ -90,16 +90,6 @@ void loop ()
 
   String dado = "";
   
-	if (access == true)	//Se a variável access for verdadeira será chamada a função accessGranted() 
-  {
-		accessGranted ();       
-    dado.concat(tagID);//foi retirado as strings
-  }else{									//Se não será chamada a função accessDenied()
-		accessDenied ();
-    dado.concat(tagID);//foi retirado as string
-    }
-  
-	delay (1000);						//aguarda 2 segundos para efetuar uma nova leitura
 
   //String dado = tagID;//variavel que recebe o HEX em String
   Serial.println("\n"+ dado );//mostrao HEX que do RFID
@@ -107,7 +97,7 @@ void loop ()
 
   
   //Dados que serão enviados
-  String get = "GET " + uri + dado + " HTTP/1.0\r\n" + "Host:" + servidor +"\r\n" + "Connection: close\r\n\r\n"; 
+  String get = "GET " + uri + dado +"&&LOC="+ loc +" HTTP/1.0\r\n" + "Host:" + servidor +"\r\n" + "Connection: close\r\n\r\n"; 
   
   //Envia Dados
   String cipSend = "AT+CIPSEND=";
@@ -134,43 +124,6 @@ void loop ()
   //envia os comandos de encerramento
   sendData(closeCommand, 2000, false);//esta linha está como false porem é certo é o DEBUG
   
-}
-
-void accessGranted ()
-{
-
-	int count = 2; //definindo a quantidade de bips
-  for (int j = 0; j < count; j++)
-	{
-    //Ligando o buzzer com uma frequência de 1500 hz e ligando o led verde.
-    tone (BUZZER, 1500);
-    digitalWrite (led_green, HIGH);   
-    delay (100);   
-    
-    //Desligando o buzzer e led verde.      
-    noTone (BUZZER);
-    digitalWrite (led_green, LOW);
-    delay (100);
-  }
-	access = false;  //Seta a variável access como false novamente
-}
-
-void accessDenied ()
-{
-  
-	int count = 1;  //definindo a quantidade de bips
-  for (int j = 0; j < count; j++)
-	{   
-    //Ligando o buzzer com uma frequência de 500 hz e ligando o led vermelho.
-    tone (BUZZER, 500);
-    digitalWrite (led_red, HIGH);   
-    delay (500); 
-    
-    //Desligando o buzzer e o led vermelho.
-    noTone (BUZZER);
-    digitalWrite (led_red, LOW);
-    delay (500);
-  }
 }
 
  String sendData(String command, const int timeout, boolean debug){
