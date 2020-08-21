@@ -23,7 +23,7 @@ String servidor = "192.168.2.211";
 String uri = "/WiFiRFID?RFID=";
 
 //ID do dispositivo no Banco de dados
-String loca = "1"
+String loc = "3";
 
 String sendData(String command, const int timeout, boolean debug);
 
@@ -80,6 +80,9 @@ void loop ()
 		delay (100);
 		return;
 	}
+  
+  aproximaCartao();
+
 	
 	// Pega o ID da Tag através da função RFID.uid e Armazena o ID na variável tagID        
 	for (byte i = 0; i < RFID.uid.size; i++)
@@ -89,8 +92,10 @@ void loop ()
 
 
   String dado = "";
-  
+  dado = tagID;
 
+  
+  
   //String dado = tagID;//variavel que recebe o HEX em String
   Serial.println("\n"+ dado );//mostrao HEX que do RFID
   dado.toUpperCase();//passa de letra minuscula para mauscula antes de enviar
@@ -126,6 +131,19 @@ void loop ()
   
 }
 
+  void aproximaCartao(){
+    int count = 2;//quantidade de bips
+    for (int j = 0; j < count; j++){
+      //liga o buzzer
+      tone(BUZZER, 1500);
+      delay(100);
+
+      //desliga buzzer
+      noTone(BUZZER);
+      delay(100);
+    }
+  }
+  
  String sendData(String command, const int timeout, boolean debug){
     String response = "";
     wifi.print(command);
