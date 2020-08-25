@@ -23,7 +23,7 @@ String servidor = "192.168.2.211";
 String uri = "/WiFiRFID?RFID=";
 
 //ID do dispositivo no Banco de dados
-String loc = "1";
+String loc = "3";
 
 String sendData(String command, const int timeout, boolean debug);
 
@@ -47,23 +47,23 @@ void setup ()
   wifi.begin(9600);//monitora o wifi pelo monitor serial
   
   //Lista as oonexoes disponiveis
-  sendData("AT+CWLAP\r\n", 1000, DEBUG);//2000
+  sendData("AT+CWLAP\r\n", 2000, DEBUG);//2000
 
   // Configura o mode de operacao
   // ? -Lista modos validos, 1- Modo Cliente, 2- Modo Host, 3-Cliente e Host
-  sendData("AT+CWMODE=1\r\n",1000,DEBUG);//2000
+  sendData("AT+CWMODE=1\r\n",2000,DEBUG);//2000
 
   // Reseta a ESP-01
  //sendData("AT+RST\r\n", 2000, DEBUG); // rst 
 
  // conecta a rede escolhida
-  sendData("AT+CWJAP=\""+ssid+"\",\""+pass+"\"\r\n",1000,DEBUG);//10000 
+  sendData("AT+CWJAP=\""+ssid+"\",\""+pass+"\"\r\n",10000,DEBUG);//10000 
 
   // Lista o ip adquirido pela ESP-01
-  sendData("AT+CIFSR\r\n", 1000, DEBUG);//2000
+  sendData("AT+CIFSR\r\n", 2000, DEBUG);//2000
   
   // Configura para multiplas conexoes
-  sendData("AT+CIPMUX=1\r\n", 1000, DEBUG);//2000       
+  sendData("AT+CIPMUX=1\r\n", 2000, DEBUG);//2000       
 
   //server.begin();
   Serial.println("Aproxime o cartão...");//Apenas mostra no monitor quando for a hora de aproximar o RFID card
@@ -127,7 +127,7 @@ void loop ()
   closeCommand+=2;
   closeCommand+="\r\n";
   //envia os comandos de encerramento
-  sendData(closeCommand, 1000, DEBUG);//foi alterado aqui para forma padrão que seria o DEBUG, aqui estava false 2000
+  sendData(closeCommand, 1000, false);//foi alterado aqui para forma padrão que seria o DEBUG, aqui estava false 2000
   
 }
 
