@@ -1,6 +1,9 @@
 ---------------------------------
 ### Servidor
 ---------------------------------
+<p align="center">
+  <img src="ServidorRFID.png" width="350" title="Servidor RFID">
+</p>
 ---------------------------------
 ### Responsáveis:
 ---------------------------------
@@ -43,8 +46,9 @@
    * Arquivo de teste para imagem a ser enviada para a aplicação e armazenada no servidor.
  * rfid.sql
    * Código em SQL do banco de dados princpal com as tabelas de cadastro, cadastro_cartao, cartao, dispositivo e ocorrencia
- * tr_seta_status.py
+ * tr_seta_status.sql
    * Código com a trigger a ser acionada para alterar o status do usuário de uma sala, se ele saiu ou entrou na mesma. 
+
 ---------------------------------
 ### Problemas encontrados
 ---------------------------------
