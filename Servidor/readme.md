@@ -1,9 +1,11 @@
 ---------------------------------
 ### Servidor
 ---------------------------------
+
 <p align="center">
-  <img src="ServidorRFID.png" width="350" title="Servidor RFID">
+  <img src="ServidorRFID.png" width="500" title="Servidor RFID">
 </p>
+
 ---------------------------------
 ### Responsáveis:
 ---------------------------------
