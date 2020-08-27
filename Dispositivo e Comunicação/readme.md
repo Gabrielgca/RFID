@@ -67,7 +67,7 @@
 <p> Para que o módulo WiFi utilizado pudesse se comunicar de forma adequada com o Arduino por meio de comandos AT, é preciso fazer a atualização de seu firmware, pois não necessáriamente o mesmo já está apto de fábrica a ter esse tipo de comunicação com o arduino e pode-se evitar possíveis erros, deixando-o assim mais estável. Desta forma, foi utilizado um Adaptador Conversor USB Serial TTL para transmitir a atualização. Os detalhes podem ser encontrados nos links auxiliares.</p>
 
 <h3>Links Auxiliares</h3>
- * Upgrade de firmware ESP8266 - ESP01
+ <p> Upgrade de firmware ESP8266 - ESP01 </p>
    * https://blogmasterwalkershop.com.br/embarcados/esp8266/upgrade-de-firmware-do-wifi-esp8266-esp-01-atraves-do-arduino-e-conversor-usb-serial/
- * Lista de comandos AT
+ <p> Lista de comandos AT </p>
    * http://room-15.github.io/blog/2015/03/26/esp8266-at-command-reference/#AT+CIPSEND
