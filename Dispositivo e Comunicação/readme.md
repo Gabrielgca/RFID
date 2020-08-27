@@ -68,6 +68,10 @@
 
 <h3>Links Auxiliares</h3>
  <p> Upgrade de firmware ESP8266 - ESP01 </p>
-   * https://blogmasterwalkershop.com.br/embarcados/esp8266/upgrade-de-firmware-do-wifi-esp8266-esp-01-atraves-do-arduino-e-conversor-usb-serial/
+ <ul>
+<li> https://blogmasterwalkershop.com.br/embarcados/esp8266/upgrade-de-firmware-do-wifi-esp8266-esp-01-atraves-do-arduino-e-conversor-usb-serial/ </li>
+ </ul>
  <p> Lista de comandos AT </p>
-   * http://room-15.github.io/blog/2015/03/26/esp8266-at-command-reference/#AT+CIPSEND
+  <ul>
+<li> http://room-15.github.io/blog/2015/03/26/esp8266-at-command-reference </li>
+ </ul>
