@@ -54,6 +54,12 @@
 </table>
 <p>Todos este componentes em junção fazem o dispositivo ser eficaz, além de usar uma linguagem de programação poderosa. A IDE utilizada para desenvolver toda parte logica foi o Arduino, utilizando a linguagem de programação Sketch.</p>
 
+<h3>Circuito Dispositivo WiFi</h3>
+
+<p align="center">
+  <img src="DispWiFiRFID.jpg" width="500" title="Disp WiFi">
+</p>
+
 <h3>Atividade do dispositivo</h3>
 <ul>
 	<li>Faz a leitura de um card RFID </li>
