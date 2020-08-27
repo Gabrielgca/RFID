@@ -31,20 +31,21 @@
 			<td>Resistor de 200ohms</td>
 			<td><img src="https://user-images.githubusercontent.com/32252053/90171813-71021f80-dd78-11ea-9ba9-5083f4988ef4.jpg" width="300" heigth="300"</td>
 		</tr>
-
-
 		<tr>
 			<td>Arduino Uno</td>
 			<td><img src="https://user-images.githubusercontent.com/32252053/90172088-df46e200-dd78-11ea-8721-4dc703af73be.jpeg" width="300" heigth="300"</td>
+			<td></td>
 		</tr>
 		<tr>
 			<td>Protoboard</td>
 			<td><img src="https://user-images.githubusercontent.com/32252053/90172195-056c8200-dd79-11ea-8386-983121283269.jpg" width="300" heigth="300"</td>
+			<td></td>
 		</tr>
 		<tr>
 			<td>Buzzer</td>
 			<td><img src="https://user-images.githubusercontent.com/32252053/90172322-377de400-dd79-11ea-9f51-4688108a5e81.jpg" width="300" heigth="300"> </td>
 		</tr>
+				
 </table>
 <p>Todos este componentes em junção fazem o dispositivo ser eficaz, além de usar uma linguagem de programação poderosa. A IDE utilizada para desenvolver toda parte logica foi o Arduino, utilizando a linguagem de programação Sketch.</p>
 
