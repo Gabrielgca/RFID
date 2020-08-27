@@ -51,7 +51,7 @@
 <h3>Circuito Dispositivo WiFi</h3>
 
 <p align="center">
-  <img src="DispWiFiRFID.jpg" width="500" title="Disp WiFi">
+  <img src="DispWiFiRFID.jpg" width="300" title="Disp WiFi">
 </p>
 
 <h3>Atividade do dispositivo</h3>
