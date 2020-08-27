@@ -1,7 +1,7 @@
 ## Dispositivo e Comunicação
 
 ### Responsáveis:
-  * Arley, Majid e Gabriel (Auxiliar)
+  * Arley, Majid, Luiza e Gabriel (Auxiliar)
 ----------------------------------------------------------
 <h1>Dispositivo RFID</h1>
 <p>O dispositivo monitora quem está no ambiente, para ter o controle de quantas pessoas estão no local e em qual setor. Todo este aparato é para garantir a segurança caso venha ocorrer alguma coisa que coloque a vida de qualquer usuário em risco. Todo o sistema foi projetado para garantir a segurança de todos dentro da organização, o monitoramento em tempo real faz com que qualquer providência tomada seja ágil e eficaz.</p>
