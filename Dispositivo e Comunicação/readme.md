@@ -9,7 +9,7 @@
 
 <h2>Projeto</h2>
 <p>Para o projeto foi usado os seguintes módulos:</p>
-<table>
+<table align="center">
 	<thead>
 		<th>Nome</th>
 		<th>Dispositivo</th>
@@ -17,31 +17,31 @@
 	<tbody>
 		<tr>
 			<td>Controlador de acesso RC522</td>
-			<td><img src="https://user-images.githubusercontent.com/32252053/90170632-b32a6180-dd76-11ea-93aa-c88b795aa0e8.jpg" width="300" heigth="300"></td>
+			<td><img src="https://user-images.githubusercontent.com/32252053/90170632-b32a6180-dd76-11ea-93aa-c88b795aa0e8.jpg" width="200" heigth="200"></td>
 		</tr>
 		<tr>
 			<td>Modulo WIFI ESP8266</td>
-			<td><img src="https://user-images.githubusercontent.com/32252053/90171095-5b402a80-dd77-11ea-87f7-0c5b4de51277.jpg" width="300" heigth="300"></td>
+			<td><img src="https://user-images.githubusercontent.com/32252053/90171095-5b402a80-dd77-11ea-87f7-0c5b4de51277.jpg" width="200" heigth="200"></td>
 		</tr>
 		<tr>
 			<td>Resistor de 10k</td>
-			<td><img src="https://user-images.githubusercontent.com/32252053/90171705-44e69e80-dd78-11ea-867b-1126307d7ce7.jpg" width="300" heigth="300"</td>
+			<td><img src="https://user-images.githubusercontent.com/32252053/90171705-44e69e80-dd78-11ea-867b-1126307d7ce7.jpg" width="200" heigth="200"</td>
 		</tr>
 		<tr>
 			<td>Resistor de 200ohms</td>
-			<td><img src="https://user-images.githubusercontent.com/32252053/90171813-71021f80-dd78-11ea-9ba9-5083f4988ef4.jpg" width="300" heigth="300"</td>
+			<td><img src="https://user-images.githubusercontent.com/32252053/90171813-71021f80-dd78-11ea-9ba9-5083f4988ef4.jpg" width="200" heigth="200"</td>
 		</tr>
 		<tr>
 			<td>Arduino Uno</td>
-			<td><img src="https://user-images.githubusercontent.com/32252053/90172088-df46e200-dd78-11ea-8721-4dc703af73be.jpeg" width="300" heigth="300"</td>
+			<td><img src="https://user-images.githubusercontent.com/32252053/90172088-df46e200-dd78-11ea-8721-4dc703af73be.jpeg" width="200" heigth="200"</td>
 		</tr>
 		<tr>
 			<td>Protoboard</td>
-			<td><img src="https://user-images.githubusercontent.com/32252053/90172195-056c8200-dd79-11ea-8386-983121283269.jpg" width="300" heigth="300"</td>
+			<td><img src="https://user-images.githubusercontent.com/32252053/90172195-056c8200-dd79-11ea-8386-983121283269.jpg" width="200" heigth="200"</td>
 		</tr>
 		<tr>
 			<td>Buzzer</td>
-			<td><img src="https://user-images.githubusercontent.com/32252053/90172322-377de400-dd79-11ea-9f51-4688108a5e81.jpg" width="300" heigth="300"> </td>
+			<td><img src="https://user-images.githubusercontent.com/32252053/90172322-377de400-dd79-11ea-9f51-4688108a5e81.jpg" width="200" heigth="200"> </td>
 		</tr>
 </table>
 <p>Todos este componentes em junção fazem o dispositivo ser eficaz, além de usar uma linguagem de programação poderosa. A IDE utilizada para desenvolver toda parte logica foi o Arduino, utilizando a linguagem de programação Sketch.</p>
