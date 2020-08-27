@@ -74,7 +74,7 @@
  <p> Upgrade de firmware ESP8266 - ESP01 </p>
  <ul>
 	
-<li><a href="https://blogmasterwalkershop.com.br/embarcados/esp8266/upgrade-de-firmware-do-wifi-esp8266-esp-01-atraves-do-arduino-e-conversor-usb-serial/">Ler sobre atualização de firmaware do WiFi ESP 8266 ESP 01</a> </li>
+<li><a href="https://blogmasterwalkershop.com.br/embarcados/esp8266/upgrade-de-firmware-do-wifi-esp8266-esp-01-atraves-do-arduino-e-conversor-usb-serial/">Ler sobre atualização de firmware do WiFi ESP 8266 ESP 01</a> </li>
  </ul>
  <p> Lista de comandos AT </p>
   <ul>
