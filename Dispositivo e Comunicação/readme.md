@@ -48,17 +48,23 @@
 </table>
 <p>Todos este componentes em junção fazem o dispositivo ser eficaz, além de usar uma linguagem de programação poderosa. A IDE utilizada para desenvolver toda parte logica foi o Arduino, utilizando a linguagem de programação Sketch.</p>
 
-<h3>Circuito Dispositivo WiFi</h3>
-
+<h3>Dispositivo WiFi</h3>
+ <p>Circuito </p>
 <p align="center">
   <img src="DispWiFiRFID.jpg" width="300" title="Disp WiFi">
 </p>
-
+ <p>Código principal: rfid-loc-wifi.ino </p>
+<ul>
+<li> Código para se comunicar com o servidor hospedado na Raspberry enviando número de indentificação do dispositivo.</li>
+ </ul>
+ 
 <h3>Atividade do dispositivo</h3>
 <ul>
-	<li>Faz a leitura de um card RFID </li>
-	<li>Envia a informação para um servidor</li>
-	<li>Conectado à rede do local</li>
+	<li>Conecta-se à rede do local</li>
+	<li>Se dectar presença do cartão RFID, faz a leitura de seu ID </li>
+	<li>Envia os dados para o módulo ESP8266 pelos comandos AT </li>
+	<li>Módulo ESP 8266 envia a informação para um servidor pelo método GET do protocolo HTTP</li>
+	
 </ul>
 <p>O dispositivo está apenas responsável por fazer a leitura do card RFID e repassar para um servidor onde o mesmo estará repassando para a aplicação para o processo de cadastro, caso não esteja no banco de dados, ou fazer a ocorrência do usuário com o cartão caso contrário. O dispositivo vai apenas passar as tags para que seja feito a comparação no banco de dados, logo o servidor retorna com a resposta se está ou não cadastrado.</p>
 
