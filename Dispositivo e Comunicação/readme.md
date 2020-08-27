@@ -31,14 +31,8 @@
 			<td>Resistor de 200ohms</td>
 			<td><img src="https://user-images.githubusercontent.com/32252053/90171813-71021f80-dd78-11ea-9ba9-5083f4988ef4.jpg" width="300" heigth="300"</td>
 		</tr>
-		<tr>
-			<td>Led vermelho</td>
-			<td><img src="https://user-images.githubusercontent.com/32252053/90171889-942ccf00-dd78-11ea-8aa0-27cf469df3d2.jpg" width="300" heigth="300"</td>
-		</tr>
-		<tr>
-			<td>Led verde</td>
-			<td><img src="https://user-images.githubusercontent.com/32252053/90172006-bfafb980-dd78-11ea-9766-f13e41f79529.png" width="300" heigth="300"</td>
-		</tr>
+
+
 		<tr>
 			<td>Arduino Uno</td>
 			<td><img src="https://user-images.githubusercontent.com/32252053/90172088-df46e200-dd78-11ea-8721-4dc703af73be.jpeg" width="300" heigth="300"</td>
@@ -58,7 +52,6 @@
 <ul>
 	<li>Faz a leitura de um card RFID </li>
 	<li>Envia a informação para um servidor</li>
-	<li>Aponta se está cadastrado ou não com led vermelho/verde</li>
 	<li>Conectado à rede do local</li>
 </ul>
 <p>O dispositivo está apenas responsável por fazer a leitura do card RFID e repassar para um servidor onde o mesmo vai estar fazendo todo o processo de cadastro e conferencia, enquanto o dispositivo vai apenas passar as tags para que seja feito a comparação no banco de dados, logo o servidor retorna com a resposta se está ou não cadastrado.</p>
