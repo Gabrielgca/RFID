@@ -55,7 +55,7 @@
 </p>
  <p>Código principal: rfid-loc-wifi.ino </p>
 <ul>
-<li> Código para se comunicar com o servidor hospedado na Raspberry enviando número de indentificação do dispositivo.</li>
+<li> Código para se comunicar com o servidor hospedado na Raspberry enviando número de identificação do dispositivo.</li>
  </ul>
  
 <h3>Atividade do dispositivo</h3>
