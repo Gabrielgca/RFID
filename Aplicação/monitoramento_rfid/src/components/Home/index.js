@@ -6,12 +6,13 @@ import axios from 'axios';
 
 import baseURL from "../../service";
 import Loader from 'react-loader-spinner';
+import AutorenewIcon from '@material-ui/icons/Autorenew';
 
 class Home extends Component {
 
   state = {
-    //Rooms será retorno de /getRooms do servidor
-    rooms: []
+    updateCounter: 30,
+    rooms: [] //Rooms será retorno de /getRooms do servidor
   };
 
   getRooms = async () => {
@@ -45,9 +46,19 @@ class Home extends Component {
   }
 
   componentDidMount() {
+    this.getRooms();
+    this.setState({ updateCounter: 30 });
+
     setInterval(() => {
-      this.getRooms();
-    }, 30000); //60.000ms equivalem a 1 minuto
+      let count = this.state.updateCounter;
+      count--;
+      this.setState({ updateCounter: count });
+      if (this.state.updateCounter === -1) {
+        this.getRooms();
+        console.log("GetRooms!");
+        this.setState({ updateCounter: 30 });
+      }
+    }, 1000); //60.000ms equivalem a 1 minuto*/
 
     //this.getRooms(); RODA UMA VEZ SÓ A REQUISIÇÃO
   }
@@ -56,7 +67,13 @@ class Home extends Component {
     const { rooms } = this.state;
     return (
       <section id="rooms">
-        <h1>Salas</h1>
+        <div style={{ display: "flex", flexDirection: "row" }}>
+          <h1 style={{ width: "50%" }}>Salas</h1>
+          <div style={{ width: "50%", display: "flex", flexDirection: "row", justifyContent: "flex-end" }}>
+            <AutorenewIcon fontSize="small" style={{color: "#FFF", }}></AutorenewIcon>
+            <p style={{ fontSize: 15, color: "#FFF", fontWeight: "bold" }}>{this.state.updateCounter.toString().padStart(2, '0')}s</p>
+          </div>
+        </div>
         {rooms.length > 0 ? (
           rooms.map((room) => {
             return (

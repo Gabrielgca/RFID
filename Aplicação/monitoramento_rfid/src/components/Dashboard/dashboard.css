@@ -51,6 +51,7 @@ div#dashboard .rooms{
 }
 
 .sector-title{
+  width: 50%;
   color: #FFF;
   margin: 0;
 }
