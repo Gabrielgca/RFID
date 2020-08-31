@@ -116,39 +116,92 @@ def teste():
     return 'Nenhuma mensagem lida.'
 
 @app.route ('/WiFiRFID')
-def WiFIRFID ():
+def WiFiRFID ():
   global uplink
   global idrfid
   global available
 
   try:
     idrfid = request.args.get('RFID')
+    iddisp = int(request.args.get('LOC'))
+
     idrfid = idrfid.upper()
     available = is_available(idrfid)
     print(idrfid)
     print(available)
+
     if not available:
+
+
       with dbRfid.sessionQueryScope() as session:
-          for cartao in session.query(Cartao).filter_by(noCartao = idrfid):
-            IDcartao = cartao.idCartao
-          for i in session.query(CadastroCartao):
-            if i.idCartao == IDcartao and i.stEstado == 'A':
-              idusuario = i.idCadastro
-              break
+        cardid_idrfid = session.query(Cartao).filter_by(noCartao = idrfid).first()
+        cardid_idrfid = cardid_idrfid.idCartao
+        userid_idrfid = session.query(CadastroCartao).filter_by(idCartao = int(cardid_idrfid), stEstado = 'A').first()
+        userid_idrfid = userid_idrfid.idCadastro
+        last_ocorr = session.query(Ocorrencia).filter_by(idCadastro = userid_idrfid).order_by(Ocorrencia.idOcorrencia.desc(), Ocorrencia.hrOcorrencia.desc()).first()
+
+        
+        #print (userid_idrfid)
+        print(last_ocorr)
+        
+      # Força Saída da última entrada do usuário caso ele esteja como entrada
+      if not last_ocorr == None:
+        if last_ocorr.idDispositivo == iddisp:
+          if last_ocorr.stOcorrencia == 'E':
+            s_ocorr = Ocorrencia (idDispositivo = last_ocorr.idDispositivo,
+                  idCadastro = int(userid_idrfid),
+                  dtOcorrencia = func.current_date(),
+                  hrOcorrencia = func.current_time(),
+                  stOcorrencia = 'S')
+            print('Entrei Aqui! - 1')
+          else:
+            s_ocorr = Ocorrencia (idDispositivo = last_ocorr.idDispositivo,
+                  idCadastro = int(userid_idrfid),
+                  dtOcorrencia = func.current_date(),
+                  hrOcorrencia = func.current_time(),
+                  stOcorrencia = 'E')
+            print('Entrei Aqui! - 2')
+          with dbRfid.sessionTransactionScope() as session:
+              session.add(s_ocorr)
+        else:
+          if last_ocorr.stOcorrencia == 'E':
+            v_ocorr = Ocorrencia (idDispositivo = last_ocorr.idDispositivo,
+                  idCadastro = int(userid_idrfid),
+                  dtOcorrencia = func.current_date(),
+                  hrOcorrencia = func.current_time(),
+                  stOcorrencia = 'S')
+        
+            with dbRfid.sessionTransactionScope() as session:
+              session.add(v_ocorr)
+            print('Entrei Aqui! - 3')
+            
+          n_ocorr = Ocorrencia (idDispositivo = iddisp,
+                idCadastro = int(userid_idrfid),
+                dtOcorrencia = func.current_date(),
+                hrOcorrencia = func.current_time(),
+                stOcorrencia = 'E')
+          with dbRfid.sessionTransactionScope() as session:
+            session.add(n_ocorr)
+          
+          print('Entrei Aqui! - 4')
+      else:
+        n_ocorr = Ocorrencia (idDispositivo = iddisp,
+                  idCadastro = int(userid_idrfid),
+                  dtOcorrencia = func.current_date(),
+                  hrOcorrencia = func.current_time(),
+                  stOcorrencia = 'E')
+        with dbRfid.sessionTransactionScope() as session:
+          session.add(n_ocorr)
+          print(print('Entrei Aqui! - 5'))
       
-      ocorr = Ocorrencia (idDispositivo = 1,
-              idCadastro = idusuario,
-              dtOcorrencia = func.current_date(),
-              hrOcorrencia = func.current_time())
-      with dbRfid.sessionTransactionScope() as session:
-        session.add(ocorr)
       return jsonify (success = True)
     else:
       uplink = True
       return jsonify (success = False)
 
   except:
-    return jsonify(answer = 'cannot read any ID')
+    print('Verifique as variáveis de envio!')
+    return jsonify(answer = 'cannot read any ID or LOC')
 
 
 @app.route ('/statusIdcard')
@@ -229,6 +282,8 @@ def findrooms():
           dict_disp.pop('stAtivo')
           dict_disp['idSala'] = dict_disp.pop('idDispositivo')
           dict_disp['nomeSala'] = dict_disp.pop('noLocalizacao')
+          #FILTRAR O ENVIO PELO DIA
+          #for j in session.query(Ocorrencia).filter_by(Ocorrencia.dtOcorrencia)
           for j in session.query(Ocorrencia):
               if i.idDispositivo == j.idDispositivo:
                   if j.stOcorrencia == 'E':
@@ -275,7 +330,10 @@ def roominfo():
           if i.stOcorrencia == 'E':
             users_inside.append(i.idCadastro)
           if i.stOcorrencia == 'S':
-            users_inside.remove(i.idCadastro)
+            try:
+              users_inside.remove(i.idCadastro)
+            except:
+              print('Aviso: Saída SEM Entrada na Sala!!')
   
   users_inside.sort()
   print(users_inside)

@@ -29,25 +29,25 @@ class MySqlFunc:
 mysql_func = MySqlFunc()
 
 class CarregaDadosAux():
-    def __init__ (self,parent = None):
-        self.parent = parent
-        self.session = parent.session
+    def __init__ (self,database = None):
+        self.database = database
         self.nno = aliased(Nomes,name="nno")
         self.sno = aliased(Sobrenomes,name="sno")
 
     def selectNomes (self):
         nno = self.nno
-        return self.session.query(nno.noNome).all()
+        with self.database.sessionQueryScope() as session:
+            return session.query(nno.noNome).all()
 
     def selectSobrenomes (self):
         sno = self.sno
-        return self.session.query(sno.noSobrenome).all()
+        with self.database.sessionQueryScope() as session:
+            return session.query(sno.noSobrenome).all()
 
 class InsereDados():
-    def __init__ (self,parent = None):
-        self.parent = parent
-        self.session = parent.session
-        self.engine = parent.engine
+    def __init__ (self,database = None):
+        self.database = database
+        self.engine = database.engine
         self.dp = aliased(Dispositivo,name="dp")
         self.cd = aliased(Cadastro,name="cd")
         self.ct = aliased(Cartao,name="ct")
@@ -58,77 +58,77 @@ class InsereDados():
         newDisp = Dispositivo(noDispositivo = "wifi",
                               noLocalizacao = "IBTI - Sala Principal",
                               vlAndar = 1)
-        self.session.add(newDisp)
+        with self.database.sessionTransactionScope() as session:
+            session.add(newDisp)
 
-        self.session.commit()
 
     def insereCadastros (self,cadastros):
-        for cadastro in cadastros:
-            self.session.add(cadastro)
-        self.session.commit()
+        with self.database.sessionTransactionScope() as session:
+            for cadastro in cadastros:
+                session.add(cadastro)
 
     def insereCartoes (self,cartoes):
-        for cartao in cartoes:
-            self.session.add(cartao)
-        self.session.commit()
+        with self.database.sessionTransactionScope() as session:
+            for cartao in cartoes:
+                session.add(cartao)
 
     def insereCadastrosCartoes(self,cadastrosCartoes):
-        for cadastroCartao in cadastrosCartoes:
-            newCadastroCartao = CadastroCartao(idCadastro = int(cadastroCartao[0]),
-                                               idCartao = int(cadastroCartao[1]),
-                                               stEstado = 'A')
-            self.session.add(newCadastroCartao)
-        self.session.commit()
+        with self.database.sessionTransactionScope() as session:
+            for cadastroCartao in cadastrosCartoes:
+                newCadastroCartao = CadastroCartao(idCadastro = int(cadastroCartao[0]),
+                                                idCartao = int(cadastroCartao[1]),
+                                                stEstado = 'A')
+                session.add(newCadastroCartao)
 
     def insereOcorrencias (self,ocorrencias):
-        for ocorrencia in ocorrencias:
-            #print(type(ocorrencia))
-            if ocorrencia.hrOcorrencia is not None:
-                self.session.add(ocorrencia)
-        self.session.commit()
+        with self.database.sessionTransactionScope() as session:
+            for ocorrencia in ocorrencias:
+                #print(type(ocorrencia))
+                if ocorrencia.hrOcorrencia is not None:
+                    session.add(ocorrencia)
     
     def selectAllDisps(self):
         dp = self.dp
-        return self.session.query(dp)
+        with self.database.sessionQueryScope() as session:
+            return session.query(dp)
     
     def selectAllCadastrosIds(self):
         cd = self.cd
-        return self.session.query(cd.idCadastro)\
-                           .order_by(asc(cd.idCadastro)).all()
+        with self.database.sessionQueryScope() as session:
+            return session.query(cd.idCadastro)\
+                            .order_by(asc(cd.idCadastro)).all()
 
     def selectAllCartoesIds(self):
         ct = self.ct
-        return self.session.query(ct.idCartao)\
-                           .order_by(asc(ct.idCartao)).all()
+        with self.database.sessionQueryScope() as session:
+            return session.query(ct.idCartao)\
+                            .order_by(asc(ct.idCartao)).all()
 
     def selectCadastrosCartoes(self):
         cd = self.cd
         ct = self.ct
         cdct = self.cdct
-        return self.session.query(cd.noUsuario,ct.noCartao,cdct.stEstado)\
-                           .join(cd,cd.idCadastro == cdct.idCadastro)\
-                           .join(ct,ct.idCartao == cdct.idCartao)
+        with self.database.sessionQueryScope() as session:
+            return session.query(cd.noUsuario,ct.noCartao,cdct.stEstado)\
+                            .join(cd,cd.idCadastro == cdct.idCadastro)\
+                            .join(ct,ct.idCartao == cdct.idCartao)
 
     def deleteAll(self):
-        self.session.query(Ocorrencia).delete()
-        self.session.commit()
-        self.engine.execute("ALTER TABLE {} AUTO_INCREMENT = 0".format(Ocorrencia.__tablename__))
-        
-        self.session.query(Dispositivo).delete()
-        self.session.commit()
-        self.engine.execute("ALTER TABLE {} AUTO_INCREMENT = 0".format(Dispositivo.__tablename__))
-        
-        self.session.query(CadastroCartao).delete()
-        self.session.commit()
-        self.engine.execute("ALTER TABLE {} AUTO_INCREMENT = 0".format(CadastroCartao.__tablename__))
-
-        self.session.query(Cadastro).delete()
-        self.session.commit()
-        self.engine.execute("ALTER TABLE {} AUTO_INCREMENT = 0".format(Cadastro.__tablename__))
-        
-        self.session.query(Cartao).delete()
-        self.session.commit()
-        self.engine.execute("ALTER TABLE {} AUTO_INCREMENT = 0".format(Cartao.__tablename__))
+        with self.database.sessionTransactionScope() as session:
+            session.query(Ocorrencia).delete()
+            self.engine.execute("ALTER TABLE {} AUTO_INCREMENT = 0".format(Ocorrencia.__tablename__))
+        with self.database.sessionTransactionScope() as session:    
+            session.query(Dispositivo).delete()
+            self.engine.execute("ALTER TABLE {} AUTO_INCREMENT = 0".format(Dispositivo.__tablename__))
+        with self.database.sessionTransactionScope() as session:    
+            session.query(CadastroCartao).delete()
+            self.engine.execute("ALTER TABLE {} AUTO_INCREMENT = 0".format(CadastroCartao.__tablename__))
+        with self.database.sessionTransactionScope() as session:
+            session.query(Cadastro).delete()
+            self.engine.execute("ALTER TABLE {} AUTO_INCREMENT = 0".format(Cadastro.__tablename__))
+        with self.database.sessionTransactionScope() as session:    
+            session.query(Cartao).delete()
+            self.engine.execute("ALTER TABLE {} AUTO_INCREMENT = 0".format(Cartao.__tablename__))
     
     def gerenateOcorrencias (self, qtde):
         entarr = np.array(['13:00:00','13:10:00','13:20:00','13:30:00','13:40:00','13:50:00'])
@@ -154,8 +154,9 @@ class InsereDados():
             dtOcorrencia = func.current_date(),
             hrOcorrencia = str(entarr[hr_ent]))
 
-            self.session.add(ocorr_ent)
-            self.session.commit()
+            with self.database.sessionTransactionScope() as session:
+                session.add(ocorr_ent)
+                session.commit()
 
 class Funcionario ():
     def __init__(self,idCad = None,behavior = None):
@@ -323,13 +324,30 @@ def generateDict(res,dictHeader = None):
 
 dbRfid = DbControl()
 
+<<<<<<< HEAD
 dbRfid.dbInit("root:#IBTI@2019@localhost/db_rfid")
+=======
+print("Informe o host: ")
+host = input()
+
+print("Informe o usuário: ")
+user = input()
+
+print("Informe o password: ")
+password = input()
+
+dbRfid.dbInit(user+":"+password+"@"+host+"/db_rfid")
+>>>>>>> 47528e10b98040a467427e9e10cc4305ce48dcdb
 
 ins = InsereDados(dbRfid)
 
 dbAux = DbControl()
 
+<<<<<<< HEAD
 dbAux.dbInit("root:#IBTI@2019@localhost/db_auxiliar")
+=======
+dbAux.dbInit(user+":"+password+"@"+host+"/db_auxiliar")
+>>>>>>> 47528e10b98040a467427e9e10cc4305ce48dcdb
 
 sel = CarregaDadosAux(dbAux)
 
