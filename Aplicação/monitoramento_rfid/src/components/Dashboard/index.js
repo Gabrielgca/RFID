@@ -9,6 +9,7 @@ import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon';
 import SpeedDialAction from '@material-ui/lab/SpeedDialAction';
 import AddIcon from '@material-ui/icons/Add';
 import ExitToApp from '@material-ui/icons/ExitToApp';
+import AutorenewIcon from '@material-ui/icons/Autorenew';
 
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -36,6 +37,7 @@ class Dashboard extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      updateCounter: 30,
       modalOpen: false, //Controla o estado do modal de detalhes do usuário
       open: false, //Controla o estado do botão flutuante que funciona como menu
       nome: localStorage.nome, //Armazenará o nome do Usuário logado
@@ -66,9 +68,19 @@ class Dashboard extends Component {
       this.setState({ nome: localStorage.nome });
     });
 
+    this.getRooms();
+    this.setState({ updateCounter: 30 });
+
     setInterval(() => {
-      this.getRooms();
-    }, 30000); //60.000ms equivalem a 1 minuto
+      let count = this.state.updateCounter;
+      count--;
+      this.setState({ updateCounter: count });
+      if (this.state.updateCounter === -1) {
+        this.getRooms();
+        console.log("GetRooms!");
+        this.setState({ updateCounter: 30 });
+      }
+    }, 1000); //60.000ms equivalem a 1 minuto*/
 
     //this.getRooms(); RODA UMA VEZ SÓ A REQUISIÇÃO
   }
@@ -123,6 +135,8 @@ class Dashboard extends Component {
       })
       .catch(error => {
         alert("Erro: " + JSON.stringify(error));
+      }).finally(() => {
+        this.getRooms();
       });
 
     //A linha abaixo o simula o retorno dos dados que virão do servidor, utilizando os dados do JSON local
@@ -194,7 +208,13 @@ class Dashboard extends Component {
         <p style={{ color: "#FFF" }}>Email: {firebase.getCurrent()}</p><br />
         <div className="rooms">
           <div className="rooms-list">
-            <h2 className="sector-title">Setores</h2>
+            <div style={{ display: "flex", flexDirection: "row" }}>
+              <h2 className="sector-title">Setores</h2>
+              <div style={{ width: "50%", display: "flex", flexDirection: "row", justifyContent: "flex-end" }}>
+                <AutorenewIcon fontSize="small" style={{ color: "#FFF", }}></AutorenewIcon>
+                <p style={{ fontSize: 15, color: "#FFF", fontWeight: "bold" }}>{this.state.updateCounter.toString().padStart(2, '0')}s</p>
+              </div>
+            </div>
             {rooms.length > 0 ? (
               rooms.map((room) => {
                 return (

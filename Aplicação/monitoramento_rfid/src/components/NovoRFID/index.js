@@ -52,7 +52,7 @@ class NewRFID extends Component {
     //Resposta 1 = cartão disponível para cadastro
     this.setState({ loading: true });
 
-    await axios.get(baseURL + "/statusIdcard")
+    await axios.get(baseURL + "statusIdcard")
       .then(response => {
         //alert("getCardStatus: " + JSON.stringify(response));
         if (response.data === 0) {
@@ -62,13 +62,13 @@ class NewRFID extends Component {
         }
         else {
           this.setState({ loading: false });
-          this.setState({ cardStatus: response.data.statusCartao });
-          this.setState({ cardCodeRFID: response.data.codigoRFIDCartao });
+          this.setState({ cardStatus: response.data.statusCartao }); // true =  cartão disponível para cadastro/ false = indisposnível
+          this.setState({ cardCodeRFID: response.data.codigoRFIDCartao }); //código do cartão RFID lido
         }
       })
       .catch(error => {
-        alert("Error: " + JSON.stringify(error));
         this.setState({ loading: false });
+        alert("Error: " + JSON.stringify(error));
       })
   }
 
