@@ -11,7 +11,7 @@ CREATE OR REPLACE TRIGGER set_new_status
     ON tb_ocorrencia FOR EACH ROW
 BEGIN
     IF EXISTS (SELECT * FROM tb_ocorrencia
-               WHERE id_cadastro = NEW.id_cadastro) THEN
+               WHERE id_cadastro = NEW.id_cadastro AND id_dispositivo = NEW.id_dispositivo) THEN
 
         SET @ocorrencia_exists = TRUE;
 
