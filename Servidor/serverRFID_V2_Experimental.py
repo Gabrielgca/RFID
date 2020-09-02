@@ -248,7 +248,7 @@ def WiFIRFID ():
     global available
 
     try:
-        locDisp = request.args.get('locDisp')
+        locDisp = request.args.get('LOC')
         idrfid = request.args.get('RFID')
         idrfid = idrfid.upper()
         available = is_available(idrfid)
@@ -290,9 +290,11 @@ def WiFIRFID ():
                                                  stOcorrencia='E'))
                 return jsonify (success = True)
         else:
+            uplink = True
             return jsonify (success = False)
 
     except Exception as e:
+        
         print(e)
         return jsonify(answer = 'cannot read any ID')
 
@@ -304,7 +306,7 @@ def statusIdcard():
     global available
     cardinfo = {}
 
-    if uplink == False or not noDevice == 'teste2':
+    if uplink == False:
         return '0'
     uplink = False
     cardinfo['statusCartao'] = available
