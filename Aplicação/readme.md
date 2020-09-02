@@ -1,13 +1,13 @@
 ## Aplicação
 
 ### Responsáveis:
-* Renato, Silvio e Arley (Auxiliar)
+* Arley, Renato e Silvio
 ---
 ### Overview:
-* Site desenvolvido para propiciar monitoramento de salas, bem como ferramenta administrativa.
+* Site desenvolvido para propiciar monitoramento de salas, bem como ferramenta administrativa contendo funções de gerenciamento de salas, usuários cadastrados, dispositivos e usuários do sistema em si.
 ---
 ### Recursos Utilizados:
-* React: uma biblioteca de JavaScript para o desenvolvimento de UI;
+* React: uma biblioteca de JavaScript para o desenvolvimento de UI. A escolha do uso desta biblioteca se deu por conta da praticidade da mesma, bem como a familiaridade com a linguagem utilizada e a facilidade de encontrar e desenvolver novas ferramentas para a mesma.
   * Axios: realiza requisições ao servidor;
   * Material Design: linguagem de design desenvolvida pela Google, auxilia na criação dos layouts, fornecendo elementos já responsivos com uma estilização padrão que pode ser aproveitada ou redefinida;
   * FuctBase64: realiza a conversão de imagens em Base64 e vice-versa;
