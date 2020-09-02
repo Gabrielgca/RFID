@@ -18,7 +18,7 @@ CORS(app)
 app.config['JSON_AS_ASCII'] = True
 
 #Inicializando o banco de dados
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:@localhost/db_rfid'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:#IBTI@2019@localhost/db_rfid'
 db = SQLAlchemy(app)
 
 #Mapeamentos dos objetos Flask-SQLAlchemy.
