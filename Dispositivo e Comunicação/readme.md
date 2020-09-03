@@ -49,7 +49,7 @@
 <h3>Dispositivo WiFi</h3>
  <p>Circuito </p>
 <p align="center">
-  <img src="CircuitoWiFiRFID.png" width="300" title="Disp WiFi">
+  <img src="CircuitoWiFiRFID.png" width="500" title="Disp WiFi">
 </p>
  <p>Código principal: rfid-loc-wifi.ino </p>
 <ul>
