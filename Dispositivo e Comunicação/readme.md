@@ -20,8 +20,11 @@
 			<td><img src="https://user-images.githubusercontent.com/32252053/90170632-b32a6180-dd76-11ea-93aa-c88b795aa0e8.jpg" width="200" heigth="200"></td>
 		</tr>
 		<tr>
-			<td>Modulo WIFI ESP8266</td>
+			<td>Modulo WIFI ESP8266 - ESP01</td>
 			<td><img src="https://user-images.githubusercontent.com/32252053/90171095-5b402a80-dd77-11ea-87f7-0c5b4de51277.jpg" width="200" heigth="200"></td>
+		</tr>
+			<td>Adaptador para protoboard - ESP01</td>
+			<td><img src="https://user-images.githubusercontent.com/65353733/92118410-d58b2a00-edcc-11ea-8b46-753434bbca85.jpg" width="200" heigth="200"> </td>
 		</tr>
 		<tr>
 			<td>Resistor de 10k</td>
@@ -43,13 +46,14 @@
 			<td>Buzzer</td>
 			<td><img src="https://user-images.githubusercontent.com/32252053/90172322-377de400-dd79-11ea-9f51-4688108a5e81.jpg" width="200" heigth="200"> </td>
 		</tr>
+		
 </table>
 <p>Todos este componentes em junção fazem o dispositivo ser eficaz, além de usar uma linguagem de programação poderosa. A IDE utilizada para desenvolver toda parte logica foi o Arduino, utilizando a linguagem de programação Sketch.</p>
 
 <h3>Dispositivo WiFi</h3>
  <p>Circuito </p>
 <p align="center">
-  <img src="DispWiFiRFID.jpg" width="300" title="Disp WiFi">
+  <img src="CircuitoWiFiRFID.png" width="500" title="Disp WiFi">
 </p>
  <p>Código principal: rfid-loc-wifi.ino </p>
 <ul>
