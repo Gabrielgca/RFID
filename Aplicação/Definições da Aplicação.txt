@@ -20,6 +20,9 @@ SETORES
 		Nome de cada setor
 		Número total de pessoas por setor
 		
+CADASTRO DE SETORES
+	Dados Requisitados:
+		
 MAPA DO SETOR
 - Acessado ao clicar na etiqueta do setor que se deseja visualizar
 	Dados Requisitados:
@@ -38,3 +41,52 @@ INFORMAÇÕES POR PESSOA
 		Horário de entrada
 	Dados Enviados:
 		ID da pessoa à qual se deseja visualizar o cadastro
+
+
+
+--
+
+NOVO PLANO DE LAYOUOT (após primeira deadline)
+
+Legenda:
+	CAIXA ALTA 							- nova tela
+	Inicial maiúscula 			- novo elemento de qualquer tipo (tabela, botão, etc.)
+	--Indentação 						- elemento dentro da tela anterior na indentação
+	(parênteses)						- detalhes do elemento / tela
+	*asterisco							- ação associada àquele elemento
+
+HOME
+	DASHBOARD
+		Setores (nome, andar, número de pessoas)
+	DASHBOARD (logged in)
+		Setores (nome, andar, número de pessoas, mais opções)
+		MAPA DO SETOR
+			Img do setor
+			Pessoas no setor (img de cada pessoa)
+		Mais opções (cadastros, setores, log out)
+			CADASTROS
+				Pessoas cadastradas (nome, img, cartão, último registro?)
+				Opções (novo cadastro, editar cadastro, remover cadastro)
+				NOVO CADASTRO
+					Dados cadastrais (nome, img de perfil)
+					*solicitar leitura de cartão
+				EDITAR CADASTRO
+					Alterar dados (nome, img)
+					Alterar cartão (estado do cartão: ativo / inativo, solicitar novo cartão)
+				REMOVER CADASTRO
+					*estado do cartão: inativo
+			SETORES
+				Setores (dispositivo, nome, andar, img)
+				Opções (novo setor, editar setor, remover setor)
+				NOVO SETOR
+					Dados do setor (dispositivo, nome, andar, img)
+				EDITAR SETOR
+					Alterar dados (nome, andar, img)
+					Alterar dispositivo (dispositivo associado, estado do dispositivo: ativo / inativo)
+				REMOVER SETOR
+					*estado do dispositivo: inativo
+				DISPOSITIVOS
+					Informações (nome, estado: ativo / inativo)
+					Opções (adicionar / remover, editar estado, alterar setor do dispositivo)
+
+* Avaliar a possibilidade de adicionar um campo de imagem de setor no banco de dados
