@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import { Link, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import firebase from '../../firebase';
 import './login.css';
-
 
 class Login extends Component {
 
@@ -34,7 +33,6 @@ class Login extends Component {
     const { email, password } = this.state;
 
     try {
-
       await firebase.login(email, password)
         .catch((error) => {
           if (error.code === 'auth/user-not-found') {

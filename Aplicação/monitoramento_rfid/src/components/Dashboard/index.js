@@ -10,6 +10,8 @@ import SpeedDialAction from '@material-ui/lab/SpeedDialAction';
 import AddIcon from '@material-ui/icons/Add';
 import ExitToApp from '@material-ui/icons/ExitToApp';
 import AutorenewIcon from '@material-ui/icons/Autorenew';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import HowToRegIcon from '@material-ui/icons/HowToReg';
 
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -24,10 +26,10 @@ import Loader from 'react-loader-spinner';
 import baseURL from "../../service";
 
 
-const actions = [
+/*const actions = [
   { icon: <AddIcon />, name: 'Novo RFID', action: 1 },
   { icon: <ExitToApp />, name: 'Sair', action: 2 }
-];
+];*/
 
 
 //const baseURL = 'http://192.168.2.196:5000/'; //Rede do IBTI
@@ -41,6 +43,7 @@ class Dashboard extends Component {
       modalOpen: false, //Controla o estado do modal de detalhes do usuário
       open: false, //Controla o estado do botão flutuante que funciona como menu
       nome: localStorage.nome, //Armazenará o nome do Usuário logado
+      cargo: localStorage.cargo,
       rooms: [], //Armazenará as salas cadastradas no sistema
       selectedPerson: {
         name: "",
@@ -51,7 +54,12 @@ class Dashboard extends Component {
         nomeSala: '',
         imgMapaSala: '',
         ocupantes: [],
-      }
+      },
+      actions: [
+        { icon: <AccountCircleIcon />, name: 'Gerenciar Usuários', action: 1 },
+        { icon: <HowToRegIcon />, name: 'Gerenciar Permissões', action: 3 },
+        { icon: <ExitToApp />, name: 'Sair', action: 2 },
+      ]
     };
 
     this.logout = this.logout.bind(this);
@@ -67,6 +75,20 @@ class Dashboard extends Component {
       localStorage.nome = info.val().nome;
       this.setState({ nome: localStorage.nome });
     });
+
+    firebase.getUserPerfil((info) => {
+      localStorage.cargo = info.val().cargo;
+      this.setState({ cargo: localStorage.cargo });
+    });
+
+    if (this.state.cargo === 'Administrador') {
+      let newActions = [
+        { icon: <AccountCircleIcon />, name: 'Gerenciar Usuários', action: 1 },
+        { icon: <HowToRegIcon />, name: 'Gerenciar Permissões', action: 3 },
+        { icon: <ExitToApp />, name: 'Sair', action: 2 }
+      ]
+      this.setState({ actions: newActions });
+    }
 
     this.getRooms();
     this.setState({ updateCounter: 30 });
@@ -151,13 +173,18 @@ class Dashboard extends Component {
   handleClose = (action) => {
     if (action === 1) {
       this.setState({ open: false });
-      this.props.history.push("/dashboard/new");
+      this.props.history.push("/users");
       //alert("Função Novo RFID");
     }
     else {
       if (action === 2) {
         this.logout();
         //alert("Função Sair");
+      }
+      else {
+        if (action === 3) {
+          this.props.history.push("/offices");
+        }
       }
     }
   };
@@ -194,7 +221,7 @@ class Dashboard extends Component {
             open={this.state.open}
             direction={"right"}
           >
-            {actions.map((action) => (
+            {this.state.actions.map((action) => (
               <SpeedDialAction
                 key={action.name}
                 icon={action.icon}
@@ -205,7 +232,8 @@ class Dashboard extends Component {
             ))}
           </SpeedDial>
         </div>
-        <p style={{ color: "#FFF" }}>Email: {firebase.getCurrent()}</p><br />
+        <p style={{ color: "#FFF" }}>Email: {firebase.getCurrent()}</p>
+        <p style={{ color: "#FFF" }}>Cargo: {this.state.cargo}</p><br />
         <div className="rooms">
           <div className="rooms-list">
             <div style={{ display: "flex", flexDirection: "row" }}>
@@ -248,7 +276,8 @@ class Dashboard extends Component {
                   if (person.imgPerfil != "") {
                     return (
                       <div className="person-avatar" onClick={() => { this.getSelectedPerson(person.idOcupante) }}>
-                        <img className="person-avatar" src={"data:image/png;base64, " + person.imgPerfil} />
+                        {/* <img className="person-avatar" src={"data:image/png;base64, " + person.imgPerfil} /> */}
+                        <img className="person-avatar" src={person.imgPerfil} />
                       </div>
                     )
                   }
@@ -282,7 +311,7 @@ class Dashboard extends Component {
 
             <div className="room-map">
               {selectedRoom.imgMapaSala !== '' ? (
-                <img className="img-mapa-sala" src={"data:image/png;base64, " + selectedRoom.imgMapaSala} />
+                <img className="img-mapa-sala" src={selectedRoom.imgMapaSala} />
               ) : (
                   <div className="sem-sala">Nenhuma sala selecionada...</div>
                 )}

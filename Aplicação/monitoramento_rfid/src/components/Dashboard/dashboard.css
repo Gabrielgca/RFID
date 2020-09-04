@@ -158,6 +158,7 @@ div#dashboard .rooms{
 }
 
 .button-room-details{
+  color: #000;
   border: 0;
   background-color: transparent;
 }

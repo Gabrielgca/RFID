@@ -1,0 +1,48 @@
+.container{
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    margin: 0 auto;
+    align-items: center;
+    justify-content: center;
+    overflow-y: scroll;
+}
+
+div .card{
+    width: 90%;
+    border-radius: 0.5em;
+    padding: 1em;
+    background-color: #FFF; 
+    margin-top: 15px;
+}
+div .card-disabled{
+    opacity: 0.25;
+    width: 90%;
+    border-radius: 0.5em;
+    padding: 1em;
+    background-color: #FFF; 
+    margin-top: 15px;
+}
+
+.buttonsArea{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    width: 90%;
+}
+
+div button{
+    color: #FFF;
+    padding: 0.5em;
+    margin-left: 10px;
+    border: 0;
+    cursor: pointer;
+}
+
+div .addButton{
+    background-color: green;
+}
+
+div .deleteButton{
+    background-color: red;
+}

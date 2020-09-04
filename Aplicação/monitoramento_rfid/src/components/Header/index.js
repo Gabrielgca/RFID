@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import AppBar from '@material-ui/core/AppBar';
 import './header.css';
-import firebase from '../../firebase';
 import { FaHome, FaLaptop } from 'react-icons/fa';
 
 function Header() {

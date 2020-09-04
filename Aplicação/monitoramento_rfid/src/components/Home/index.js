@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import firebase from '../../firebase';
 import './home.css';
-import Header from '../Header';
 import axios from 'axios';
 
 import baseURL from "../../service";
@@ -70,7 +68,7 @@ class Home extends Component {
         <div style={{ display: "flex", flexDirection: "row" }}>
           <h1 style={{ width: "50%" }}>Salas</h1>
           <div style={{ width: "50%", display: "flex", flexDirection: "row", justifyContent: "flex-end" }}>
-            <AutorenewIcon fontSize="small" style={{color: "#FFF", }}></AutorenewIcon>
+            <AutorenewIcon fontSize="small" style={{ color: "#FFF", }}></AutorenewIcon>
             <p style={{ fontSize: 15, color: "#FFF", fontWeight: "bold" }}>{this.state.updateCounter.toString().padStart(2, '0')}s</p>
           </div>
         </div>
