@@ -1,0 +1,104 @@
+
+
+div#area h1 {
+    color: #FFF;
+    text-align: center;
+    margin: 30px;
+}
+
+div#area header {
+    width: 100%;
+    max-width: 680px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 30px auto 10px;
+}
+
+div#area header a {
+    background: #272727;
+    padding: 8px 18px 8px;
+    border-radius: 5px;
+    color: #FFF;
+    text-decoration: none;
+    font-size: 15px;
+}
+
+div.room {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    max-height: 500px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin: 0 auto;
+}
+
+div.room-list {
+    width: 100%;
+    max-width: 930px;
+    margin: 0 auto;
+    padding-right: 30px;
+    overflow-y: scroll;
+    max-height: 500px;
+}
+
+article {
+    
+    align-items: center;
+    background: #FFF;
+    border: 1px solid #DDD;
+    margin-top: 20px;
+    padding: 1em;
+    border-radius: 5px;
+    justify-content: space-between;
+}
+
+
+/* Estilização do modal de detalhes */
+
+#alert-dialog-title {
+    text-align: center;
+}
+
+#alert-dialog-description {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+#alert-dialog-description p {
+    min-width: 300px;
+}
+
+.div-loader {
+    display: flex;
+    flex: column;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    padding-top: 10%;
+}
+
+.person-details p {
+    text-align: center;
+}
+
+.selectLabel {
+    margin-top: 18px;
+}
+
+.pesquisa {
+    align-items: center;
+    flex: column;
+    display: flex;
+    justify-content: center;
+}
+
+.btnArea{
+    margin-left: 70%;
+    margin-top: -40px;
+}
