@@ -28,6 +28,7 @@ import Input from '@material-ui/core/Input';
 import AddIcon from '@material-ui/icons/Add';
 import ClearIcon from '@material-ui/icons/Clear';
 import EditIcon from '@material-ui/icons/Edit';
+import { FormControlLabel } from '@material-ui/core';
 
 
 
@@ -38,24 +39,30 @@ class UsersRFID extends Component {
         this.state = {
             filterUsers: [],
             filter: '',
-            selectedUsers: { key: '', name: '', status: '' },
+            selectedUsers: { key: '', name: '', idade: '', cargo: '', status: '' },
             nome: localStorage.nome,
             modalDeactivateOpen: false,
             modalReactivateOpen: false,
             people: [{
                 key: 1,
                 name: "Arley Souto Aguiar",
+                idade: 25,
+                cargo: 'Analista',
                 status: "Ativo",
                 rfid: '1234'
             }, {
                 key: 2,
                 name: "Silvio Júnior",
+                idade: 26,
+                cargo: 'Administrador',
                 status: "Inativo",
                 rfid: '4321'
             }],
 
             selectedPerson: {
                 name: "",
+                idade: '',
+                cargo: '',
                 status: "",
                 rfid: ''
             }
@@ -110,6 +117,12 @@ class UsersRFID extends Component {
         this.setState({ selectedPerson: newSelectedPerson })
     }
 
+    cargo = async (event) => {
+        let newJob = this.state.selectedPerson;
+        newJob.cargo = event.target.value;
+        this.setState({ selectedPerson: newJob })
+    }
+
     rfid = async (event) => {
         this.setState({ status: event.target.rfid })
     }
@@ -138,7 +151,7 @@ class UsersRFID extends Component {
 
     getUsers = () => {
         this.setState({ users: [] });
-        this.state.selectedPerson.getAllUsers((allUsers) => {
+        this.state.selectedPerson.map((allUsers) => {
             allUsers.forEach((oneUser) => {
                 let list = {
                     key: oneUser.key,
@@ -228,6 +241,8 @@ class UsersRFID extends Component {
                             <div className={item.status === "Ativo" ? "card" : "card-disabled"}>
                                 <article>
                                     <p><b>Nome:</b> {item.name}</p>
+                                    <p><b>Idade:</b> {item.idade}</p>
+                                    <p><b>Cargo:</b> {item.cargo}</p>
                                     <p><b>Status:</b> {item.status}</p>
                                     <p><b>RFID:</b> {item.rfid}</p>
                                     <div className="btnArea">
@@ -281,6 +296,19 @@ class UsersRFID extends Component {
                                 fullWidth
 
                             />
+                            <FormControl disabled>
+                                <InputLabel>Idade</InputLabel>
+                                <Input value={this.state.selectedPerson.idade} />
+                            </FormControl>
+                            <InputLabel className="selectLabel">Cargo</InputLabel>
+                            <Select
+                                value={this.state.selectedPerson.cargo}
+                                onChange={this.cargo}
+                            >
+                                <MenuItem value="Analista">Analista</MenuItem>
+                                <MenuItem value="Administrador">Administrador</MenuItem>
+                                <MenuItem value="Operador">Operador</MenuItem>
+                            </Select>
                             <InputLabel className="selectLabel">Status</InputLabel>
                             <Select
                                 value={this.state.selectedPerson.status}
