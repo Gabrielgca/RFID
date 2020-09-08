@@ -43,10 +43,12 @@ class UsersRFID extends Component {
             modalDeactivateOpen: false,
             modalReactivateOpen: false,
             people: [{
+                key: 1,
                 name: "Arley Souto Aguiar",
                 status: "Ativo",
                 rfid: '1234'
             }, {
+                key: 2,
                 name: "Silvio Júnior",
                 status: "Inativo",
                 rfid: '4321'
@@ -295,8 +297,8 @@ class UsersRFID extends Component {
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                        <Button  onClick={this.editUser} autoFocus style={{backgroundColor:'green', color:'#FFF'}}>Salvar</Button>
-                        <Button onClick={this.modalClose} style={{ backgroundColor:'red', color:'#FFF'}}  autoFocus>
+                        <Button onClick={this.editUser} autoFocus style={{ backgroundColor: 'green', color: '#FFF' }}>Salvar</Button>
+                        <Button onClick={this.modalClose} style={{ backgroundColor: 'red', color: '#FFF' }} autoFocus>
                             Cancelar
                         </Button>
                     </DialogActions>
