@@ -9,7 +9,8 @@ import Register from './components/Register';
 import Header from './components/Header';
 import NewRFID from './components/NovoRFID';
 import Users from './components/Users';
-import Offices from './components/Offices';
+import UsersRFID from './components/UsersRFID';
+//import Offices from './components/Offices';
 
 import './global.css';
 import './App.css';
@@ -41,7 +42,8 @@ class App extends Component {
           <Route exact path="/register" component={Register} />
           <Route exact path="/dashboard/new" component={NewRFID} />
           <Route exact path="/users" component={Users} />
-          <Route exact path="/offices" component={Offices} />
+          <Route exact path="/users-rfid" component={UsersRFID}/>
+          {/* <Route exact path="/offices" component={Offices} /> */}
         </Switch>
       </BrowserRouter>
     ) : (
