@@ -8,7 +8,7 @@
 
 <ul>
 	<li>Usuários cadastrados associados a uma tag/cartão RFID</li>
-	<li>Dispositivos leitores de RFID conectados com a rede WiFi local, localizados em cada ambiente a ser monitorado</li>
+	<li>Dispositivos leitores de RFID conectados à rede WiFi local, localizados em cada ambiente a ser monitorado</li>
 	<li>Banco de dados para guardar os dados de cada usuário, dispositivo, cartão e ocorrência</li>
 	<li>Servidor fazendo as pontes de comunicação entre as partes</li>
   <li>Página Web com as informações devidamente organizadas</li>
