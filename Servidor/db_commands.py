@@ -309,6 +309,15 @@ class RfidCommands():
         return presencaList
 
     #COMANDO NOVO!
+    def selAllDispsAndLocDisp(self):
+        dp = self.dp
+        ld = self.ld
+        dl = self.dl
+        s = self.db.session
+        return s.query(dp,ld).join(dl,dp.idDispositivo == dl.idDispositivo)\
+                             .join(ld,dl.idLocalizacaoDisp == ld.idLocalizacaoDisp).scalar()
+
+    #COMANDO NOVO!
     def selUltRotaCadastro(self,idCadastro):
         rt = self.rt
         s = self.db.session
@@ -407,8 +416,9 @@ class RfidCommands():
             s.refresh()
 
     #COMANDO NOVO!
-    def insertPermUsuDisp(self,permUsuDisp,permissaoDisp,dispLocalizacao,permHorario=None,refresh=None):
+    def insertPermUsuDisp(self, cadastro, permUsuDisp, permissaoDisp, dispLocalizacao, permHorario=None, refresh=None):
         s = self.db.session
+        permUsuDisp.cadastro = cadastro
         permUsuDisp.permissaoDisp = permissaoDisp
         permUsuDisp.dispLocalizacao = dispLocalizacao
         permUsuDisp.permHorario = permHorario
