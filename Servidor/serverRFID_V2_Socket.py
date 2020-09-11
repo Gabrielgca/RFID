@@ -254,8 +254,9 @@ def rooms():
 def roominfo(data):
     global id_sala
     id_sala = data['idSala']
-    fuc_roominfo(id_sala)
-
+    print(f'O ID da sala recebido foi: {id_sala}')
+    room = fuc_roominfo(id_sala)
+    emit('news_from_roominfo', room)
 #-----------------------------------------------------#
 #------------------------ROTAS------------------------#
 #-----------------------------------------------------#
@@ -277,6 +278,7 @@ def WiFIRFID ():
     global uplink
     global idrfid
     global available
+    global id_sala
 
     try:
         locDisp = request.args.get('LOC')
@@ -299,7 +301,7 @@ def WiFIRFID ():
                                                      dtOcorrencia=db.func.current_date(),
                                                      hrOcorrencia=db.func.current_time(),
                                                      stOcorrencia=stOc))
-                    return jsonify (success = True)
+                    
                 else:
                     if ultOcorrencia.stOcorrencia == 'E':
                         cmd.insertOcorrencia(Ocorrencia (idDispositivo=ultOcorrencia.idDispositivo,
@@ -312,7 +314,7 @@ def WiFIRFID ():
                                                      dtOcorrencia=db.func.current_date(),
                                                      hrOcorrencia=db.func.current_time(),
                                                      stOcorrencia='E'))
-                    return jsonify (success = True)
+                    
             else:
                 cmd.insertOcorrencia(Ocorrencia (idDispositivo=locDisp,
                                                  idCadastro=cadastroCartao.idCadastro,
@@ -320,17 +322,20 @@ def WiFIRFID ():
                                                  hrOcorrencia=db.func.current_time(),
                                                  stOcorrencia='E'))
                 
-                ##Atualiza a quantidade de pessoas nas salas
-                rooms_update = findrooms()
-                emit('rooms_update', rooms_update)
-                #Verifica se atualização na sala selecionada
-                if int(locDisp) == int(id_sala):
-                    fuc_roominfo(locDisp)
-                return jsonify (success = True)
+            ##Atualiza a quantidade de pessoas nas salas
+            rooms_updates = findrooms()
+            print('EMITI')
+            print(type(rooms_updates))
+            socketio.emit('rooms_update', rooms_updates)
+            #Verifica se atualização na sala selecionada
+            if int(locDisp) == int(id_sala):
+                rooms = fuc_roominfo(locDisp)
+                socketio.emit('news_from_roominfo', rooms)
+            return jsonify (success = True)
         else:
             uplink = True
             # Envia o ID para a aplicação e o possibilita ser cadastrado
-            emit('register', idrfid)
+            socketio.emit('register', idrfid)
             return jsonify (success = False)
 
     except Exception as e:
@@ -460,9 +465,9 @@ def fuc_roominfo(app_id_sala):
         if os.path.exists(os.getcwd().replace("\\","/")+"/static/imagens/SalaIBTI.png"):
             img_sala = url_for("static",filename = "imagens/SalaIBTI.png",_external = True)
             sala = dict( idSala = id_sala, nomeSala = room['salas'][int(id_sala)-1]['nomeSala'], imgMapaSala = img_sala ,ocupantes = lista_ocupantes)
-        room['salaSelecionada'] = sala
+            room['salaSelecionada'] = sala
 
-        emit('news_from_roominfo', room)
+        return room
     else:
         print("O idSala "+str(id_sala)+" não existe no banco de dados!")
 
