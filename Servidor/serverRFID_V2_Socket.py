@@ -254,7 +254,7 @@ def rooms():
 def roominfo(data):
     global id_sala
     id_sala = data['idSala']
-    fuc_roominfo(app_id_sala)
+    fuc_roominfo(id_sala)
 
 #-----------------------------------------------------#
 #------------------------ROTAS------------------------#
@@ -383,11 +383,11 @@ def register():
 
 @app.route ('/registerDisp', methods = ['GET','POST'])
 def registerDisp():
-
+    pass
 
 @app.route ('/registerSetor', methods = ['GET','POST'])
 def registerSetor():
-
+    pass
 #---------------------------------#
 
 
