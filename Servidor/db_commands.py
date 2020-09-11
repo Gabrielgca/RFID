@@ -20,7 +20,9 @@ class RfidCommands():
             return Function("CONVERTE_MES",self.date_format(col,"%m"))
 
     def __init__(self,database=None):
-        from serverRFID_V2_Experimental import Cadastro, Cartao, Dispositivo, Rota, Ocorrencia, CadastroCartao, LocalizacaoDisp, DispLocalizacao
+        from serverRFID_V2_Experimental import Cadastro, Cartao, Dispositivo, Rota \
+                                               , Ocorrencia, CadastroCartao, LocalizacaoDisp \
+                                               , DispLocalizacao, PermHorario, PermissaoDisp
         self.db = database
         self.cd = self.db.aliased(Cadastro, name='CD')
         self.ct = self.db.aliased(Cartao, name='CT')
@@ -30,9 +32,13 @@ class RfidCommands():
         self.rt = self.db.aliased(Rota, name='RT')
         self.ld = self.db.aliased(LocalizacaoDisp, name='LD')
         self.dl = self.db.aliased(DispLocalizacao, name='DL')
+        self.ph = self.db.aliased(PermHorario, name='PH')
+        self.pd = self.db.aliased(PermissaoDisp, name='PD')
         self.mysql_func = self.MySqlFunc(database)
 
-    
+    ###################
+    # COMANDOS SELECT #
+    ###################
     def selAllDispositivos(self):
         dp = self.dp
         s = self.db.session
@@ -48,10 +54,74 @@ class RfidCommands():
         s = self.db.session
         return s.query(oc).all()
 
-    def selCadastros(self,cadastros):
+    def selAllRotas(self):
+        rt = self.rt
+        s = self.db.session
+        return s.query(rt).all()
+
+    def selAllLocalizacaoDisps(self):
+        ld = self.ld
+        s = self.db.session
+        return s.query(ld).all()
+
+    def selAllPermHorarios(self):
+        ph = self.ph
+        s = self.db.session
+        return s.query(ph).all()
+
+    def selAllPermissaoDisps(self):
+        pd = self.pd
+        s = self.db.session
+        return s.query(pd).all()
+
+    def selDispositivo(self, idDispositivo):
+        dp = self.dp
+        s = self.db.session
+        if type(idDispositivo) != list:
+            idDispositivo = [idDispositivo]
+        return s.query(dp).filter(dp.idDispositivo.in_(idDispositivo)).all()
+
+    def selCadastro(self, idCadastro):
         cd = self.cd
         s = self.db.session
-        return s.query(cd).filter(cd.idCadastro.in_(cadastros)).all()
+        if type(idCadastro) != list:
+            idCadastro = [idCadastro]
+        return s.query(cd).filter(cd.idCadastro.in_(idCadastro)).all()
+
+    def selOcorrencia(self, idOcorrencia):
+        oc = self.oc
+        s = self.db.session
+        if type(idOcorrencia) != list:
+            idOcorrencia = [idOcorrencia]
+        return s.query(cd).filter(cd.idOcorrencia.in_(idOcorrencia)).all()
+
+    def selRota(self, idRota):
+        rt = self.rt
+        s = self.db.session
+        if type(idRota) != list:
+            idRota = [idRota]
+        return s.query(rt).filter(rt.idRota.in_(idRota)).all()
+
+    def selLocalizacaoDisp(self, idLocalizacaoDisp):
+        ld = self.ld
+        s = self.db.session
+        if type(idLocalizacaoDisp) != list:
+            idLocalizacaoDisp = [idLocalizacaoDisp]
+        return s.query(ld).filter(ld.idLocalizacaoDisp.in_(idLocalizacaoDisp)).all()
+
+    def selPermHorario(self, idPermHorario):
+        ph = self.ph
+        s = self.db.session
+        if type(idPermHorario) != list:
+            idPermHorario = [idPermHorario]
+        return s.query(ph).filter(ph.idPermHorario.in_(idPermHorario)).all()
+
+    def selPermissaoDisp(self, idPermissaoDisp):
+        pd = self.pd
+        s = self.db.session
+        if type(idPermissaoDisp) != list:
+            idPermissaoDisp = [idPermissaoDisp]
+        return s.query(pd).filter(pd.idPermissaoDisp.in_(idPermissaoDisp)).all()
 
     def selCountCartoesAtivos(self,rfid):
         ct = self.ct
@@ -247,7 +317,15 @@ class RfidCommands():
                 .filter(rt.idCadastro == idCadastro)\
                 .order_by(desc(rt.idRotas))\
                 .limit(1).scalar()
-                          
+
+    ###########################
+    # FIM DOS COMANDOS SELECT #
+    ###########################
+
+
+    ###################
+    # COMANDOS INSERT #
+    ###################
     def insertCadastro(self,cadastro,refresh=False):
         s = self.db.session
         s.add(cadastro)
@@ -339,6 +417,14 @@ class RfidCommands():
         if refresh:
             s.refresh(permUsuDisp)
 
+    ###########################
+    # FIM DOS COMANDOS INSERT #
+    ###########################
+
+
+    ###################
+    # COMANDOS UPDATE #
+    ###################
     def updateCadastroImg(self, idCadastro, imgUrl):
         s = self.db.session
         cd = self.cd
@@ -425,6 +511,14 @@ class RfidCommands():
         dispLocalizacaoUpdt.stSituacao = newStatus
         s.commit()
 
+    ###########################
+    # FIM DOS COMANDOS UPDATE #
+    ###########################
+
+
+    ###################
+    # COMANDOS DELETE #
+    ###################
     #COMANDO NOVO!
     def deleteUltRotaCadastro(self,idCadastro):
         s = self.db.session
@@ -433,3 +527,7 @@ class RfidCommands():
         if ultRota is not None:
             s.query(rt).filter(rt.idRotas == ultRota.idRotas).delete()
             s.commit()
+
+    ###########################
+    # FIM DOS COMANDOS DELETE #
+    ###########################
