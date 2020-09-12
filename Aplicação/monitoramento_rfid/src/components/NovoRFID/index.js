@@ -11,9 +11,11 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
+
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 import Loader from 'react-loader-spinner';
 import baseURL from "../../service";
+import io from 'socket.io-client';
 
 const fileUpload = require('fuctbase64');
 
@@ -32,6 +34,8 @@ class NewRFID extends Component {
       cardCodeRFID: '',
       fileResult: '',
       loading: false,
+      age: '',//Armazenará a idade do usuario
+      office: ''//Armazenará o cargo
     };
 
     this.register = this.register.bind(this);
@@ -40,14 +44,27 @@ class NewRFID extends Component {
     this.handleClose = this.handleClose.bind(this);
   }
 
+
   componentDidMount() {
     if (!firebase.getCurrent()) {
       this.props.history.replace('/');
       return null;
     }
+
+    var ENDPOINT = 'http://192.168.2.196:7000';
+    this.socket = io.connect(ENDPOINT, {
+      reconnection: true
+    })
+
+    this.socket.on('register', response => {
+      this.setState({ cardCodeRFID: response })
+      this.setState({ cardStatus: true })
+      console.log('Register: ' + response)
+    })
+
   }
 
-  getCardCodeStatus = async () => {
+  /* getCardCodeStatus = async () => { TESTANDO COM SOCKET
     //Resposta 0 = cartão já cadastrado
     //Resposta 1 = cartão disponível para cadastro
     this.setState({ loading: true });
@@ -70,7 +87,7 @@ class NewRFID extends Component {
         this.setState({ loading: false });
         alert("Error: " + JSON.stringify(error));
       })
-  }
+  } */
 
   handleLoadingOn = async () => {
     this.setState({ loading: true });
@@ -95,11 +112,15 @@ class NewRFID extends Component {
 
     if (this.state.name !== '' &&
       this.state.cardCodeRFID !== '' &&
-      this.state.fileResult !== '') {
+      this.state.fileResult !== '' &&
+      this.state.age !== '' &&
+      this.state.office !== '') {
 
       const params = {
         codigoRFIDCartao: this.state.cardCodeRFID,
         nomeUsuario: this.state.name,
+        idadeUsuario: this.state.age,
+        cargoUsuario: this.state.office,
         imgPerfil: this.state.fileResult
       }
 
@@ -165,22 +186,29 @@ class NewRFID extends Component {
             {/* <h4>Status: {this.state.cardStatus === true ? "Cartão disponível" : "Cartão já utilizado!"}</h4> */}
           </div>
 
-          <div className="get-code-div">
-            <div class='input-wrapper'>
-              <label for='input-file'>
-                Selecionar um arquivo
+
+          <div class='input-wrapper'>
+            <label for='input-file'>
+              Selecionar um arquivo
               </label>
-              <input type="file" id="input-file" placeholder="Imagem de Perfil"
-                onChange={this.handleFile} required />
-              <span id='file-name'></span>
-            </div>
-            <button type="button" onClick={() => { this.getCardCodeStatus() }}>Ler Cartão</button>
+            <input type="file" id="input-file" placeholder="Imagem de Perfil"
+              onChange={this.handleFile} required />
+            <span id='file-name'></span>
           </div>
+
 
           {/* <progress value={this.state.progress} max="100" /> */}
 
-          <input type="text" placeholder="Nome Completo..." value={this.state.titulo} autoFocus
+          <input type="text" placeholder="Nome Completo..." value={this.state.name} autoFocus
             onChange={(e) => this.setState({ name: e.target.value })} required /><br />
+
+          <input type="text" placeholder="Idade" value={this.state.age} autoFocus
+            onChange={(e) => this.setState({ age: e.target.value })} required /><br />
+
+
+          <input type="text" placeholder="Cargo" value={this.state.office} autoFocus
+            onChange={(e) => this.setState({ office: e.target.value })} required /><br />
+
 
           <input type="text" placeholder="Código do Cartão RFID" value={this.state.cardCodeRFID} disabled={true} />
 
