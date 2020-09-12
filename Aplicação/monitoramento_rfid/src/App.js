@@ -10,6 +10,9 @@ import Header from './components/Header';
 import NewRFID from './components/NovoRFID';
 import Users from './components/Users';
 import UsersRFID from './components/UsersRFID';
+import socket from './components/soketTeste';
+import TesteSocket from './components/soketTeste/teste-socket-io';
+import CadastroDispRFID from './components/CadastroDispRFID';
 //import Offices from './components/Offices';
 
 import './global.css';
@@ -43,6 +46,9 @@ class App extends Component {
           <Route exact path="/dashboard/new" component={NewRFID} />
           <Route exact path="/users" component={Users} />
           <Route exact path="/users-rfid" component={UsersRFID}/>
+          {/* <Route exact path="/socket" component={socket}/> */}
+          <Route exact path="/testesocket" component={TesteSocket}/>
+          <Route exact path="/cadastro-dispositivo" component={CadastroDispRFID}/>
           {/* <Route exact path="/offices" component={Offices} /> */}
         </Switch>
       </BrowserRouter>
