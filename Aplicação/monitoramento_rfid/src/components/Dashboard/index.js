@@ -13,6 +13,7 @@ import AutorenewIcon from '@material-ui/icons/Autorenew';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import HowToRegIcon from '@material-ui/icons/HowToReg';
 import TapAndPlayIcon from '@material-ui/icons/TapAndPlay';
+import QueuePlayNextIcon from '@material-ui/icons/QueuePlayNext';
 
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -60,6 +61,7 @@ class Dashboard extends Component {
         { icon: <AccountCircleIcon />, name: 'Gerenciar Usuários', action: 1 },
         { icon: <HowToRegIcon />, name: 'Gerenciar Permissões', action: 3 },
         { icon: <TapAndPlayIcon />, name: 'Gerenciamento de usuário RFID', action: 4 },
+        { icon: <QueuePlayNextIcon/>, name: 'Adicionar novo dispositivo', action: 5},
         { icon: <ExitToApp />, name: 'Sair', action: 2 },
       ]
     };
@@ -88,6 +90,7 @@ class Dashboard extends Component {
         { icon: <AccountCircleIcon />, name: 'Gerenciar Usuários', action: 1 },
         { icon: <HowToRegIcon />, name: 'Gerenciar Permissões', action: 3 },
         { icon: <TapAndPlayIcon />, name: 'Gerenciamento de usuário RFID', action: 4 },
+        { icon: <QueuePlayNextIcon/>, name: 'Adicionar novo dispositivo', action: 5},
         { icon: <ExitToApp />, name: 'Sair', action: 2 }
       ]
       this.setState({ actions: newActions });
@@ -191,6 +194,11 @@ class Dashboard extends Component {
         else {
           if (action === 4) {
             this.props.history.push("/users-rfid");
+          }
+          else{
+            if(action === 5){
+              this.props.history.push("/cadastro-dispositivo")
+            }
           }
         }
       }
