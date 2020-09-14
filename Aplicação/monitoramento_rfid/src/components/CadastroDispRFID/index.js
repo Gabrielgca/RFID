@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { BrowserRouter, Switch, Route, withRouter } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 import firebase from '../../firebase';
 import './CadastroDisp.css';
 
@@ -12,6 +12,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import TextField from '@material-ui/core/TextField';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@material-ui/core/FormControl';
 
 
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
@@ -19,6 +20,7 @@ import Loader from 'react-loader-spinner';
 import baseURL from "../../service";
 import io from 'socket.io-client';
 import axios from 'axios';
+import { InputLabel } from '@material-ui/core';
 
 class CadastroDispRFID extends Component {
 
@@ -30,7 +32,7 @@ class CadastroDispRFID extends Component {
             nomeDispositivo: '',
         }
 
-        
+
         this.registerDevices = this.registerDevices.bind(this)
     }
 
@@ -41,10 +43,16 @@ class CadastroDispRFID extends Component {
         }
     }
 
-    
+    searchDevices = () => {
+        alert('teste')
+    }
+
+    handleSetor = (event) =>{
+
+    }
 
     registerDevices = async (e) => {
-        
+
         e.preventDefault();
 
         if (this.state.key !== '' &&
@@ -55,7 +63,7 @@ class CadastroDispRFID extends Component {
                 statusRFID: this.state.nomeDispositivo,
                 nomeDispRFID: this.state.nomeDispositivo
             }
-           
+
             await axios.post(baseURL + 'registerDevices' + params)
                 .then(response => {
                     alert("Usuário salvo com sucesso")
@@ -73,12 +81,29 @@ class CadastroDispRFID extends Component {
 
     render() {
         return (
+
             <div className="formArea">
+                <header id="new">
+                    <Link to="/dispositivos">Voltar</Link>
+                </header>
                 {JSON.stringify(this.codigoDispRFID)}
                 <form onSubmit={this.registerDevices} id="formRFID">
                     <h1>Cadastro de dispositivo RFID</h1>
-                    <TextField id="outlined-basic" label="ID" variant="outlined" style={{ marginBottom: 20 }}
-                        value={this.state.key} autoFocus onChange={(e) => this.setState({ key: e.target.value })} required />
+                    <FormControl variant="outlined" style={{ marginBottom:20}}>
+                        <InputLabel>Localização</InputLabel>
+                        <Select
+                        value={this.state.nomeDispositivo}
+                        onChange={this.handleSetor}
+                        label="Localização"
+                        >
+                            <MenuItem>Sala de Reunião</MenuItem>
+                            <MenuItem>Sala Principal</MenuItem>
+                            <MenuItem>Sala de Reunião</MenuItem>
+                        </Select>
+                    </FormControl>
+                    
+                    <FormControl variant="outlined">
+                        <InputLabel>Status</InputLabel>
                     <Select
                         style={{ marginBottom: 20, width: 100 }}
                         autoFocus
@@ -88,11 +113,11 @@ class CadastroDispRFID extends Component {
                         value={this.state.status}
                         onChange={(e) => this.setState({ status: e.target.value })}
                     >
-                        <MenuItem value='ativo'>Ativado</MenuItem>
+                        <MenuItem value='ativo'>Ativo</MenuItem>
                         <MenuItem value='inativo'>Inativo</MenuItem>
                     </Select>
-                    <TextField id="outlined-basic" label="Localização" variant="outlined" style={{ marginBottom: 20 }}
-                        value={this.state.nomeDispositivo} onChange={(e) => this.setState({ nomeDispositivo: e.target.value })} required />
+                    </FormControl>
+
                     <Button type='submit' variant="contained" disableElevation style={{ height: 50, background: 'green', color: '#FFF' }}>Salvar</Button>
                 </form>
 
