@@ -324,7 +324,7 @@ class RfidCommands():
         desc = self.db.desc
         return s.query(rt)\
                 .filter(rt.idCadastro == idCadastro)\
-                .order_by(desc(rt.idRotas))\
+                .order_by(desc(rt.idRota))\
                 .limit(1).scalar()
 
     ###########################
@@ -535,7 +535,7 @@ class RfidCommands():
         rt = self.rt
         ultRota = self.selUltRotaCadastro(idCadastro=idCadastro)
         if ultRota is not None:
-            s.query(rt).filter(rt.idRotas == ultRota.idRotas).delete()
+            s.query(rt).filter(rt.idRota == ultRota.idRota).delete()
             s.commit()
 
     ###########################
