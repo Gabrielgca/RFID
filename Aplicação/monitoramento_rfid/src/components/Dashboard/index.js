@@ -61,7 +61,7 @@ class Dashboard extends Component {
         { icon: <AccountCircleIcon />, name: 'Gerenciar Usuários', action: 1 },
         { icon: <HowToRegIcon />, name: 'Gerenciar Permissões', action: 3 },
         { icon: <TapAndPlayIcon />, name: 'Gerenciamento de usuário RFID', action: 4 },
-        { icon: <QueuePlayNextIcon/>, name: 'Adicionar novo dispositivo', action: 5},
+        { icon: <QueuePlayNextIcon/>, name: 'Dispositivos', action: 5},
         { icon: <ExitToApp />, name: 'Sair', action: 2 },
       ]
     };
@@ -90,7 +90,7 @@ class Dashboard extends Component {
         { icon: <AccountCircleIcon />, name: 'Gerenciar Usuários', action: 1 },
         { icon: <HowToRegIcon />, name: 'Gerenciar Permissões', action: 3 },
         { icon: <TapAndPlayIcon />, name: 'Gerenciamento de usuário RFID', action: 4 },
-        { icon: <QueuePlayNextIcon/>, name: 'Adicionar novo dispositivo', action: 5},
+        { icon: <QueuePlayNextIcon/>, name: 'Dispositivos', action: 5},
         { icon: <ExitToApp />, name: 'Sair', action: 2 }
       ]
       this.setState({ actions: newActions });
@@ -197,7 +197,7 @@ class Dashboard extends Component {
           }
           else{
             if(action === 5){
-              this.props.history.push("/cadastro-dispositivo")
+              this.props.history.push("/dispositivos")
             }
           }
         }
