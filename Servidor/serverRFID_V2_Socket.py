@@ -600,18 +600,16 @@ def registerDisp():
         noDisp = data['disp']
 
         new_disp = Dispositivo(noDispositivo = noDisp, stAtivo = 'A')
-        all_loc = cmd.selAllLocalizacaoDisps()
 
-        for i in all_loc:
-            if i.noLocalizacao == noLoc:
-                id_loc = i.idLocalizacaoDisp
-            else:
-                print('Não foi encontrada a localização desejada.')
+        disp_loc = cmd.selLocalizacaoDisp_no(noDisp)
+        id_disp_loc = disp_loc.idLocalizacaoDisp
+
 
         
         try:
             cmd.insertDispositivo(new_disp, refresh=True)
-            cmd.insertDispLocalizacao(dispLocalizacao,dispositivo,localizacaoDisp,refresh=False):
+            dispLoca = DispLocalizacao()
+            cmd.insertDispLocalizacao(dispLoca,new_disp.idDispositivo, id_disp_loc)
 
         except Exception as e:
             print(e)
@@ -634,12 +632,12 @@ def registerLoc():
 
         try:
 
-        andar = int(str_andar)
-        area = int(str_area)
-        qt_pes = int(area/2)
-        insereDispLoc = LocalizacaoDisp(noLocalizacao = str_loc, vlAndar = andar, vlQuantidadePessoas = qt_pes)
-        
-        cmd.insertLocalizacaoDisp(insereDisloc)
+            andar = int(str_andar)
+            area = int(str_area)
+            qt_pes = int(area/2)
+            insereDispLoc = LocalizacaoDisp(noLocalizacao = str_loc, vlAndar = andar, vlQuantidadePessoas = qt_pes)
+            
+            cmd.insertLocalizacaoDisp(insereDisloc)
 
         except Exception as e:
             print(e)
