@@ -60,6 +60,8 @@ class Cadastro(db.Model):
 
     cartoes = db.relationship('CadastroCartao', back_populates='cadastro')
     ocorrencias = db.relationship('Ocorrencia', back_populates='cadastro')
+    rotas = db.relationship('Rota', back_populates='cadastro')
+    permissoesDisp = db.relationship('PermUsuDisp', back_populates='cadastro')
 
     def __repr__(self):
         return '''<Cadastro
@@ -100,28 +102,54 @@ class Dispositivo(db.Model):
 
     idDispositivo = db.Column('id_dispositivo', db.Integer, primary_key=True, unique=True, nullable=False, comment='''Idendificador do dispositivo.''')
     noDispositivo = db.Column('no_dispositivo', db.String(15), nullable=False, comment='''Descrição do dispositivo.''')
-    noLocalizacao = db.Column('no_localizacao', db.String(45), nullable=False, comment='''Localização do dispositivo.''')
-    vlAndar = db.Column('vl_andar', db.Integer, nullable=False, comment='''O andar em que se encontra o dispositivo.''')
     stAtivo = db.Column('st_ativo', db.String(1), nullable=False, default='A', comment='''Status ativo ou inativo do dispositivo.''')
 
     ocorrencias = db.relationship('Ocorrencia', back_populates='dispositivo')
+    rotasOrigem = db.relationship('Rota', back_populates='dispositivoOrigem', foreign_keys='Rota.idDispositivoOrigem')
+    rotasDestino = db.relationship('Rota', back_populates='dispositivoDestino', foreign_keys='Rota.idDispositivoDestino')
+    localizacaoDisps = db.relationship('DispLocalizacao', back_populates='dispositivo')
 
     def __repr__(self):
         return '''<Dispositivo
     (id_dispositivo='{}',
-    no_dispositivo='{}',
-    no_localizacao='{}',
     vl_andar='{}',
-    st_ativo='{}')>'''.format(self.idDispositivo, self.noDispositivo, self.noLocalizacao, self.vlAndar, self.stAtivo)
+    st_ativo='{}')>'''.format(self.idDispositivo, self.noDispositivo, self.stAtivo)
 
     def getDict(self):
         self.dictionary = {}
         self.dictionary['idDispositivo'] = self.idDispositivo
         self.dictionary['noDispositivo'] = self.noDispositivo
-        self.dictionary['noLocalizacao'] = self.noLocalizacao
-        self.dictionary['vlAndar'] = self.vlAndar
         self.dictionary['stAtivo'] = self.stAtivo
         return self.dictionary
+
+#MAPEAMENTO NOVO!
+class Rota(db.Model):
+    __tablename__ = 'tb_rota'
+
+    idRota = db.Column('id_rota', db.Integer, primary_key=True, unique=True, nullable=False, comment='''Identificador de uma rota.''')
+    idDispositivoOrigem = db.Column('id_dispositivo_origem', db.Integer, db.ForeignKey('tb_dispositivo.id_dispositivo'), nullable=False, comment='''Identificador do dispositvo(origem)''')
+    idDispositivoDestino = db.Column('id_dispositivo_destino', db.Integer,  db.ForeignKey('tb_dispositivo.id_dispositivo'), nullable=False, comment='''Identificador do dispositvo(destino)''')
+    idCadastro = db.Column('id_cadastro', db.Integer,  db.ForeignKey('tb_cadastro.id_cadastro'), nullable=False, comment='''Identificador do cadastro''')
+
+    dispositivoOrigem = db.relationship('Dispositivo', back_populates='rotasOrigem', foreign_keys=[idDispositivoOrigem])
+    dispositivoDestino = db.relationship('Dispositivo', back_populates='rotasDestino', foreign_keys=[idDispositivoDestino])
+    cadastro = db.relationship('Cadastro', back_populates='rotas')
+
+    def __repr__(self):
+        return '''<Rota
+    (id_rota='{}',
+    id_dispositivo_origem='{}',
+    id_dispositivo_destino='{}',
+    id_cadastro='{}')>'''.format(self.idRota,self.idDispositivoOrigem,self.idDispositivoDestino,self.idCadastro)
+
+    def getDict(self):
+        self.dictionary = {}
+        self.dictionary['idRota'] = self.idRota
+        self.dictionary['idDispositivoOrigem'] = self.idDispositivoOrigem
+        self.dictionary['idDispositivoDestino'] = self.idDispositivoDestino
+        self.dictionary['idCadastro'] = self.idCadastro
+        return self.dictionary 
+
 
 class Ocorrencia(db.Model):
     __tablename__ = 'tb_ocorrencia'
@@ -153,6 +181,177 @@ class Ocorrencia(db.Model):
         self.dictionary['dtOcorrencia'] = self.dtOcorrencia
         self.dictionary['hrOcorrencia'] = self.hrOcorrencia
         self.dictionary['stOcorrencia'] = self.stOcorrencia
+        return self.dictionary
+
+
+#MAPEAMENTO NOVO!
+class LocalizacaoDisp(db.Model):
+    __tablename__ = 'tb_localizacao_disp' 
+
+    idLocalizacaoDisp = db.Column('id_localizacao_disp', db.Integer, primary_key=True, unique=True, nullable=False, comment='''Identificação da localização do dispositivo''')
+    noLocalizacao = db.Column('no_localizacao', db.String(40), nullable=False, comment='''Nome da localização do dispositivo''')
+    vlAndar = db.Column('vl_andar', db.Integer, nullable=True,default=None, comment='''Indicação do andar da localização''')
+    vlQuantidadePessoas = db.Column('vl_quantidade_pessoas', db.Integer, nullable=False, comment='''Quantidade de pessoas na localização''')
+
+    dispositivos = db.relationship('DispLocalizacao', back_populates='localizacaoDisp')
+
+    def __repr__(self):
+        return '''<Localizacao_disp
+	(id_localizacao_disp='{}',
+	no_localizacao='{}',
+	vl_andar='{}',
+	vl_quantidade_pessoas='{}')>'''.format(self.idLocalizacaoDisp, self.noLocalizacao, self.vlAndar, self.vlQuantidadePessoas)
+
+    def getDict(self):
+        self.dictionary = {}
+        self.dictionary['idLocalizacaoDisp'] = self.idLocalizacaoDisp
+        self.dictionary['noLocalizacao'] = self.noLocalizacao
+        self.dictionary['vlAndar'] = self.vlAndar
+        self.dictionary['vlQuantidadePessoas'] = self.vlQuantidadePessoas
+        return self.dictionary
+
+#MAPEAMENTO NOVO!
+class DispLocalizacao(db.Model):
+    __tablename__ = 'tb_disp_localizacao' 
+
+    idDispLocalizacao = db.Column('id_disp_localizacao', db.Integer, primary_key=True, unique=True, nullable=False, comment="""Identificador tabela associativa 'Dispositivo Localização'""")
+    idDispositivo = db.Column('id_dispositivo', db.Integer, db.ForeignKey('tb_dispositivo.id_dispositivo'), nullable=False, comment='''Idenificador do dispositivo''')
+    idLocalizacaoDisp = db.Column('id_localizacao_disp', db.Integer, db.ForeignKey('tb_localizacao_disp.id_localizacao_disp'), nullable=False, comment='''Identificador da localização do dispositivo''')
+    stSituacao = db.Column('st_situacao', db.String(1), nullable=False, comment='''Status indicando Ativo e Inativo''')
+
+    dispositivo = db.relationship('Dispositivo', back_populates='localizacaoDisps')
+    localizacaoDisp = db.relationship('LocalizacaoDisp', back_populates='dispositivos')
+    permHorarios = db.relationship('PermUsuDisp', back_populates='dispLocalizacao')
+    ocupacoes = db.relationship('Ocupacao', back_populates='dispLocalizacao')
+
+    def __repr__(self):
+        return '''<Disp_localizacao
+	(id_disp_localizacao='{}',
+	id_dispositivo='{}',
+	id_localizacao_disp='{}',
+	st_situacao='{}')>'''.format(self.idDispLocalizacao, self.idDispositivo, self.idLocalizacaoDisp, self.stSituacao)
+
+    def getDict(self):
+        self.dictionary = {}
+        self.dictionary['idDispLocalizacao'] = self.idDispLocalizacao
+        self.dictionary['idDispositivo'] = self.idDispositivo
+        self.dictionary['idLocalizacaoDisp'] = self.idLocalizacaoDisp
+        self.dictionary['stSituacao'] = self.stSituacao
+        return self.dictionary
+
+
+#MAPEAMENTO NOVO!
+class Ocupacao(db.Model):
+    __tablename__ = 'tb_ocupacao'
+
+    idOcupacao = db.Column('id_ocupacao', db.Integer, primary_key=True, unique=True, nullable=False, comment='''Identificador da ocupação.''')
+    idDispLocalizacao = db.Column('id_disp_localizacao', db.Integer, db.ForeignKey('tb_disp_localizacao.id_disp_localizacao'), nullable=False, comment='''Identificador tabela associativa 'Dispositivo Localização'.''')
+    dtOcupacao = db.Column('dt_ocupacao', db.Date, nullable=False, comment='''Data do resumo da ocorrência, atrelado ao cadastro ocorrencia por dispositivo.''')
+    hrOcupacao = db.Column('hr_ocupacao', db.Time, nullable=False, comment='''Hora do resumo da ocorrência, atrelado ao cadastro ocorrencia por dispositivo.''')
+    nrPessoas = db.Column('nr_pessoas', db.Integer, nullable=False, comment='''Número de pessoas existentes na sala = Nr. de entradas - nr. de saídas do dispositivo.''')
+
+    dispLocalizacao = db.relationship('DispLocalizacao', back_populates='ocupacoes')
+
+    def __repr__(self):
+        return '''<Ocupacao
+    (id_ocupacao='{}',
+    id_disp_localizacao='{}',
+    dt_ocupacao='{}',
+    hr_ocupacao='{}',
+    nr_pessoas='{}')>'''.format(self.idOcupacao, self.idDispLocalizacao, self.dtOcupacao, self.hrOcupacao, self.nrPessoas)
+
+    def getDict(self):
+        self.dictionary = {}
+        self.dictionary['idOcupacao'] = self.idOcupacao
+        self.dictionary['idDispLocalizacao'] = self.idDispLocalizacao
+        self.dictionary['dtOcupacao'] = self.dtOcupacao
+        self.dictionary['hrOcupacao'] = self.hrOcupacao
+        self.dictionary['nrPessoas'] = self.nrPessoas
+        return self.dictionary
+
+#MAPEAMENTO NOVO!
+class PermissaoDisp(db.Model):
+    __tablename__ = 'tb_permissao_disp' 
+
+    idPermissao = db.Column('id_permissao', db.Integer, primary_key=True, unique=True, nullable=False, comment='''Identificador da permissao''')
+    noPermissao = db.Column('no_permissao', db.String(30), nullable=False, comment='''Descrição da permissão''')
+    stStatus = db.Column('st_status', db.String(1), nullable=False, comment='''Status Ativo / Inativo''')
+
+    cadastrosPerms = db.relationship('PermUsuDisp', back_populates='permissaoDisp')
+
+    def __repr__(self): 
+        return '''<Permissao_disp
+    (id_permissao='{}',
+    no_permissao='{}',
+    st_status='{}')>'''.format(self.idPermissao,self.noPermissao,self.stStatus)
+
+    def getDict(self):
+        self.dictionary = {}
+        self.dictionary['idPermissao'] = self.idPermissao
+        self.dictionary['noPermissao'] = self.noPermissao
+        self.dictionary['stStatus'] = self.stStatus
+        return self.dictionary
+
+
+#MAPEAMENTO NOVO!
+class PermHorario(db.Model):
+    __tablename__ = 'tb_perm_horario' 
+
+    idPermHorario = db.Column('id_perm_horario', db.Integer, primary_key=True, unique=True, nullable=False, comment='''Identificador da ocorrência horário permissão''')
+    dtOcorrência = db.Column('dt_ocorrência', db.Date, nullable=False, comment='''Data ocorrência permissão''')
+    hrIncial = db.Column('hr_incial', db.Time, nullable=False, comment='''Hora Início permissão''')
+    hrFinal = db.Column('hr_final', db.Time, nullable=False, comment='''Hora final permissão''')
+
+    dispLocalizacoes = db.relationship('PermUsuDisp', back_populates='permHorario')
+
+    def __repr__(self):
+        return '''<Perm_horario
+    (id_perm_horario='{}',
+    dt_ocorrência='{}',
+    hr_incial='{}',
+    hr_final='{}')>'''.format(self.idPermHorario, self.dtOcorrência, self.hrIncial, self.hrFinal)
+
+    def getDict(self):
+        self.dictionary = {}
+        self.dictionary['idPermHorario'] = self.idPermHorario
+        self.dictionary['dtOcorrência'] = self.dtOcorrência
+        self.dictionary['hrIncial'] = self.hrIncial
+        self.dictionary['hrFinal'] = self.hrFinal
+        return self.dictionary
+
+#MAPEAMENTO NOVO!
+class PermUsuDisp(db.Model):
+    __tablename__ = 'tb_perm_usu_disp'
+
+    idPermUsuDisp = db.Column('id_perm_usu_disp', db.Integer, primary_key=True, unique=True, nullable=False, comment='''Identificador permissão usuário x dispositivo''')
+    idCadastro = db.Column('id_cadastro', db.Integer, db.ForeignKey('tb_cadastro.id_cadastro'), nullable=False, comment='''Identificador do cadastro''')
+    idPermissao = db.Column('id_permissao', db.Integer, db.ForeignKey('tb_permissao_disp.id_permissao'), nullable=False, comment='''Identificador da permissão''')
+    idDispLocalizacao = db.Column('id_disp_localizacao', db.Integer, db.ForeignKey('tb_disp_localizacao.id_disp_localizacao'), nullable=False, comment='''Identificador da localização do dispositivo''')
+    idPermHorario = db.Column('id_perm_horario', db.Integer, db.ForeignKey('tb_perm_horario.id_perm_horario'), nullable=True, comment='''Identificador permissão por horário de bloqueio.. se existir não libera''')
+    stStatus = db.Column('st_status', db.String(1), nullable=False, comment='''Status permissão Ativo ou Inativo''')
+
+    cadastro = db.relationship('Cadastro', back_populates='permissoesDisp')
+    permissaoDisp = db.relationship('PermissaoDisp', back_populates='cadastrosPerms')
+    dispLocalizacao = db.relationship('DispLocalizacao', back_populates='permHorarios')
+    permHorario = db.relationship('PermHorario', back_populates='dispLocalizacoes')
+
+    def __repr__(self):
+        return '''<Perm_usu_disp
+    (id_perm_usu_disp='{}',
+    id_cadastro='{}',
+    id_permissao='{}',
+    id_disp_localizacao='{}',
+    id_perm_horario='{}',
+    st_status='{}')>'''.format(self.idPermUsuDisp, self.idCadastro, self.idPermissao, self.idDispLocalizacao, self.idPermHorario, self.stStatus)
+
+    def getDict(self):
+        self.dictionary = {}
+        self.dictionary['idPermUsuDisp'] = self.idPermUsuDisp
+        self.dictionary['idCadastro'] = self.idCadastro
+        self.dictionary['idPermissao'] = self.idPermissao
+        self.dictionary['idDispLocalizacao'] = self.idDispLocalizacao
+        self.dictionary['idPermHorario'] = self.idPermHorario
+        self.dictionary['stStatus'] = self.stStatus
         return self.dictionary
 
 #Inicializando o objeto com os comandos Flask - SQLAlchemy
@@ -350,7 +549,7 @@ def register():
         try:
             data = request.get_json ()
         except (KeyError, TypeError, ValueError):
-            resp = jsonify ('success = False')
+            resp = jsonify (success = False)
             return answer (app, 204, resp)
 
         str_card = data['codigoRFIDCartao']
@@ -388,11 +587,40 @@ def register():
 
 @app.route ('/registerDisp', methods = ['GET','POST'])
 def registerDisp():
-    pass
+    try:
+        noDisp = request.args.get('NAME')
+        idrfid = request.args.get('RFID')
+    except:
+        print('Something went wrong.')
+        return "0"
 
-@app.route ('/registerSetor', methods = ['GET','POST'])
-def registerSetor():
-    pass
+@app.route ('/registerLoc', methods = ['GET','POST'])
+def registerLoc():
+    if request.method == 'POST':
+
+        try:
+            data = request.get_json ()
+        except (KeyError, TypeError, ValueError):
+            resp = jsonify (success = False)
+            return answer (app, 204, resp)
+
+        str_loc = data['loc']
+        str_andar = data['andar']
+        str_area = data['area']
+
+        try:
+            andar = int(str_andar)
+            area = int(str_area)
+            qt_pes = int(area/2)
+        except Exception as e:
+            print(e)
+            return jsonify (success = False)
+        insereDispLoc = LocalizacaoDisp(noLocalizacao = str_loc, vlAndar = andar, vlQuantidadePessoas = qt_pes)
+        try:
+            cmd.insertLocalizacaoDisp(insereDisloc)
+        except Exception as e:
+            print(e)
+            return jsonify(success = False)
 #---------------------------------#
 
 
