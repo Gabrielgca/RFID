@@ -109,6 +109,14 @@ class RfidCommands():
             idLocalizacaoDisp = [idLocalizacaoDisp]
         return s.query(ld).filter(ld.idLocalizacaoDisp.in_(idLocalizacaoDisp)).all()
 
+    def selLocalizacaoDisp_no(self, noLocalizacao):
+        ld = self.ld
+        s = self.db.session
+        if type(noLocalizacao) != list:
+            noLocalizacao = [noLocalizacao]
+        return s.query(ld).filter(ld.noLocalizacao.in_(noLocalizacao)).all()
+
+
     def selPermHorario(self, idPermHorario):
         ph = self.ph
         s = self.db.session
