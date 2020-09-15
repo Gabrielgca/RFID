@@ -587,12 +587,36 @@ def register():
 
 @app.route ('/registerDisp', methods = ['GET','POST'])
 def registerDisp():
-    try:
-        noDisp = request.args.get('NAME')
-        idrfid = request.args.get('RFID')
-    except:
-        print('Something went wrong.')
-        return "0"
+    
+     if request.method == 'POST':
+
+        try:
+            data = request.get_json ()
+        except (KeyError, TypeError, ValueError):
+            resp = jsonify (success = False)
+            return answer (app, 204, resp)
+    
+        noLoc = data['loc']
+        noDisp = data['disp']
+
+        new_disp = Dispositivo(noDispositivo = noDisp, stAtivo = 'A')
+        all_loc = cmd.selAllLocalizacaoDisps()
+
+        for i in all_loc:
+            if i.noLocalizacao == noLoc:
+                id_loc = i.idLocalizacaoDisp
+            else:
+                print('Não foi encontrada a localização desejada.')
+
+        
+        try:
+            cmd.insertDispositivo(new_disp, refresh=True)
+            cmd.insertDispLocalizacao(dispLocalizacao,dispositivo,localizacaoDisp,refresh=False):
+
+        except Exception as e:
+            print(e)
+            return jsonify(success = False)
+
 
 @app.route ('/registerLoc', methods = ['GET','POST'])
 def registerLoc():
@@ -609,15 +633,14 @@ def registerLoc():
         str_area = data['area']
 
         try:
-            andar = int(str_andar)
-            area = int(str_area)
-            qt_pes = int(area/2)
-        except Exception as e:
-            print(e)
-            return jsonify (success = False)
+
+        andar = int(str_andar)
+        area = int(str_area)
+        qt_pes = int(area/2)
         insereDispLoc = LocalizacaoDisp(noLocalizacao = str_loc, vlAndar = andar, vlQuantidadePessoas = qt_pes)
-        try:
-            cmd.insertLocalizacaoDisp(insereDisloc)
+        
+        cmd.insertLocalizacaoDisp(insereDisloc)
+
         except Exception as e:
             print(e)
             return jsonify(success = False)
