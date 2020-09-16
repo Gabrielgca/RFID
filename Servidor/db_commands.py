@@ -20,7 +20,7 @@ class RfidCommands():
             return Function("CONVERTE_MES",self.date_format(col,"%m"))
 
     def __init__(self,database=None):
-        from serverRFID_V2_Experimental import Cadastro, Cartao, Dispositivo, Rota \
+        from serverRFID_V2_Socket import Cadastro, Cartao, Dispositivo, Rota \
                                                , Ocorrencia, CadastroCartao, LocalizacaoDisp \
                                                , DispLocalizacao, PermHorario, PermissaoDisp
         self.db = database
@@ -115,6 +115,13 @@ class RfidCommands():
         if type(noLocalizacao) != list:
             noLocalizacao = [noLocalizacao]
         return s.query(ld).filter(ld.noLocalizacao.in_(noLocalizacao)).all()
+
+    def selDispLocalizacao(self, idLocalizacao):
+        dl = self.dl
+        s = self.db.session
+        if type(idLocalizacao) != list:
+            idLocalizacao = [idLocalizacao]
+        return s.query(dl).filter(dl.idLocalizacaoDisp.in_(idLocalizacao), dl.stSituacao.in_("A")).all()
 
 
     def selPermHorario(self, idPermHorario):
@@ -398,10 +405,8 @@ class RfidCommands():
             s.refresh(localizacaoDisp)
 
     #COMANDO NOVO!
-    def insertDispLocalizacao(self,dispLocalizacao,dispositivo,localizacaoDisp,refresh=False):
-        s = self.db.session
-        dispLocalizacao.dispositivo = dispositivo
-        dispLocalizacao.localizacaoDisp = localizacaoDisp
+    def insertDispLocalizacao(self,dispLocalizacao, refresh = False):
+
         s.add(dispLocalizacao)
         s.commit()
         if refresh:
@@ -421,15 +426,11 @@ class RfidCommands():
         s.add(permHorario)
         s.commit()
         if refresh:
-            s.refresh()
+            s.refresh(permHorario)
 
     #COMANDO NOVO!
-    def insertPermUsuDisp(self, cadastro, permUsuDisp, permissaoDisp, dispLocalizacao, permHorario=None, refresh=None):
+    def insertPermUsuDisp(self, permUsuDisp, refresh=None):
         s = self.db.session
-        permUsuDisp.cadastro = cadastro
-        permUsuDisp.permissaoDisp = permissaoDisp
-        permUsuDisp.dispLocalizacao = dispLocalizacao
-        permUsuDisp.permHorario = permHorario
         s.add(permUsuDisp)
         s.commit()
         if refresh:
