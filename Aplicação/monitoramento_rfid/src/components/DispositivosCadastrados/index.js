@@ -46,7 +46,7 @@ class DispositivoCadastrado extends Component {
                 status: "Ativo",
             }, {
                 key: 2,
-                nameDevice: "Sala Principal",
+                nameDevice: "Sala principal",
                 status: "Inativo",
             }],
 
@@ -186,6 +186,8 @@ class DispositivoCadastrado extends Component {
         this.setState({ selectedUser: { key: '', nameDevice: '', status: '' } })
     }
 
+    
+
 
     render() {
         return (
@@ -258,32 +260,37 @@ class DispositivoCadastrado extends Component {
                 >
                     <DialogTitle id="alert-dialog-title">{"Detalhes do dispositivo"}</DialogTitle>
                     <DialogContent>
-                        <FormControl disabled>
+                        <FormControl disabled style={{ marginBottom: 25 }}>
                             <InputLabel>ID</InputLabel>
                             <Input value={this.state.selectedDevice.key} />
                         </FormControl>
+
                         <DialogContentText id="alert-dialog-description">
-                            <TextField
-                                autoFocus
-                                margin='dense'
-                                id='name'
-                                label='Nome'
-                                type='text'
-                                value={this.state.selectedDevice.nameDevice}
-                                onChange={this.nameDevice}
-                                fullWidth
+                            <InputLabel>Localização</InputLabel>
+                           
+                                <Select
+                                    style={{ width: 180 }}
+                                    label="localização"
+                                    value={this.state.selectedDevice.nameDevice}
+                                    onChange={this.nameDevice}  
+                                >
+                                    <MenuItem value=""><em>None</em></MenuItem>
+                                    <MenuItem value="Sala de reunião">Sala de reuniao</MenuItem>
+                                    <MenuItem value="Sala principal">Sala Principal</MenuItem>
+                                    <MenuItem value="Sala de manutenção">Sala de Manutenção</MenuItem>
+                                </Select>
+                           
 
-                            />
-
-
-                            <InputLabel className="selectLabel">Status</InputLabel>
-                            <Select
-                                value={this.state.selectedDevice.status}
-                                onChange={this.statusDevice}
-                            >
-                                <MenuItem value="Ativo">Ativo</MenuItem>
-                                <MenuItem value="Inativo">Inativo</MenuItem>
-                            </Select>
+                            
+                                <InputLabel className="selectLabel">Status</InputLabel>
+                                <Select
+                                    value={this.state.selectedDevice.status}
+                                    onChange={this.statusDevice}
+                                >
+                                    <MenuItem value="Ativo">Ativo</MenuItem>
+                                    <MenuItem value="Inativo">Inativo</MenuItem>
+                                </Select>
+                            
 
                         </DialogContentText>
                     </DialogContent>
