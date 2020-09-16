@@ -82,7 +82,9 @@ class UsersRFID extends Component {
         this.setState({
             selectedPerson: {
                 name: user.name,
+                idade: user.idade,
                 status: user.status,
+                cargo: user.cargo,
                 rfid: user.rfid
             }
         })
