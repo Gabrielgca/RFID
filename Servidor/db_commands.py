@@ -22,7 +22,8 @@ class RfidCommands():
     def __init__(self,database=None):
         from serverRFID_V2_Socket import Cadastro, Cartao, Dispositivo, Rota \
                                                , Ocorrencia, CadastroCartao, LocalizacaoDisp \
-                                               , DispLocalizacao, PermHorario, PermissaoDisp
+                                               , DispLocalizacao, PermHorario, PermissaoDisp, PermUsuDisp
+                                               
         self.db = database
         self.cd = self.db.aliased(Cadastro, name='CD')
         self.ct = self.db.aliased(Cartao, name='CT')
@@ -34,6 +35,7 @@ class RfidCommands():
         self.dl = self.db.aliased(DispLocalizacao, name='DL')
         self.ph = self.db.aliased(PermHorario, name='PH')
         self.pd = self.db.aliased(PermissaoDisp, name='PD')
+        self.pud = self.db.aliased(PermUsuDisp, name='PUD')
         self.mysql_func = self.MySqlFunc(database)
 
     ###################
@@ -122,6 +124,13 @@ class RfidCommands():
         if type(idLocalizacao) != list:
             idLocalizacao = [idLocalizacao]
         return s.query(dl).filter(dl.idLocalizacaoDisp.in_(idLocalizacao), dl.stSituacao.in_("A")).all()
+
+    def selUsuDisp(self, idCadastro):
+        pud = self.pud
+        s = self.db.session
+        if type(idCadastro) != list:
+            idCadastro = [idCadastro]
+        return s.query(pud).filter(pud.idCadastro.in_(idCadastro), pud.stStatus.in_("A")).all()
 
 
     def selPermHorario(self, idPermHorario):
