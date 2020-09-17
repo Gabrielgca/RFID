@@ -94,14 +94,11 @@ header#new{
     padding: 10px 20px;
     border-radius: 5px; 
     border: 0px;
-    background: linear-gradient(to bottom right, #00ab98, #00564c);
     color: #FFF;
     font-weight: bold;
     font-size: 15px;
     cursor: pointer;
-    width: 100%;
     margin: 0 auto;
-    margin-top: 15px;
   }
   
 form#new-post button:disabled{
@@ -491,3 +488,22 @@ form#new-post h4{
     stroke-dashoffset: 900;
   }
 }
+
+.usersList{
+  width: 89%;
+  background: #FFF;
+  flex-direction: row;
+  display: flex;
+  justify-content: space-between;
+  height: 20px;
+  padding: 20px 30px;
+  border-radius: 9px;
+  align-items: center;
+  margin:3px
+}
+
+.flatScroll{
+  overflow-y: scroll;
+  max-height: 200px;
+}
+

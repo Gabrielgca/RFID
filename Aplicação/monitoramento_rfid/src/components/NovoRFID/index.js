@@ -10,12 +10,21 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import TextField from '@material-ui/core/TextField';
+import Select from '@material-ui/core/Select';
+import InputLabel from '@material-ui/core/InputLabel';
+import FormControl from '@material-ui/core/FormControl';
+import MenuItem from '@material-ui/core/MenuItem';
+import AddIcon from '@material-ui/icons/Add';
+import RemoveIcon from '@material-ui/icons/Remove';
+
 
 
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 import Loader from 'react-loader-spinner';
 import baseURL from "../../service";
 import io from 'socket.io-client';
+import FlatList from 'flatlist-react';
 
 const fileUpload = require('fuctbase64');
 
@@ -35,7 +44,11 @@ class NewRFID extends Component {
       fileResult: '',
       loading: false,
       age: '',//Armazenará a idade do usuario
-      office: ''//Armazenará o cargo
+      office: '',//Armazenará o cargo
+      permissions: [],
+      localization: '',
+      hrini: '',
+      hrfim: '',
     };
 
     this.register = this.register.bind(this);
@@ -109,26 +122,29 @@ class NewRFID extends Component {
 
   register = async (e) => {
     e.preventDefault();
-
     if (this.state.name !== '' &&
       this.state.cardCodeRFID !== '' &&
-      this.state.fileResult !== '' &&
+      //this.state.fileResult !== '' &&
       this.state.age !== '' &&
-      this.state.office !== '') {
+      this.state.office !== '' &&
+      this.state.permissions.length > 0) {
 
       const params = {
         codigoRFIDCartao: this.state.cardCodeRFID,
         nomeUsuario: this.state.name,
-        idadeUsuario: this.state.age,
-        cargoUsuario: this.state.office,
-        imgPerfil: this.state.fileResult
+        idade: this.state.age,
+        trab: this.state.office,
+        //imgPerfil: this.state.fileResult,
+        permissoes: this.state.permissions
       }
+      alert(JSON.stringify(params))
 
       //Se todos os dados necessários existirem, envia os dados para o servidor salvar no banco
       await axios.post(baseURL + "register", params)
         .then(response => {
           //alert("Sucesso! " + JSON.stringify(response));
           alert("Usuário cadastrado com sucesso!");
+          console.log(response)
         })
         .catch(error => {
           alert("Erro: " + JSON.stringify(error));
@@ -151,6 +167,32 @@ class NewRFID extends Component {
       //alert("Result: " + JSON.stringify(result));
     });
   }
+
+  handleAddPermission = () => {
+    if ((this.state.hrini !== '' && this.state.hrfim !== '' && this.state.localization !== '') || (this.state.hrini === '' && this.state.hrfim === '' && this.state.localization !== '')) {
+      let newPermissions = this.state.permissions;
+      newPermissions.push({
+        loc: this.state.localization,
+        hrini: this.state.hrini,
+        hrfim: this.state.hrfim,
+        perm: 's'
+      })
+      this.setState({ permissions: newPermissions })
+    }
+    else {
+      alert('Os campos de hora e fim precisam ser preenchidos')
+      return null;
+    }
+  }
+
+  removeEntrada = (index) => {
+    let deleteItem = this.state.permissions;
+    deleteItem.splice(index, 1)
+    this.setState({ permissions: deleteItem })
+  }
+
+
+
 
   render() {
     return (
@@ -198,21 +240,76 @@ class NewRFID extends Component {
 
 
           {/* <progress value={this.state.progress} max="100" /> */}
+          <div className='inputs'>
+            <TextField label='Nome Completo' variant='outlined' autoFocus style={{ background: '#FFF', borderRadius: 8, marginBottom: 10, width: '100%' }}
+              value={this.state.nome} onChange={(e) => this.setState({ name: e.target.value })} required
+            />
 
-          <input type="text" placeholder="Nome Completo..." value={this.state.name} autoFocus
-            onChange={(e) => this.setState({ name: e.target.value })} required /><br />
+            <TextField label='Codigo RFID' variant='outlined' style={{ background: '#FFF', borderRadius: 8, width: '20%' }}
+              value={this.state.cardCodeRFID} disabled
+            />
 
-          <input type="text" placeholder="Idade" value={this.state.age} autoFocus
-            onChange={(e) => this.setState({ age: e.target.value })} required /><br />
+            <TextField label='Idade' variant='outlined' style={{ background: '#FFF', borderRadius: 8, width: '20%', marginLeft: '2%' }}
+              value={this.state.age} onChange={(e) => this.setState({ age: e.target.value })} required
+            />
+
+            <TextField label='Função' variant='outlined' style={{ background: '#FFF', borderRadius: 8, width: '56%', marginLeft: '2%', marginBottom: 10 }}
+              value={this.state.office} onChange={(e) => this.setState({ office: e.target.value })} required
+            />
+
+            <FormControl variant='outlined' style={{ background: '#FFF', borderRadius: 8, width: '20%', height: 42 }}>
+              <InputLabel id='labelTitle'>Permissão</InputLabel>
+              <Select
+                labelId='labelTitle'
+                label='Permissão'
+                value={this.state.localization}
+                onChange={(e) => this.setState({ localization: e.target.value })}
+              >
+                <MenuItem value='Laboratorio'>Laboratorio</MenuItem>
+                <MenuItem value='Sala do IBTI'>Sala do IBTI</MenuItem>
+                <MenuItem value='Sala Principal'>Sala Principal</MenuItem>
+              </Select>
+            </FormControl>
+
+            <TextField label='Hora de inicio' variant='outlined' style={{ background: '#FFF', borderRadius: 8, width: '20%', marginLeft: '2%', marginBottom: 10 }}
+              value={this.state.hrini} onChange={(e) => this.setState({ hrini: e.target.value })}
+            />
+            <TextField label='Hora de fim' variant='outlined' style={{ background: '#FFF', borderRadius: 8, width: '20%', marginLeft: '2%', marginBottom: 10 }}
+              value={this.state.hrfim} onChange={(e) => this.setState({ hrfim: e.target.value })}
+            />
 
 
-          <input type="text" placeholder="Cargo" value={this.state.office} autoFocus
-            onChange={(e) => this.setState({ office: e.target.value })} required /><br />
+
+            <Button onClick={this.handleAddPermission} variant='contained' style={{ marginLeft: '2%', background: 'green', height: 42 }} ><AddIcon /></Button>
+            <div className='flatScroll'>
+              <FlatList
+                renderWhenEmpty={() => <div></div>}
+                list={this.state.permissions}
+                renderItem={(item) => (
+                  <div>
+                    <div className='usersList'>
+                      <p><b>Localização:</b> {item.loc}</p>
+                      <p><b>Hora de inicio:</b> {item.hrini}</p>
+                      <p><b>Hora fim:</b> {item.hrfim}</p>
+                      <p><b>Permissão:</b>{item.perm}</p>
+                    </div>
+                    <div>
+                      <Button onClick={() => (this.removeEntrada(this.state.permissions.indexOf(item)))} variant='contained' style={{ background: 'red', marginLeft: '90%', marginTop: '-10%' }} ><RemoveIcon /></Button>
+                    </div>
+                  </div>
+                )}
+              >
+              </FlatList>
+            </div>
 
 
-          <input type="text" placeholder="Código do Cartão RFID" value={this.state.cardCodeRFID} disabled={true} />
-
-          <button type="submit" disabled={this.state.cardStatus === true ? false : true}>Cadastrar</button>
+            <Button
+              onClick={this.register}
+              style={{ background: 'green', width: ' 100%' }}>
+              Cadastrar
+            </Button>
+            {/* <button type="submit" disabled={this.state.cardCodeRFID === '' ? true : false}>Cadastrar</button> */}
+          </div>
         </form>
 
         <div>
