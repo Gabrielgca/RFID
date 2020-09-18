@@ -5,7 +5,6 @@ import json
 import ttn
 from flask import Flask, jsonify, request, url_for, render_template
 from flask_sqlalchemy import SQLAlchemy
-from flask_cors import CORS
 from flask_socketio import SocketIO, emit, send
 import base64
 from flask_ngrok import run_with_ngrok
@@ -321,14 +320,14 @@ class PermHorario(db.Model):
     dt_fim='{}',
     hr_incial='{}',
     hr_final='{}',
-    st_permanente='{}')>'''.format(self.idPermHorario, self.dtInicio, self.dtFim, self.hrIncial, self.hrFinal, self.stPermanente)
+    st_permanente='{}')>'''.format(self.idPermHorario, self.dtInicio, self.dtFim, self.hrInicial, self.hrFinal, self.stPermanente)
 
     def getDict(self):
         self.dictionary = {}
         self.dictionary['idPermHorario'] = self.idPermHorario
         self.dictionary['dtInicio'] = self.dtInicio
         self.dictionary['dtFim'] = self.dtFim
-        self.dictionary['hrIncial'] = self.hrIncial
+        self.dictionary['hrIncial'] = self.hrInicial
         self.dictionary['hrFinal'] = self.hrFinal
         self.dictionary['stPermanente'] = self.stPermanente
         return self.dictionary
@@ -687,7 +686,7 @@ def registerDisp():
 
         
         try:
-            #cmd.insertDispositivo(new_disp, refresh=True)
+            cmd.insertDispositivo(new_disp, refresh=True)
             if noLoc != 0:
                 dispLoca = DispLocalizacao(idDispositivo = new_disp.idDispositivo, idLocalizacaoDisp = id_disp_loc, stSituacao = st_disp)
                 
@@ -780,6 +779,28 @@ def registerPerm():
                     print(f'3 - {e}')
                     return jsonify (success = False)
         return jsonify (success = True)
+
+@app.route ('/permtest', methods = ['GET', 'POST'])
+def permtest ():
+    try:
+        idCadastro = int (request.args.get ('idCadastro'))
+        idLocal = int (request.args.get ('idLocal'))
+    except:
+        print ('ERROR WHEN TRYING TO GET ARGS')
+
+    var = cmd.selAllPermCadastroLocal (idCadastro, idLocal)
+    print (var)
+    
+    for i in var:
+        if i.idPermHorario is not None:
+            print (f'--> ID_FERM_HORARIO = {i.idPermHorario}')
+            var1 = cmd.selPermHorarioByTime (i.idPermHorario, db.func.current_time ())
+            print (f'PERM_HORARIO: {var1}')
+        else:
+            print ('NO PERM_HORARIO')
+            
+    return jsonify (success = True)
+
 
 
 #---------------------------------#

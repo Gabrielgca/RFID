@@ -20,7 +20,7 @@ class RfidCommands():
             return Function("CONVERTE_MES",self.date_format(col,"%m"))
 
     def __init__(self,database=None):
-        from serverRFID_V2_Socket import Cadastro, Cartao, Dispositivo, Rota \
+        from serverRFID_V2_Socket_EXP import Cadastro, Cartao, Dispositivo, Rota \
                                                , Ocorrencia, CadastroCartao, LocalizacaoDisp \
                                                , DispLocalizacao, PermHorario, PermissaoDisp, PermUsuDisp
                                                
@@ -125,13 +125,25 @@ class RfidCommands():
             idLocalizacao = [idLocalizacao]
         return s.query(dl).filter(dl.idLocalizacaoDisp.in_(idLocalizacao), dl.stSituacao.in_("A")).all()
 
-    def selUsuDisp(self, idCadastro):
+    def selAllPermissions (self, idCadastro):
         pud = self.pud
         s = self.db.session
-        if type(idCadastro) != list:
+        if type (idCadastro) != list:
             idCadastro = [idCadastro]
-        return s.query(pud).filter(pud.idCadastro.in_(idCadastro), pud.stStatus.in_("A")).all()
+        return s.query (pud).filter (pud.idCadastro.in_(idCadastro), pud.stStatus.in_('A')).all ()
 
+    def selAllPermCadastroLocal (self, idCadastro, idLocal):
+        dl = self.dl
+        pud = self.pud
+        s = self.db.session
+
+        if type (idCadastro) != list:
+            idCadastro = [idCadastro]
+        if type (idLocal) != list:
+            idLocal = [idLocal]
+
+        return s.query (pud).join (dl, pud.idDispLocalizacao == dl.idDispLocalizacao) \
+            .filter (pud.idCadastro.in_(idCadastro), pud.idDispLocalizacao.in_(idLocal), dl.stSituacao.in_('A')).all ()
 
     def selPermHorario(self, idPermHorario):
         ph = self.ph
@@ -139,6 +151,15 @@ class RfidCommands():
         if type(idPermHorario) != list:
             idPermHorario = [idPermHorario]
         return s.query(ph).filter(ph.idPermHorario.in_(idPermHorario)).all()
+
+    def selPermHorarioByTime (self, idPermHorario, currentTime):
+        ph = self.ph
+        s = self.db.session
+
+        if type(idPermHorario) != list:
+            idPermHorario = [idPermHorario]
+
+        return s.query (ph).filter (ph.idPermHorario.in_(idPermHorario), self.db.between (currentTime, ph.hrInicial, ph.hrFinal)).all ()
 
     def selPermissaoDisp(self, idPermissaoDisp):
         pd = self.pd
@@ -415,7 +436,7 @@ class RfidCommands():
 
     #COMANDO NOVO!
     def insertDispLocalizacao(self,dispLocalizacao, refresh = False):
-
+        s = self.db.session
         s.add(dispLocalizacao)
         s.commit()
         if refresh:
