@@ -2,6 +2,7 @@ import app from 'firebase/app';
 import 'firebase/database';
 import 'firebase/auth';
 import 'firebase/storage';
+import Offices from './components/Offices';
 
 // Your web app's Firebase configuration
 let firebaseConfig = {
@@ -79,8 +80,14 @@ class Firebase {
     }
     else {
       const uid = app.auth().currentUser.uid;
-      await app.database().ref('usuarios').child(uid).once('value').then(callback);
+      var officeKey;
+      await app.database().ref('usuarios').child(uid).once('value', (snapshot) => {
+        //console.log(snapshot.val().cargo);
+        officeKey = snapshot.val().cargo;
+      });
     }
+
+    await app.database().ref('cargos').child(officeKey).child('nomeCargo').once('value').then(callback);
   }
 
   async getAllUsers(callback) {
@@ -102,10 +109,11 @@ class Firebase {
     }
   }
 
-  async updateUser(userKey, userName, userOffice) {
+  async updateUser(userKey, userName, userOffice, userStatus) {
     app.database().ref('usuarios').child(userKey).set({
       nome: userName,
-      cargo: userOffice
+      cargo: userOffice,
+      status: userStatus
       //tipoUsuario: 'Administrador' // Exemplo
     });
   }
@@ -118,11 +126,85 @@ class Firebase {
   async reactivateUser(userKey) {
     app.database().ref('usuarios').child(userKey).update({ status: "Ativo" });
   }
-  
-  async addOffice(officeName){
+
+
+  /* async addOffice(permissions, officeName) {
     let newOfficeKey = app.database().ref('cargos').push().key;
     return app.database().ref('cargos').child(newOfficeKey).set({
-      nomeCargo: officeName
+      nomeCargo: officeName,
+      status: 'Ativo',
+      permissoes: permissions
+    });
+  } */
+
+  async addOffice(permissions, officeName) {
+    let newOfficeKey = app.database().ref('cargos').push().key;
+    return app.database().ref('cargos').child(newOfficeKey).set({
+      nomeCargo: officeName,
+      status: 'Ativo',
+      permissoes: permissions
+    });
+  }
+
+  async addPermission(permissionName) {
+    let newPermissionKey = app.database().ref('permissions').child('dispositivo').push().key;
+    return app.database().ref('permissions').child('dispositivo').child(newPermissionKey).set({
+      nomePermissao: permissionName
+    });
+  }
+
+  async getPermissions(callback) {
+    await app.database().ref('permissions').once('value').then(callback);
+  }
+
+  async getCategoryPermissions(category, callback) {
+    await app.database().ref("permissions").child(category).once('value').then(callback);
+  }
+
+  async updateOffice(officeKey, officeName, permissions, officeStatus) {
+    app.database().ref('cargos').child(officeKey).set({
+      nomeCargo: officeName,
+      permissoes: permissions,
+      status: officeStatus
+      //tipoUsuario: 'Administrador' // Exemplo
+    });
+  }
+
+  async getOfficePermissions(callback) {
+    var officeKey;
+    this.getUserName(async (info) => {
+      //console.log(info.val().cargo);
+      officeKey = info.val().cargo;
+      await app.database().ref('cargos').child(officeKey).child('permissoes').once('value').then(callback);
+    });
+    //await app.database().ref('cargos').child(officeKey).child('permissoes').once('value').then(callback);
+  }
+
+  async disableOffice(officeName, officeKey) {
+    var find = 0;
+    await app.database().ref('usuarios').once('value', async (snapshot) => {
+      //console.log(JSON.stringify(snapshot));
+      snapshot.forEach((childItem) => {
+        if (childItem.val().cargo === officeName) {
+          find = 1;
+        }
+      })
+    });
+
+    if (find === 1) {
+      return "Erro! Você não pode desabilitar um cargo enquanto houver usuários atrelados a ele!";
+    }
+    else {
+      await app.database().ref('cargos').child(officeKey).update({
+        status: 'Inativo'
+      });
+      return "Usuário desabilitado com sucesso!";
+    }
+  }
+
+  async enableOffice(officeKey) {
+    await app.database().ref('cargos').child(officeKey).update({
+      status: 'Ativo'
     });
   }
 

@@ -5,16 +5,17 @@ import firebase from './firebase';
 import Home from './components/Home';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
-import Register from './components/Register';
+import NewUser from './components/NewUser';
 import Header from './components/Header';
-import NewRFID from './components/NovoRFID';
+import NewRFID from './components/NewRFID';
+import NewOffice from './components/NewOffice';
 import Users from './components/Users';
 import UsersRFID from './components/UsersRFID';
-import socket from './components/soketTeste';
-import TesteSocket from './components/soketTeste/teste-socket-io';
-import CadastroDispRFID from './components/CadastroDispRFID';
-import Dispositivos  from './components/DispositivosCadastrados';
-//import Offices from './components/Offices';
+import Offices from './components/Offices';
+import Sectors from './components/Sectors';
+import NewSector from './components/NewSector';
+import Devices from './components/Devices';
+import NewDevices from './components/NewDevices';
 
 import './global.css';
 import './App.css';
@@ -43,14 +44,21 @@ class App extends Component {
           <Route exact path="/" component={Home} />
           <Route exact path="/login" component={Login} />
           <Route exact path="/dashboard" component={Dashboard} />
-          <Route exact path="/register" component={Register} />
-          <Route exact path="/dashboard/new" component={NewRFID} />
+
+          <Route exact path="/usersRFID" component={UsersRFID} />
+          <Route exact path="/usersRFID/new" component={NewRFID} />
+
           <Route exact path="/users" component={Users} />
-          <Route exact path="/users-rfid" component={UsersRFID}/>
-          <Route exact path="/testesocket" component={TesteSocket}/>
-          <Route exact path="/dispositivos/cadastro-dispositivo" component={CadastroDispRFID}/>
-          <Route exact path="/dispositivos" component={Dispositivos}/>
-          {/* <Route exact path="/offices" component={Offices} /> */}
+          <Route exact path="/users/new" component={NewUser} />
+
+          <Route exact path="/offices" component={Offices} />
+          <Route exact path="/offices/new" component={NewOffice} />
+
+          <Route exact path="/sectors" component={Sectors} />
+          <Route exact path="/sectors/new" component={NewSector} />
+
+          <Route exact path="/devices" component={Devices} />
+          <Route exact path="/devices/new" component={NewDevices} />
         </Switch>
       </BrowserRouter>
     ) : (
