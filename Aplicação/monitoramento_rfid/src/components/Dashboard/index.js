@@ -13,6 +13,7 @@ import AutorenewIcon from '@material-ui/icons/Autorenew';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import HowToRegIcon from '@material-ui/icons/HowToReg';
 import TapAndPlayIcon from '@material-ui/icons/TapAndPlay';
+import ApartmentIcon from '@material-ui/icons/Apartment';
 import QueuePlayNextIcon from '@material-ui/icons/QueuePlayNext';
 
 import Button from '@material-ui/core/Button';
@@ -26,6 +27,8 @@ import axios from 'axios';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 import Loader from 'react-loader-spinner';
 import baseURL from "../../service";
+import io from 'socket.io-client';
+import ENDPOINT from '../../socketAPIService';
 
 
 /*const actions = [
@@ -46,6 +49,14 @@ class Dashboard extends Component {
       open: false, //Controla o estado do botão flutuante que funciona como menu
       nome: localStorage.nome, //Armazenará o nome do Usuário logado
       cargo: localStorage.cargo,
+      permissions: {
+        cargo: [],
+        conta: [],
+        dashboard: [],
+        dispositivo: [],
+        setor: [],
+        usuario: []
+      },
       rooms: [], //Armazenará as salas cadastradas no sistema
       selectedPerson: {
         name: "",
@@ -60,13 +71,153 @@ class Dashboard extends Component {
       actions: [
         { icon: <AccountCircleIcon />, name: 'Gerenciar Usuários', action: 1 },
         { icon: <HowToRegIcon />, name: 'Gerenciar Permissões', action: 3 },
-        { icon: <TapAndPlayIcon />, name: 'Gerenciamento de usuário RFID', action: 4 },
-        { icon: <QueuePlayNextIcon/>, name: 'Dispositivos', action: 5},
-        { icon: <ExitToApp />, name: 'Sair', action: 2 },
+        { icon: <TapAndPlayIcon />, name: 'Gerenciar Usuários RFID', action: 4 },
+        { icon: <ApartmentIcon />, name: "Gerenciar Setores", action: 5 },
+        { icon: <QueuePlayNextIcon />, name: 'Gerenciar Dispositivos', action: 6 },
+        { icon: <ExitToApp />, name: 'Sair', action: 2 }
       ]
     };
 
     this.logout = this.logout.bind(this);
+    this.checkCategory = this.checkCategory.bind(this);
+  }
+
+  async getAllPermissions() {
+    /* await firebase.getCategoryPermissions("cargo", (allPermissions) => {
+      this.ordenatePermissions(allPermissions);
+    });
+
+    await firebase.getCategoryPermissions("conta", (allPermissions) => {
+      this.ordenatePermissions(allPermissions)
+    });
+
+    await firebase.getCategoryPermissions("setor", (allPermissions) => {
+      this.ordenatePermissions(allPermissions)
+    });
+
+    await firebase.getCategoryPermissions("dispositivo", (allPermissions) => {
+      this.ordenatePermissions(allPermissions)
+    });
+
+    await firebase.getCategoryPermissions("usuario", (allPermissions) => {
+      this.ordenatePermissions(allPermissions)
+    });
+
+    await firebase.getCategoryPermissions("dashboard", (allPermissions) => {
+      this.ordenatePermissions(allPermissions)
+    }); */
+
+    await firebase.getOfficePermissions((officePermissions) => {
+      officePermissions.forEach((category) => {
+        //console.log(JSON.stringify(category.key));
+        category.forEach((permission) => {
+          //console.log(JSON.stringify(permission))
+        })
+        this.ordenatePermissions(category);
+      })
+    });
+  }
+
+  ordenatePermissions(category) {
+    /* console.log(category.key)
+    category.forEach((permission) => {
+      console.log(permission.val().nomePermissao);
+    })
+    console.log("\n"); */
+
+    /* console.log("Nome da categoria: " + category.key) */
+
+    let perm;
+    if (category.key === "cargo") {
+      perm = this.state.permissions.cargo;
+    }
+    else {
+      if (category.key === "conta") {
+        perm = this.state.permissions.conta;
+      }
+      else {
+        if (category.key === "dispositivo") {
+          perm = this.state.permissions.dispositivo;
+        }
+        else {
+          if (category.key === "setor") {
+            perm = this.state.permissions.setor;
+          }
+          else {
+            if (category.key === "usuario") {
+              perm = this.state.permissions.usuario;
+            }
+            else {
+              if (category.key === "dashboard") {
+                perm = this.state.permissions.dashboard;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    var newPermissions = this.state.permissions;
+
+    category.forEach((permission) => {
+      /* console.log(JSON.stringify(permission)); */
+      let list = {
+        key: permission.val().key,
+        nomePermissao: permission.val().nomePermissao,
+        status: permission.val().status
+      }
+      //console.log(list)
+      perm.push(list);
+    });
+    this.setState({ permissions: newPermissions });
+  }
+
+  checkCategory(categoryName) { //Função que irá verificar se o usuário possui alguma permissão em uma categoria específica desejada
+    let perm;
+    if (categoryName === "cargo") {
+      perm = this.state.permissions.cargo;
+    }
+    else {
+      if (categoryName === "conta") {
+        perm = this.state.permissions.conta;
+      }
+      else {
+        if (categoryName === "dispositivo") {
+          perm = this.state.permissions.dispositivo;
+        }
+        else {
+          if (categoryName === "setor") {
+            perm = this.state.permissions.setor;
+          }
+          else {
+            if (categoryName === "usuario") {
+              perm = this.state.permissions.usuario;
+            }
+            else {
+              if (categoryName === "dashboard") {
+                perm = this.state.permissions.dashboard;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    console.log(perm);
+
+    /* console.log(this.state.permissions); */
+
+    perm.map((permission) => {
+      //console.log(JSON.stringify(permission))
+      if (permission.status === true) {
+        console.log("true")
+        return true;
+      }
+      //return false;
+    })
+
+
+
   }
 
   async componentDidMount() {
@@ -75,31 +226,76 @@ class Dashboard extends Component {
       return null;
     }
 
-    /* firebase.getUserName((info) => {
+    firebase.getUserName((info) => {
       localStorage.nome = info.val().nome;
       this.setState({ nome: localStorage.nome });
-    }); */
+    });
 
-     firebase.getUserPerfil((info) => {
-       localStorage.cargo = info.val().cargo;
-       this.setState({ cargo: localStorage.cargo });
-     });
+    firebase.getUserPerfil((info) => {
+      localStorage.cargo = info.val();
+      this.setState({ cargo: localStorage.cargo });
+      //console.log("Valor recebido: " + info.val());
+    });
+
+    await this.getAllPermissions();
+
+    this.checkCategory("cargo");
 
     if (this.state.cargo === 'Administrador') {
       let newActions = [
         { icon: <AccountCircleIcon />, name: 'Gerenciar Usuários', action: 1 },
         { icon: <HowToRegIcon />, name: 'Gerenciar Permissões', action: 3 },
-        { icon: <TapAndPlayIcon />, name: 'Gerenciamento de usuário RFID', action: 4 },
-        { icon: <QueuePlayNextIcon/>, name: 'Dispositivos', action: 5},
+        { icon: <TapAndPlayIcon />, name: 'Gerenciar Usuários RFID', action: 4 },
+        { icon: <ApartmentIcon />, name: "Gerenciar Setores", action: 5 },
+        { icon: <QueuePlayNextIcon />, name: 'Gerenciar Dispositivos', action: 6 },
         { icon: <ExitToApp />, name: 'Sair', action: 2 }
       ]
       this.setState({ actions: newActions });
+    }
+    else {
+      if (this.state.cargo === "Auxiliar") {
+        let newActions = [
+          { icon: <ExitToApp />, name: 'Sair', action: 2 }
+        ]
+        this.setState({ actions: newActions });
+      }
+      else {
+        if (this.state.cargo === "Operador") {
+          let newActions = [
+            { icon: <TapAndPlayIcon />, name: 'Gerenciar Usuários RFID', action: 4 },
+            { icon: <ExitToApp />, name: 'Sair', action: 2 }
+          ]
+          this.setState({ actions: newActions });
+        }
+        else {
+          if (this.state.cargo === "Operador Master") {
+            let newActions = [
+              { icon: <TapAndPlayIcon />, name: 'Gerenciar Usuários RFID', action: 4 },
+              { icon: <ApartmentIcon />, name: "Gerenciar Setores", action: 5 },
+              { icon: <QueuePlayNextIcon />, name: 'Gerenciar Dispositivos', action: 6 },
+              { icon: <ExitToApp />, name: 'Sair', action: 2 }
+            ]
+            this.setState({ actions: newActions });
+          }
+          else {
+            if (this.state.cargo === "Gestor") {
+              let newActions = [
+                { icon: <AccountCircleIcon />, name: 'Gerenciar Usuários', action: 1 },
+                { icon: <TapAndPlayIcon />, name: 'Gerenciar Usuários RFID', action: 4 },
+                { icon: <ApartmentIcon />, name: "Gerenciar Setores", action: 5 },
+                { icon: <QueuePlayNextIcon />, name: 'Gerenciar Dispositivos', action: 6 },
+              ]
+              this.setState({ actions: newActions });
+            }
+          }
+        }
+      }
     }
 
     this.getRooms();
     this.setState({ updateCounter: 30 });
 
-    setInterval(() => {
+    /* setInterval(() => {
       let count = this.state.updateCounter;
       count--;
       this.setState({ updateCounter: count });
@@ -108,7 +304,7 @@ class Dashboard extends Component {
         console.log("GetRooms!");
         this.setState({ updateCounter: 30 });
       }
-    }, 1000); //60.000ms equivalem a 1 minuto*/
+    }, 1000); */ //60.000ms equivalem a 1 minuto*/
 
     //this.getRooms(); RODA UMA VEZ SÓ A REQUISIÇÃO
   }
@@ -133,7 +329,7 @@ class Dashboard extends Component {
 
   }
 
-  getRooms = async () => {
+  /* getRooms = async () => {
     await axios.get(baseURL + "rooms")
       .then(response => {
         this.setState({ rooms: response.data.salas });
@@ -141,6 +337,22 @@ class Dashboard extends Component {
       .catch(error => {
         alert("Erro: " + JSON.stringify(error));
       })
+  } */
+
+  getRooms() {
+    //var ENDPOINT = "http://192.168.2.196:7000"; //ENDPOINT
+    var socket = io.connect(ENDPOINT, {
+      reconnection: true,
+      //timeout: 30000
+      // transports: ['websocket']
+    });
+
+    // Inicia os eventos que ficarão em estado de observação, 
+    // onde cada alteração, será enviada do servidor para a aplicação em tempo real
+    socket.emit("rooms");
+    socket.on("rooms_update", response => {
+      this.setState({ rooms: response.salas });
+    });
   }
 
   getRoomDetails = async (roomId) => {
@@ -193,11 +405,16 @@ class Dashboard extends Component {
         }
         else {
           if (action === 4) {
-            this.props.history.push("/users-rfid");
+            this.props.history.push("/usersRFID");
           }
-          else{
-            if(action === 5){
-              this.props.history.push("/dispositivos")
+          else {
+            if (action === 5) {
+              this.props.history.push("/sectors");
+            }
+            else {
+              if (action === 6) {
+                this.props.history.push("/devices");
+              }
             }
           }
         }
@@ -206,17 +423,22 @@ class Dashboard extends Component {
   };
 
   getSelectedPerson = async (personId) => {
-    const { selectedRoom } = this.state;
-    selectedRoom.ocupantes.map((ocupante) => {
-      if (ocupante.idOcupante === personId) {
-        let newSelectedPerson = {
-          name: ocupante.nomeOcupante,
-          imgPerfil: ocupante.imgPerfil
+    if (this.state.cargo !== 'Auxiliar') {
+      const { selectedRoom } = this.state;
+      selectedRoom.ocupantes.map((ocupante) => {
+        if (ocupante.idOcupante === personId) {
+          let newSelectedPerson = {
+            name: ocupante.nomeOcupante,
+            imgPerfil: ocupante.imgPerfil
+          }
+          this.setState({ selectedPerson: newSelectedPerson });
+          this.modalOpen();
         }
-        this.setState({ selectedPerson: newSelectedPerson });
-        this.modalOpen();
-      }
-    })
+      });
+    }
+    else {
+      alert("Você não tem permissão para ver os dados dos usuários!");
+    }
   }
 
   render() {
@@ -225,6 +447,7 @@ class Dashboard extends Component {
       <div id="dashboard">
         <div className="user-info">
           <h1 style={{ color: "#FFF", marginRight: 20 }}>Olá, {this.state.nome}</h1>
+          {/* <p>{JSON.stringify(this.state.permissions)}</p> */}
           { /* <Link to="/dashboard/new"><FaPlus style={{ marginRight: 10 }} /> RFID</Link> */}
           {/* <button style={{ backgroundColor: "red" }} className="sign-out-button" onClick={() => this.logout()}><FaSignOutAlt style={{ marginRight: 10 }} /> Sair</button> */}
 

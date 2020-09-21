@@ -106,6 +106,7 @@ class New extends Component{
         <header id="new">
           <Link to="/dashboard">Voltar</Link>
         </header>
+        <h1 style={{ color: '#FFF', marginBottom: 15 }}>CADASTRAR NOVA CONTA</h1>
         <form onSubmit={this.cadastrar} id="new-post">
 
           <span>{this.state.alert}</span>

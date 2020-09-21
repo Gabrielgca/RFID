@@ -10,7 +10,6 @@ import Paper from '@material-ui/core/Paper';
 import InputBase from '@material-ui/core/InputBase';
 import IconButton from '@material-ui/core/IconButton';
 import SearchIcon from '@material-ui/icons/Search';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 
 //modal
@@ -41,7 +40,6 @@ class UsersRFID extends Component {
             filter: '',
             selectedUser: { key: '', name: '', idade: '', cargo: '', status: '' },
             nome: localStorage.nome,
-            cargo: localStorage.cargo,
             modalDeactivateOpen: false,
             modalReactivateOpen: false,
             people: [{
@@ -77,25 +75,6 @@ class UsersRFID extends Component {
             this.props.history.replace('/login');
             return null;
         }
-
-        firebase.getUserName((info) => {
-            localStorage.nome = info.val().nome;
-            this.setState({ nome: localStorage.nome });
-        });
-
-        firebase.getUserPerfil((info) => {
-            localStorage.cargo = info.val().cargo;
-            this.setState({ cargo: localStorage.cargo });
-        });
-
-        /* if (this.state.cargo === "Auxiliar") {
-            this.props.history.replace("/dashboard");
-            return null;
-        }
-        else {
-            alert("Acesso autorizado");
-            alert(this.state.cargo)
-        } */
 
     }
 
@@ -231,50 +210,51 @@ class UsersRFID extends Component {
     render() {
         const { people } = this.state;
         return (
-            <div className="container">
+            <div id="area">
                 <header id="new">
-                    {/* <Link to="/dashboard">Voltar</Link> */}
-                    <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.push('/dashboard') }}>
-                        Voltar
-                    </Button>
+                    <Link to="/dashboard">Voltar</Link>
                 </header>
-                <h1 style={{ color: '#FFF' }}>Usuários RFID</h1>
-                <Paper style={{ marginTop: 50 }}>
-                    <InputBase
-                        value={this.state.filter}
-                        style={{ paddingLeft: 20, width: 500 }}
-                        onChange={(e) => this.setState({ filter: e.target.value })}
-                        placeholder="Faça uma pesquisa..."
-                    />
-                    <IconButton type="button" onClick={this.searchUser}>
-                        <SearchIcon />
-                    </IconButton>
+                <h1>Usuários RFID</h1>
+                <div className="pesquisa">
+                    <Paper style={{ marginTop: 50 }}>
+                        <InputBase
+                            value={this.state.filter}
+                            style={{ paddingLeft: 20, width: 500 }}
+                            onChange={(e) => this.setState({ filter: e.target.value })}
+                            placeholder="Faça uma pesquisa..."
+                        />
+                        <IconButton type="button" onClick={this.searchUser}>
+                            <SearchIcon />
+                        </IconButton>
 
-                    <IconButton type="button" onClick={this.handleClearFilter}>
-                        <ClearIcon />
-                    </IconButton>
+                        <IconButton type="button" onClick={this.handleClearFilter}>
+                            <ClearIcon />
+                        </IconButton>
 
-                    <IconButton type="button" onClick={() => { this.props.history.push("/usersRFID/new") }}>
-                        <AddIcon style={{ color: 'green' }} />
-                    </IconButton>
-                </Paper>
+                        <IconButton type="button" onClick={() => { this.props.history.push("/usersRFID/new") }}>
+                            <AddIcon style={{ color: 'green' }} />
+                        </IconButton>
+                    </Paper>
+                </div>
                 <FlatList
                     list={this.state.filterUsers.length > 0 ? this.state.filterUsers : this.state.people}
                     renderItem={(item) => (
-                        <div className={item.status === "Ativo" ? "users-rfid-card" : "users-rfid-card-disabled"}>
-                            <p><b>Nome:</b> {item.name}</p>
-                            <p><b>Idade:</b> {item.idade}</p>
-                            <p><b>Cargo:</b> {item.cargo}</p>
-                            <p><b>Status:</b> {item.status}</p>
-                            <p><b>RFID:</b> {item.rfid}</p>
-                            <div className="btnArea">
-                                <Button endIcon={<EditIcon />} onClick={() => { this.modalOpen(item) }} style={{ backgroundColor: 'green', color: '#FFF', marginRight: 10 }}>Editar</Button>
-                                {item.status == 'Ativo' ? (
-                                    <Button endIcon={<EditIcon />} onClick={() => { this.handleDeactivateUser(item) }} style={{ backgroundColor: 'red', color: '#FFF' }}>Desativar</Button>
-                                ) : (
-                                        <Button endIcon={<EditIcon />} onClick={() => { this.handleReactivate(item) }} style={{ backgroundColor: 'blue', color: '#FFF' }}>Reativar</Button>
-                                    )
-                                }
+                        <div className="room-list">
+                            <div className={item.status === "Ativo" ? "users-rfid-card" : "users-rfid-card-disabled"}>
+                                <p><b>Nome:</b> {item.name}</p>
+                                <p><b>Idade:</b> {item.idade}</p>
+                                <p><b>Cargo:</b> {item.cargo}</p>
+                                <p><b>Status:</b> {item.status}</p>
+                                <p><b>RFID:</b> {item.rfid}</p>
+                                <div className="btnArea">
+                                    <Button endIcon={<EditIcon />} onClick={() => { this.modalOpen(item) }} style={{ backgroundColor: 'green', color: '#FFF', marginRight: 10 }}>Editar</Button>
+                                    {item.status == 'Ativo' ? (
+                                        <Button endIcon={<EditIcon />} onClick={() => { this.handleDeactivateUser(item) }} style={{ backgroundColor: 'red', color: '#FFF' }}>Desativar</Button>
+                                    ) : (
+                                            <Button endIcon={<EditIcon />} onClick={() => { this.handleReactivate(item) }} style={{ backgroundColor: 'blue', color: '#FFF' }}>Reativar</Button>
+                                        )
+                                    }
+                                </div>
                             </div>
                         </div>
 

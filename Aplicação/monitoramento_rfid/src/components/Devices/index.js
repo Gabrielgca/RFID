@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom';
 import firebase from '../../firebase';
 import axios from 'axios';
 import baseURL from '../../service';
-import './dispositivos.css';
+import './devices.css';
 
 //pesquisa
 import Paper from '@material-ui/core/Paper';
@@ -32,7 +32,7 @@ import ClearIcon from '@material-ui/icons/Clear';
 import EditIcon from '@material-ui/icons/Edit';
 
 
-class DispositivoCadastrado extends Component {
+class Devices extends Component {
 
     constructor(props) {
         super(props);
@@ -355,4 +355,4 @@ class DispositivoCadastrado extends Component {
     }
 }
 
-export default withRouter(DispositivoCadastrado);
+export default withRouter(Devices);

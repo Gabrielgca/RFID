@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import firebase from '../../firebase';
-import './CadastroDisp.css';
+import './NewDevices.css';
 
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -24,7 +24,7 @@ import axios from 'axios';
 
 
 
-class CadastroDispRFID extends Component {
+class NewDevices extends Component {
 
     constructor(props) {
         super(props);
@@ -179,4 +179,4 @@ class CadastroDispRFID extends Component {
     }
 }
 
-export default withRouter(CadastroDispRFID);
+export default withRouter(NewDevices);

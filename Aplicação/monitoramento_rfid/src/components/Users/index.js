@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import firebase from '../../firebase';
-import './index.css';
+import './users.css';
 
 import Paper from '@material-ui/core/Paper';
 import InputBase from '@material-ui/core/InputBase';
@@ -20,6 +20,7 @@ import ClearIcon from '@material-ui/icons/Clear';
 import EditIcon from '@material-ui/icons/Edit';
 import BlockIcon from '@material-ui/icons/Block';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -34,6 +35,8 @@ class Users extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            nome: localStorage.nome,
+            cargo: localStorage.cargo,
             users: [],
             filteredUsers: [],
             offices: [],
@@ -82,7 +85,7 @@ class Users extends Component {
     handleUpdate = () => {
         //alert("Novos dados: " + JSON.stringify(this.state.selectedUser));
         const { key } = this.state.selectedUser;
-        firebase.updateUser(key, this.state.selectedUser.nome, this.state.selectedUser.cargo);
+        firebase.updateUser(key, this.state.selectedUser.nome, this.state.selectedUser.cargo, this.state.selectedUser.status);
         this.handleClose();
         this.getUsers();
     }
@@ -102,6 +105,29 @@ class Users extends Component {
     }
 
     async componentDidMount() {
+        if (!firebase.getCurrent()) {
+            this.props.history.replace('/login');
+            return null;
+        }
+
+        firebase.getUserName((info) => {
+            localStorage.nome = info.val().nome;
+            this.setState({ nome: localStorage.nome });
+        });
+
+        firebase.getUserPerfil((info) => {
+            localStorage.cargo = info.val().cargo;
+            this.setState({ cargo: localStorage.cargo });
+        });
+
+        /* if (this.state.cargo === "Administrador" || this.state.cargo === "Gestor") {
+            alert("Acesso autorizado");
+        }
+        else {
+            this.props.history.replace("/dashboard");
+            return null;
+        } */
+
         firebase.getAllUsers((allUsers) => {
             allUsers.forEach((oneUser) => {
                 //alert("Key: " + oneUser.key);
@@ -192,7 +218,13 @@ class Users extends Component {
     render() {
         return (
             <div className="container">
-                <h1 style={{ color: '#FFF', marginTop: 10 }}>Usuários de Conta</h1>
+                <header id="new">
+                    {/* <Link to="/dashboard">Voltar</Link> */}
+                    <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.goBack() }}>
+                        Voltar
+                    </Button>
+                </header>
+                <h1 style={{ color: '#FFF' }}>Usuários de Conta</h1>
                 <Paper style={{ marginTop: 50 }}>
                     <InputBase
                         value={this.state.filter}
@@ -208,7 +240,7 @@ class Users extends Component {
                         <ClearIcon />
                     </IconButton>
 
-                    <IconButton type="button" onClick={() => { this.props.history.push("/register") }}>
+                    <IconButton type="button" onClick={() => { this.props.history.push("/users/new") }}>
                         <AddIcon style={{ color: 'green' }} />
                     </IconButton>
                 </Paper>
@@ -242,7 +274,7 @@ class Users extends Component {
                     )}
                     renderWhenEmpty={() => <div>Carregando...</div>}
                     //sortBy={["item.cargo", { key: "lastName", descending: true }]}
-                    sortBy={["cargo", "nome", "status"]}
+                    sortBy={["status", "cargo", "nome"]}
                 //groupBy={person => person.info.age > 18 ? 'Over 18' : 'Under 18'}
                 />
 
@@ -261,7 +293,7 @@ class Users extends Component {
                             autoFocus
                             margin="dense"
                             id="name"
-                            label="Nome do Usuário"
+                            label="Status"
                             type="text"
                             fullWidth
                         />
@@ -288,7 +320,7 @@ class Users extends Component {
 
                             {this.state.offices.map((office) => {
                                 return (
-                                    <MenuItem value={office.nomeCargo}>{office.nomeCargo}</MenuItem>
+                                    <MenuItem value={office.key}>{office.nomeCargo}</MenuItem>
                                 );
                             })}
                         </Select>
