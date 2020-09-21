@@ -510,17 +510,18 @@ def WiFIRFID ():
         if not available:
             cadastroCartao = cmd.selCadastroCartaoAtivo(idrfid)
             ultOcorrencia = cmd.selUltOcorrenciaCadastro(cadastroCartao.idCadastro)
+            #VERIFICANDO PERMISSÕES
             permissions_cadastro_local = cmd.selAllPermCadastroLocal (cadastroCartao.idCadastro, locDisp)
-                if len (permissions_cadastro_local) <= 0:
-                     # ACCESS DENIED
-                    return jsonify (success = False)
-                else:
-                    for i in permissions_cadastro_local:
-                        if i.idPermHorario is not None:
-                            permissions_by_time = cmd.selPermHorarioByTime (i.idPermHorario, db.func.current_time ())
-                            if len (permissions_by_time) <= 0:
-                                # ACCESS DENIED
-                                return jsonify (success = False)
+            if len (permissions_cadastro_local) <= 0:
+                    # ACCESS DENIED
+                return jsonify (success = False)
+            else:
+                for i in permissions_cadastro_local:
+                    if i.idPermHorario is not None:
+                        permissions_by_time = cmd.selPermHorarioByTime (i.idPermHorario, db.func.current_time ())
+                        if len (permissions_by_time) <= 0:
+                            # ACCESS DENIED
+                            return jsonify (success = False)
             
             # ACCESS GRANTED, proceed to database insert
             if ultOcorrencia is not None:
