@@ -41,6 +41,8 @@ class RfidCommands():
     ###################
     # COMANDOS SELECT #
     ###################
+    
+    #-----------COMANDO GABRIEL-----------#
     def selAllDispositivos(self, include_inactive = False):
         dp = self.dp
         s = self.db.session
@@ -79,6 +81,7 @@ class RfidCommands():
         s = self.db.session
         return s.query(pd).all()
 
+    #-----------COMANDO GABRIEL-----------#
     def selAllCadastroCartao(self):
         pd = self.pd
         s = self.db.session
@@ -118,7 +121,7 @@ class RfidCommands():
         if type(idLocalizacaoDisp) != list:
             idLocalizacaoDisp = [idLocalizacaoDisp]
         return s.query(ld).filter(ld.idLocalizacaoDisp.in_(idLocalizacaoDisp)).all()
-
+    #--------COMANDO GABRIEL--------#
     def selLocalizacaoDisp_no(self, noLocalizacao):
         ld = self.ld
         s = self.db.session
@@ -133,6 +136,7 @@ class RfidCommands():
             idLocalizacao = [idLocalizacao]
         return s.query(dl).filter(dl.idLocalizacaoDisp.in_(idLocalizacao), dl.stSituacao.in_("A")).all()
 
+    #-----------COMANDO GABRIEL-----------#
     def selDispLocalizacao_disp(self, idDispositivo):
         dl = self.dl
         s = self.db.session
@@ -140,6 +144,7 @@ class RfidCommands():
             idDispositivo = [idDispositivo]
         return s.query(dl).filter(dl.idDispositivo.in_(idDispositivo), dl.stSituacao.in_("A")).all()
 
+    #-----------COMANDO GABRIEL-----------#
     def selDispLocalizacao_disp_loc(self, idDispositivo, idLocalizacao):
         dl = self.dl
         s = self.db.session
@@ -189,7 +194,7 @@ class RfidCommands():
                           .filter(ct.noCartao == rfid,cdct.stEstado == 'A').scalar()
         return cadastroCartao
 
-
+    #-----------COMANDO GABRIEL-----------#
     def selCadastroCartao (self,idCadastro):
         cdct = self.cdct
         s = self.db.session
@@ -198,7 +203,7 @@ class RfidCommands():
         cadastroCartao = s.query(cdct).filter(cdct.idCadastro.in_(idCadastro),cdct.stEstado == 'A').all()
         return cadastroCartao
 
-
+     #-----------COMANDO GABRIEL-----------#
     def selnoCartao (self,idCartao):
         ct = self.ct
         s = self.db.session
