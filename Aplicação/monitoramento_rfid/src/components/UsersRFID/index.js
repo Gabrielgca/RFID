@@ -3,6 +3,7 @@ import { Link, withRouter } from 'react-router-dom';
 import firebase from '../../firebase';
 import FlatList from 'flatlist-react';
 import Loader from 'react-loader-spinner';
+import axios from 'axios';
 import './adm.css';
 
 //pesquisa
@@ -28,6 +29,7 @@ import Input from '@material-ui/core/Input';
 import AddIcon from '@material-ui/icons/Add';
 import ClearIcon from '@material-ui/icons/Clear';
 import EditIcon from '@material-ui/icons/Edit';
+import baseURL from '../../service';
 
 
 
@@ -42,23 +44,9 @@ class UsersRFID extends Component {
             nome: localStorage.nome,
             modalDeactivateOpen: false,
             modalReactivateOpen: false,
-            people: [{
-                key: 1,
-                name: "Arley Souto Aguiar",
-                idade: 25,
-                cargo: 'Analista',
-                status: "Ativo",
-                rfid: '1234'
-            }, {
-                key: 2,
-                name: "Silvio Júnior",
-                idade: 26,
-                cargo: 'Administrador',
-                status: "Inativo",
-                rfid: '4321'
-            }],
-
+            people: [{ key: 1, name: 'Arley', status: 'Ativo' }, { key: 2, name: 'Silvio', status: 'Ativo' }],//vai armazenar as pessoas cadastradas
             selectedPerson: {
+                key: 0,
                 name: "",
                 idade: '',
                 cargo: '',
@@ -77,10 +65,12 @@ class UsersRFID extends Component {
         }
 
     }
+    
 
     modalOpen = async (user) => {
         this.setState({
             selectedPerson: {
+                key: user.key,
                 name: user.name,
                 idade: user.idade,
                 status: user.status,
@@ -150,20 +140,7 @@ class UsersRFID extends Component {
         })
     }
 
-    getUsers = () => {
-        this.setState({ users: [] });
-        this.state.selectedPerson.map((allUsers) => {
-            allUsers.forEach((oneUser) => {
-                let list = {
-                    key: oneUser.key,
-                    name: oneUser.val().name,
-                    status: oneUser.val().status,
-                    rfid: oneUser.val().rfid
-                }
-                this.setState({ users: [...this.state.users, list] });
-            })
-        })
-    }
+
 
     reativeUser = () => {
         alert('usuario reativado');
@@ -208,6 +185,8 @@ class UsersRFID extends Component {
     }
 
 
+
+
     render() {
         const { people } = this.state;
         return (
@@ -229,7 +208,7 @@ class UsersRFID extends Component {
                             <ClearIcon />
                         </IconButton>
 
-                        <IconButton type="button" onClick={() => { this.props.history.push("/register") }}>
+                        <IconButton type="button" onClick={() => { this.props.history.push("/dashboard/new") }}>
                             <AddIcon style={{ color: 'green' }} />
                         </IconButton>
                     </Paper>
@@ -241,6 +220,7 @@ class UsersRFID extends Component {
                         <div className="room-list">
                             <div className={item.status === "Ativo" ? "card" : "card-disabled"}>
                                 <article>
+                                    <p><b>ID: </b>{item.key}</p>
                                     <p><b>Nome:</b> {item.name}</p>
                                     <p><b>Idade:</b> {item.idade}</p>
                                     <p><b>Cargo:</b> {item.cargo}</p>
@@ -285,6 +265,10 @@ class UsersRFID extends Component {
                 >
                     <DialogTitle id="alert-dialog-title">{"Detalhes do usuário"}</DialogTitle>
                     <DialogContent>
+                        <FormControl disabled>
+                            <InputLabel>ID</InputLabel>
+                            <Input value={this.state.selectedPerson.key} />
+                        </FormControl>
                         <DialogContentText id="alert-dialog-description">
                             <TextField
                                 autoFocus

@@ -13,6 +13,7 @@ import TextField from '@material-ui/core/TextField';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
+import { InputLabel } from '@material-ui/core';
 
 
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
@@ -20,7 +21,8 @@ import Loader from 'react-loader-spinner';
 import baseURL from "../../service";
 import io from 'socket.io-client';
 import axios from 'axios';
-import { InputLabel } from '@material-ui/core';
+
+
 
 class CadastroDispRFID extends Component {
 
@@ -29,7 +31,16 @@ class CadastroDispRFID extends Component {
         this.state = {
             key: '',
             status: '',
+            localization: '',
             nomeDispositivo: '',
+            localization: [],
+            cad: [],
+
+            selectLocazation: {
+                localization: '',
+                status:''
+            }
+
         }
 
 
@@ -41,32 +52,71 @@ class CadastroDispRFID extends Component {
             this.props.history.replace('/');
             return null;
         }
+        this.getLocalization();
     }
 
-    searchDevices = () => {
-        alert('teste')
+
+    localizationDevices = async (event) =>{
+        let newLocalization = this.state.selectLocazation;
+        newLocalization.localization = event.target.value;
+        this.setState({ selectLocazation: newLocalization })
     }
 
-    handleSetor = (event) =>{
-
+    statusDevice = async (event) =>{
+        let newStatus = this.state.selectLocazation;
+        newStatus.status = event.target.value;
+        this.setState({ selectLocazation: newStatus })
     }
+
+    getStatusDevices = async () =>{
+        await axios.get(baseURL + 'dispInfo')
+        .then(response =>{
+            this.setState({ status: response.data.status})
+        })
+        .catch(error =>{
+            alert('Erro:' + JSON.stringify(error))
+        })
+    }
+
+    getLocalization = async () => {
+        await axios.get(baseURL + 'locInfo')
+            .then(response => {
+                this.setState({ localization: response.data.locinfo })
+            })
+            .catch(error => {
+                alert('Erro:' + JSON.stringify(error))
+            })
+    }
+
+    getStatus = async (user) =>{
+        await this.setState({
+            selectLocazation:{
+                status: user.status,
+                localization: user.loc
+            }
+        })
+    }
+
+
 
     registerDevices = async (e) => {
-
         e.preventDefault();
-
-        if (this.state.key !== '' &&
-            this.state.status !== '' &&
+        if (this.state.selectLocazation.status !== '' &&
             this.state.nomeDispositivo !== '') {
+                
             const params = {
-                codigoDispRFID: this.state.key,
-                statusRFID: this.state.nomeDispositivo,
-                nomeDispRFID: this.state.nomeDispositivo
-            }
+                desc: this.state.nomeDispositivo,
+                status: this.state.selectLocazation.status,
+                loc: this.state.selectLocazation.localization
 
-            await axios.post(baseURL + 'registerDevices' + params)
+            }
+            
+            
+            await axios.post(baseURL + 'registerDisp' , params)
                 .then(response => {
                     alert("Usuário salvo com sucesso")
+                    console.log(response);
+                    
                 })
                 .catch(error => {
                     alert("Erro: " + JSON.stringify(error))
@@ -86,39 +136,42 @@ class CadastroDispRFID extends Component {
                 <header id="new">
                     <Link to="/dispositivos">Voltar</Link>
                 </header>
-                {JSON.stringify(this.codigoDispRFID)}
-                <form onSubmit={this.registerDevices} id="formRFID">
+
+                <form id="formRFID">
                     <h1>Cadastro de dispositivo RFID</h1>
-                    <FormControl variant="outlined" style={{ marginBottom:20}}>
+                    <TextField label='Descrição do Dispositivo' variant='outlined' style={{ marginBottom: 20 }} onChange={(e) => this.setState({ nomeDispositivo: e.target.value }) } />
+                    <FormControl variant="outlined" style={{ marginBottom: 20 }}>
                         <InputLabel>Localização</InputLabel>
                         <Select
-                        value={this.state.nomeDispositivo}
-                        onChange={this.handleSetor}
-                        label="Localização"
+                            value={this.state.selectLocazation.localization}
+                            onChange={this.localizationDevices}
+                            label="Localização"
                         >
-                            <MenuItem>Sala de Reunião</MenuItem>
-                            <MenuItem>Sala Principal</MenuItem>
-                            <MenuItem>Sala de Reunião</MenuItem>
+                            {this.state.localization.map((loc) => {
+                                return (
+                                    <MenuItem value={loc.id_loc}>{loc.id_loc} - {loc.loc}</MenuItem>
+                                )
+                            })}
                         </Select>
                     </FormControl>
-                    
+
                     <FormControl variant="outlined">
                         <InputLabel>Status</InputLabel>
-                    <Select
-                        style={{ marginBottom: 20, width: 100 }}
-                        autoFocus
-                        margin='dense'
-                        label='Status'
-                        type='text'
-                        value={this.state.status}
-                        onChange={(e) => this.setState({ status: e.target.value })}
-                    >
-                        <MenuItem value='ativo'>Ativo</MenuItem>
-                        <MenuItem value='inativo'>Inativo</MenuItem>
-                    </Select>
+                        <Select
+                            style={{ marginBottom: 20, width: 100 }}
+                            autoFocus
+                            margin='dense'
+                            label='Status'
+                            type='text'
+                            value={this.state.selectLocazation.status}
+                            onChange={this.statusDevice}
+                        >
+                            <MenuItem value='A'>Ativo</MenuItem>
+                            <MenuItem value='I'>Inativo</MenuItem>
+                        </Select>
                     </FormControl>
 
-                    <Button type='submit' variant="contained" disableElevation style={{ height: 50, background: 'green', color: '#FFF' }}>Salvar</Button>
+                    <Button onClick={this.registerDevices} variant="contained" disableElevation style={{ height: 50, background: 'green', color: '#FFF' }}>Salvar</Button>
                 </form>
 
             </div>

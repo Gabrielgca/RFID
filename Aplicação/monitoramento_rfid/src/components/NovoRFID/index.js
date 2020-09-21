@@ -3,6 +3,7 @@ import { Link, withRouter } from 'react-router-dom';
 import firebase from '../../firebase';
 import axios from 'axios';
 import './index.css';
+import { maskHr } from './maskHr';
 
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -55,6 +56,7 @@ class NewRFID extends Component {
     this.handleFile = this.handleFile.bind(this);
     this.handleClickOpen = this.handleClickOpen.bind(this);
     this.handleClose = this.handleClose.bind(this);
+    this.handleHora = this.handleHora.bind(this)
   }
 
 
@@ -191,7 +193,10 @@ class NewRFID extends Component {
     this.setState({ permissions: deleteItem })
   }
 
+  handleHora(h) {
+    this.setState({ hrini: maskHr(h.target.value)})
 
+  }
 
 
   render() {
@@ -271,7 +276,7 @@ class NewRFID extends Component {
               </Select>
             </FormControl>
 
-            <TextField label='Hora de inicio' variant='outlined' style={{ background: '#FFF', borderRadius: 8, width: '20%', marginLeft: '2%', marginBottom: 10 }}
+            <TextField name='hrini' label='Hora de inicio' variant='outlined' style={{ background: '#FFF', borderRadius: 8, width: '20%', marginLeft: '2%', marginBottom: 10 }}
               value={this.state.hrini} onChange={(e) => this.setState({ hrini: e.target.value })}
             />
             <TextField label='Hora de fim' variant='outlined' style={{ background: '#FFF', borderRadius: 8, width: '20%', marginLeft: '2%', marginBottom: 10 }}

@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import firebase from '../../firebase';
+import axios from 'axios';
+import baseURL from '../../service';
 import './dispositivos.css';
 
 //pesquisa
@@ -29,6 +31,7 @@ import AddIcon from '@material-ui/icons/Add';
 import ClearIcon from '@material-ui/icons/Clear';
 import EditIcon from '@material-ui/icons/Edit';
 
+
 class DispositivoCadastrado extends Component {
 
     constructor(props) {
@@ -36,28 +39,24 @@ class DispositivoCadastrado extends Component {
         this.state = {
             filterDevice: [],
             filter: '',
-            selectedDevice: { key: '', nameDevice: '', status: '' },
+            selectedDevice: { key: '', localization: '', nameDevice: '', status: '' },
             nome: localStorage.nomeDevice,
             modalDeactivateOpen: false,
             modalReactivateOpen: false,
-            devices: [{
-                key: 1,
-                nameDevice: "Sala de reunião",
-                status: "Ativo",
-            }, {
-                key: 2,
-                nameDevice: "Sala principal",
-                status: "Inativo",
-            }],
+            devices: [],
+            localization:[],
 
-            selectedPerson: {
-                nameDevice: "",
-                status: "",
+            selectedDevice: {
+                key: 0,
+                nameDevice: '',
+                localization: '',
+                status: '',
 
             }
         };
 
         this.logout = this.logout.bind(this);
+        this.localizationDevice = this.localizationDevice.bind(this);
     }
 
     async componentDidMount() {
@@ -65,14 +64,17 @@ class DispositivoCadastrado extends Component {
             this.props.history.replace('/login');
             return null;
         }
+        this.getDevices();
 
     }
 
     modalOpen = async (user) => {
-        this.setState({
+        this.getLocalization();
+        await this.setState({
             selectedDevice: {
-                key: user.key,
-                nameDevice: user.nameDevice,
+                key: user.id_disp,
+                nameDevice: user.desc,
+                localization: user.id_loc,
                 status: user.status,
             }
         })
@@ -94,9 +96,9 @@ class DispositivoCadastrado extends Component {
     }
 
 
-    nameDevice = async (event) => {
+    localizationDevice = async (event) => {
         let newNameDevice = this.state.selectedDevice;
-        newNameDevice.nameDevice = event.target.value;
+        newNameDevice.localization = event.target.value;
         this.setState({ selectedDevice: newNameDevice })
     }
 
@@ -130,19 +132,6 @@ class DispositivoCadastrado extends Component {
         })
     }
 
-    getUsers = () => {
-        this.setState({ devices: [] });
-        this.state.selectedDevice.map((allUsers) => {
-            allUsers.forEach((oneUser) => {
-                let list = {
-                    key: oneUser.key,
-                    nameDevice: oneUser.val().nameDevice,
-                    status: oneUser.val().status,
-                }
-                this.setState({ devices: [...this.state.devices, list] });
-            })
-        })
-    }
 
     reativeUser = () => {
         alert('Dispositivo reativado');
@@ -152,7 +141,7 @@ class DispositivoCadastrado extends Component {
 
     handleCloseReactivateDevice = () => {
         this.setState({ modalReactivateOpen: false });
-        this.setState({ selectedUser: { key: '', nameDevice: '', status: '' } })
+        this.setState({ selectedDevice: { key: '', nameDevice: '', status: '' } })
     }
 
     handleClearFilter = () => {
@@ -161,7 +150,7 @@ class DispositivoCadastrado extends Component {
     }
 
     handleDeactiveDevice = (user) => {
-        this.setState({ selectedUser: { key: user.key, name: user.nameDevice, status: user.status } })
+        this.setState({ selectedDevice: { key: user.key, name: user.nameDevice, status: user.status } })
         this.setState({ modalDeactivateOpen: true })
     }
 
@@ -171,7 +160,7 @@ class DispositivoCadastrado extends Component {
     }
 
     handleReative = (user) => {
-        this.setState({ selectedUser: { key: user.key, nameDevice: user.nameDevice, status: user.status } })
+        this.setState({ selectedDevice: { key: user.key, nameDevice: user.nameDevice, status: user.status } })
         this.setState({ modalReactivateOpen: true })
     }
 
@@ -183,10 +172,30 @@ class DispositivoCadastrado extends Component {
 
     handleCloseDeactivate = () => {
         this.setState({ modalDeactivateOpen: false });
-        this.setState({ selectedUser: { key: '', nameDevice: '', status: '' } })
+        this.setState({ selectedDevice: { key: '', nameDevice: '', status: '' } })
     }
 
-    
+    getDevices = async () => {
+        await axios.get(baseURL + 'dispInfo')
+            .then(response => {
+                this.setState({ devices: response.data.dispinfo });
+            })
+            .catch(error => {
+                alert('Erro:' + JSON.stringify(error))
+            })
+    }
+
+    getLocalization = async () =>{
+        await axios.get(baseURL + 'locInfo')
+        .then(response => {
+            this.setState({ localization: response.data.locinfo });
+        })
+        .catch(error => {
+            alert('Erro:' + JSON.stringify(error))
+        })
+    }
+
+
 
 
     render() {
@@ -218,13 +227,15 @@ class DispositivoCadastrado extends Component {
                     list={this.state.filterDevice.length > 0 ? this.state.filterDevice : this.state.devices}
                     renderItem={(item) => (
                         <div className="room-list">
-                            <div className={item.status === "Ativo" ? "card" : "card-disabled"}>
-                                <p><b>ID:</b> {item.key}</p>
-                                <p><b>Localização do Dispositivo:</b> {item.nameDevice}</p>
-                                <p><b>Status:</b> {item.status}</p>
+                            <div className={item.status === "A" ? "card" : "card-disabled"}>
+                                <p><b>ID:</b> {item.id_disp}</p>
+                                <p><b>Descrição do Dispositivo:</b> {item.desc}</p>
+                                <p><b>Localização do Dispositivo:</b> {item.no_loc}</p>
+                                {item.status === 'A' ? (<p><b>Status:</b> Ativo</p>) : (<p></p>)}
+                                {item.status === 'I' ? (<p><b>Status:</b> Inativo</p>) : (<p></p>)}
                                 <div className="btnArea">
                                     <Button endIcon={<EditIcon />} onClick={() => { this.modalOpen(item) }} style={{ backgroundColor: 'green', color: '#FFF', marginRight: 10 }}>Editar</Button>
-                                    {item.status == 'Ativo' ? (
+                                    {item.status == 'A' ? (
                                         <Button endIcon={<EditIcon />} onClick={() => { this.handleDeactiveDevice(item) }} style={{ backgroundColor: 'red', color: '#FFF' }}>Desativar</Button>
                                     ) : (
                                             <Button endIcon={<EditIcon />} onClick={() => { this.handleReative(item) }} style={{ backgroundColor: 'blue', color: '#FFF' }}>Reativar</Button>
@@ -260,39 +271,46 @@ class DispositivoCadastrado extends Component {
                 >
                     <DialogTitle id="alert-dialog-title">{"Detalhes do dispositivo"}</DialogTitle>
                     <DialogContent>
+
                         <FormControl disabled style={{ marginBottom: 25 }}>
                             <InputLabel>ID</InputLabel>
                             <Input value={this.state.selectedDevice.key} />
                         </FormControl>
+                        <DialogContentText>
+                            <TextField variant='outlined' label='Desrição do dispositivo' value={this.state.selectedDevice.nameDevice} />
+                        </DialogContentText>
 
                         <DialogContentText id="alert-dialog-description">
                             <InputLabel>Localização</InputLabel>
-                           
-                                <Select
-                                    style={{ width: 180 }}
-                                    label="localização"
-                                    value={this.state.selectedDevice.nameDevice}
-                                    onChange={this.nameDevice}  
-                                >
-                                    <MenuItem value=""><em>None</em></MenuItem>
-                                    <MenuItem value="Sala de reunião">Sala de reuniao</MenuItem>
-                                    <MenuItem value="Sala principal">Sala Principal</MenuItem>
-                                    <MenuItem value="Sala de manutenção">Sala de Manutenção</MenuItem>
-                                </Select>
-                           
 
-                            
-                                <InputLabel className="selectLabel">Status</InputLabel>
-                                <Select
-                                    value={this.state.selectedDevice.status}
-                                    onChange={this.statusDevice}
-                                >
-                                    <MenuItem value="Ativo">Ativo</MenuItem>
-                                    <MenuItem value="Inativo">Inativo</MenuItem>
-                                </Select>
-                            
+                            <Select
+                                style={{ width: 180 }}
+                                label="localização"
+                                value={this.state.selectedDevice.localization}
+                                onChange={(event) => {this.localizationDevice(event)}}
+                            >
+                                {this.state.localization.map((loc)=>{
+                                    return(
+                                        <MenuItem value={loc.id_loc}>{loc.id_loc} - {loc.loc} </MenuItem>
+                                    )
+                                })}
 
+
+                            </Select>
                         </DialogContentText>
+
+
+                        <InputLabel className="selectLabel">Status</InputLabel>
+                        <Select
+                            value={this.state.selectedDevice.status}
+                            onChange={this.statusDevice}
+                        >
+                            <MenuItem value="A">Ativo</MenuItem>
+                            <MenuItem value="I">Inativo</MenuItem>
+                        </Select>
+
+
+
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={this.editDevice} autoFocus style={{ backgroundColor: 'green', color: '#FFF' }}>Salvar</Button>
