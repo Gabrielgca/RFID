@@ -136,6 +136,28 @@ class RfidCommands():
             idLocalizacao = [idLocalizacao]
         return s.query(dl).filter(dl.idLocalizacaoDisp.in_(idLocalizacao), dl.stSituacao.in_("A")).all()
 
+    def selAllPermissions (self, idCadastro):
+        pud = self.pud
+        s = self.db.session
+        if type (idCadastro) != list:
+            idCadastro = [idCadastro]
+        return s.query (pud).filter (pud.idCadastro.in_(idCadastro), pud.stStatus.in_('A')).all ()
+
+    # COMANDO RENATO
+    def selAllPermCadastroLocal (self, idCadastro, idLocal):
+        dl = self.dl
+        pud = self.pud
+        s = self.db.session
+
+        if type (idCadastro) != list:
+            idCadastro = [idCadastro]
+        if type (idLocal) != list:
+            idLocal = [idLocal]
+
+        return s.query (pud).join (dl, pud.idDispLocalizacao == dl.idDispLocalizacao) \
+            .filter (pud.idCadastro.in_(idCadastro), pud.idDispLocalizacao.in_(idLocal), dl.stSituacao.in_('A')).all ()
+    
+    
     #-----------COMANDO GABRIEL-----------#
     def selDispLocalizacao_disp(self, idDispositivo):
         dl = self.dl
@@ -156,7 +178,7 @@ class RfidCommands():
         return s.query(dl).filter(dl.idDispositivo.in_(idDispositivo), dl.idLocalizacaoDisp.in_(idLocalizacao)).all()
 
 
-
+    #-----------COMANDO GABRIEL-----------#
     def selUsuDisp(self, idCadastro):
         pud = self.pud
         s = self.db.session
@@ -172,6 +194,15 @@ class RfidCommands():
             idPermHorario = [idPermHorario]
         return s.query(ph).filter(ph.idPermHorario.in_(idPermHorario)).all()
 
+    # COMANDO RENATO
+    def selPermHorarioByTime (self, idPermHorario, currentTime):
+        ph = self.ph
+        s = self.db.session
+
+        if type(idPermHorario) != list:
+            idPermHorario = [idPermHorario]
+
+        return s.query (ph).filter (ph.idPermHorario.in_(idPermHorario), self.db.between (currentTime, ph.hrInicial, ph.hrFinal)).all ()
     def selPermissaoDisp(self, idPermissaoDisp):
         pd = self.pd
         s = self.db.session
@@ -315,7 +346,7 @@ class RfidCommands():
     def selCountPessoasSala(self,idDispositivo):
         return self.selEntradas(idDispositivo=idDispositivo,
                                    count = True)\
-             - self.selSaidas(idDispositivo=dispositivo,
+             - self.selSaidas(idDispositivo=idDispositivo,
                                   count = True)
 
     def selUltOcorrenciaCadastro(self,idCadastro=None):
