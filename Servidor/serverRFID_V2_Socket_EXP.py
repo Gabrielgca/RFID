@@ -5,6 +5,7 @@ import json
 import ttn
 from flask import Flask, jsonify, request, url_for, render_template
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 from flask_socketio import SocketIO, emit, send
 import base64
 from flask_ngrok import run_with_ngrok
@@ -21,7 +22,7 @@ app.config['JSON_AS_ASCII'] = True
 #Inicializando o banco de dados
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:@localhost/db_rfid_v2'
 db = SQLAlchemy(app)
-
+CORS(app)
 #Mapeamentos dos objetos Flask-SQLAlchemy.
 class CadastroCartao(db.Model):
     __tablename__  = 'tb_cadastro_cartao'
@@ -213,6 +214,7 @@ class LocalizacaoDisp(db.Model):
     def getDict(self):
         self.dictionary = {}
         self.dictionary['idLocalizacaoDisp'] = self.idLocalizacaoDisp
+        self.dictionary['noEmpresa'] = self.noEmpresa
         self.dictionary['noLocalizacao'] = self.noLocalizacao
         self.dictionary['vlAndar'] = self.vlAndar
         self.dictionary['vlArea'] = self.vlArea
@@ -327,7 +329,7 @@ class PermHorario(db.Model):
         self.dictionary['idPermHorario'] = self.idPermHorario
         self.dictionary['dtInicio'] = self.dtInicio
         self.dictionary['dtFim'] = self.dtFim
-        self.dictionary['hrIncial'] = self.hrInicial
+        self.dictionary['hrInicial'] = self.hrInicial
         self.dictionary['hrFinal'] = self.hrFinal
         self.dictionary['stPermanente'] = self.stPermanente
         return self.dictionary
@@ -668,9 +670,13 @@ def registerDisp():
             resp = jsonify (success = False)
             return answer (app, 204, resp)
     
-        noDisp = data['disp']
-        st_disp = data['status']
-        noLoc = 0
+        try:
+            noDisp = data['desc']
+            st_disp = data['status']
+            noLoc = 0
+        except Exception as e:
+            print (e)
+            return jsonify(success = False)
         try:
             noLoc = data['loc']
             disp_loc = cmd.selLocalizacaoDisp_no(noLoc)
@@ -696,6 +702,109 @@ def registerDisp():
             print(e)
             return jsonify(success = False)
 
+@app.route ('/updateDisp', methods = ['GET','POST'])
+def updateDisp():
+    if request.method == 'POST':
+        global old_id_disp_loc
+        try:
+            data = request.get_json ()
+        except (KeyError, TypeError, ValueError):
+            resp = jsonify (success = False)
+            return answer (app, 204, resp)
+        update_disp = Dispositivo()
+        noLoc = 0
+        for key in data:
+            if key == "id_disp": id_disp = data['id_disp']  
+            if key == "disp": update_disp.noDispositivo = data['disp']   
+            if key == "status": update_disp.stAtivo = data['status']  
+            if key == "loc": noLoc = data['loc']
+                
+        try:
+            cmd.updateDispositivo(int(id_disp), update_disp)
+
+            if update_disp.stAtivo == "I" and len(cmd.selDispLocalizacao_disp(id_disp)) != 0:
+                update_disp_loc = DispLocalizacao()
+                
+                old_disp_loc = cmd.selDispLocalizacao_disp(id_disp)
+
+                for i in range(len(old_disp_loc)):
+                    dict_old_disp_loc = old_disp_loc[i].getDict()
+                    old_id_disp_loc = dict_old_disp_loc['idDispLocalizacao']
+
+                    cmd.updateStSituacaoDispLoc(old_id_disp_loc, update_disp.stAtivo)
+            
+            if noLoc != 0:
+                    old_disp_loc = cmd.selDispLocalizacao_disp(id_disp)
+
+                    new_loc_disp = cmd.selLocalizacaoDisp_no(noLoc)
+
+                    dict_new_loc_disp = new_loc_disp[0].getDict()
+                    new_id_loc_disp = dict_new_loc_disp['idLocalizacaoDisp']
+
+                    #print(f'AQUIIIIIII     {cmd.selDispLocalizacao_disp_loc(id_disp, new_id_loc_disp)}')
+                    
+                    #CASO HAJA UMA CONEXÃO PRÉVIA AINDA ATIVA
+                    if len(old_disp_loc) != 0:
+                        for i in range(len(old_disp_loc)):
+                            dict_old_disp_loc = old_disp_loc[i].getDict()
+                            old_id_disp_loc = dict_old_disp_loc['idDispLocalizacao']
+
+                            cmd.updateStSituacaoDispLoc(old_id_disp_loc, "I")
+                    #VERIFICA SE JÁ EXISTE UMA CONEXÃO COM A LOCALIZAÇÃO ENVIADA
+                    if len(cmd.selDispLocalizacao_disp_loc(id_disp, new_id_loc_disp)) != 0:
+                        update_disp_loc = cmd.selDispLocalizacao_disp_loc(id_disp, new_id_loc_disp)
+                        dict_update_disp_loc = update_disp_loc[0].getDict()
+
+                        update_id_disp_loc = dict_update_disp_loc['idDispLocalizacao']
+
+                        cmd.updateStSituacaoDispLoc(update_id_disp_loc, "A")
+                    #CASO NÃO HAJA UMA CONEXÃO, FARÁ UMA
+                    else :
+                        new_loc_disp = cmd.selLocalizacaoDisp_no(noLoc)
+
+                        dict_new_loc_disp = new_loc_disp[0].getDict()
+                        new_id_loc_disp = dict_new_loc_disp['idLocalizacaoDisp']
+                        
+                        
+                        dispLoca = DispLocalizacao(idDispositivo = id_disp, idLocalizacaoDisp = new_id_loc_disp, stSituacao = "A")  
+                        cmd.insertDispLocalizacao(dispLoca)
+
+            return jsonify(success = True)
+        except Exception as e:
+            print (f'1 - {e}')
+            return jsonify(success = False)
+
+
+
+@app.route ('/dispInfo', methods = ['GET','POST'])
+def dispInfo():
+    all_disp = cmd.selAllDispositivos(include_inactive = True)
+
+    info_disp = {}
+    list_disp = []
+    for i in all_disp:
+        dict_disp = {}
+        dict_disp["id_disp"] = i.idDispositivo
+        dict_disp["desc"] = i.noDispositivo
+        dict_disp["status"] = i.stAtivo
+        if len(cmd.selDispLocalizacao_disp(i.idDispositivo)) != 0:
+            disp_loc = cmd.selDispLocalizacao_disp(i.idDispositivo)
+            id_loc_disp = disp_loc[0].idLocalizacaoDisp
+
+            dict_disp["id_loc"] = id_loc_disp
+
+            loc_disp = cmd.selLocalizacaoDisp(id_loc_disp)
+            dict_disp["no_loc"] = loc_disp[0].noLocalizacao
+
+            
+        list_disp.append(dict_disp)
+
+    info_disp["dispinfo"] = list_disp
+    return jsonify (info_disp)
+
+
+
+
 
 @app.route ('/registerLoc', methods = ['GET','POST'])
 def registerLoc():
@@ -718,12 +827,62 @@ def registerLoc():
             area = int(str_area)
             insereDispLoc = LocalizacaoDisp(noEmpresa = str_emp,noLocalizacao = str_loc, vlAndar = andar, vlArea = area)
              
-            cmd.insertLocalizacaoDisp(insereDispLoc)
-            return jsonify(success = True)
+            cmd.insertLocalizacaoDisp(insereDispLoc, refresh = True)
+            #VERIFICAR COM A APLICAÇÃO SE PODERÃO ARMAZENAR ISSO
+            return jsonify(idLoc = insereDispLoc.idLocalizacaoDisp)
 
         except Exception as e:
             print(e)
             return jsonify(success = False)
+
+
+@app.route ('/updateLoc', methods = ['GET','POST'])
+def updateLoc():
+    if request.method == 'POST':
+        try:
+            data = request.get_json ()
+        except (KeyError, TypeError, ValueError):
+            resp = jsonify (success = False)
+            return answer (app, 204, resp)
+        
+
+        id_loc = data['id_loc']
+
+        update_loc_disp = LocalizacaoDisp(idLocalizacaoDisp = id_loc)
+
+        for key in data:
+            if key == "emp": update_loc_disp.noEmpresa = data['emp']   
+            if key == "loc": update_loc_disp.noLocalizacao = data['loc']  
+            if key == "andar": update_loc_disp.vlAndar = data['andar']
+            if key == "area": update_loc_disp.vlArea = data['area']
+                
+        
+        cmd.updateLocalizacaoDisp(int(id_loc), update_loc_disp)
+        print(update_loc_disp)
+        return jsonify(success = True)
+
+
+@app.route ('/locInfo', methods = ['GET','POST'])
+def locInfo():
+
+    info_loc_disp = {}
+    list_loc_disp = []
+    all_loc_disp = cmd.selAllLocalizacaoDisps()
+    for i in all_loc_disp:
+        dict_loc_disp = {}
+        dict_loc_disp["id_loc"] = i.idLocalizacaoDisp
+        dict_loc_disp["emp"] = i.noEmpresa
+        dict_loc_disp["loc"] = i.noLocalizacao
+        dict_loc_disp["andar"] = i.vlAndar
+        dict_loc_disp["area"] = i.vlArea
+        list_loc_disp.append(dict_loc_disp)
+
+    info_loc_disp["locinfo"] = list_loc_disp
+    return jsonify (info_loc_disp)
+        
+    
+
+
 
 
 @app.route ('/registerPerm', methods = ['GET','POST'])
@@ -780,28 +939,31 @@ def registerPerm():
                     return jsonify (success = False)
         return jsonify (success = True)
 
-@app.route ('/permtest', methods = ['GET', 'POST'])
-def permtest ():
-    try:
-        idCadastro = int (request.args.get ('idCadastro'))
-        idLocal = int (request.args.get ('idLocal'))
-    except:
-        print ('ERROR WHEN TRYING TO GET ARGS')
 
-    var = cmd.selAllPermCadastroLocal (idCadastro, idLocal)
-    print (var)
+@app.route ('/userInfo', methods = ['GET','POST'])
+def userInfo():
     
-    for i in var:
-        if i.idPermHorario is not None:
-            print (f'--> ID_FERM_HORARIO = {i.idPermHorario}')
-            var1 = cmd.selPermHorarioByTime (i.idPermHorario, db.func.current_time ())
-            print (f'PERM_HORARIO: {var1}')
-        else:
-            print ('NO PERM_HORARIO')
+    info_user = {}
+    list_user= []
+    all_user = cmd.selAllCadastros()
+
+    for i in all_user:
+        dict_user = {}
+        dict_user["id_user"] = i.idCadastro
+        dict_user["nome"] = i.noUsuario
+        dict_user["idade"] = i.vlIdade
+        dict_user["cargo"] = i.noAreaTrabalho
+        if len(cmd.selCadastroCartao(i.idCadastro)) > 0:
+            cad_cat = cmd.selCadastroCartao(i.idCadastro)
+            nocartao = cmd.selnoCartao(cad_cat[0].idCartao)
+            dict_user["status"] = cad_cat[0].stEstado
+            dict_user["RFID"] = nocartao
             
-    return jsonify (success = True)
+        list_user.append(dict_user)
 
+    info_user['usuarios']=list_user
 
+    return jsonify(info_user)
 
 #---------------------------------#
 
