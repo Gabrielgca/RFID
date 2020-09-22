@@ -269,11 +269,13 @@ class NewRFID extends Component {
               value={this.state.office} onChange={(e) => this.setState({ office: e.target.value })} required
             />
 
-            <FormControl variant='outlined' style={{ background: '#FFF', borderRadius: 8, width: '20%' }}>
-              <InputLabel id='labelTitle'>Permissão</InputLabel>
+            <FormControl variant="outlined" style={{ backgroundColor: '#FFF', width: "40%", borderRadius: 8, height: 42 }}>
+              <InputLabel id="demo-simple-select-outlined-label">Permissão</InputLabel>
               <Select
-                labelId='labelTitle'
-                label='Permissão'
+                style={{ height: 42 }}
+                labelId="demo-simple-select-outlined-label"
+                id="demo-simple-select-outlined"
+                label="Permissão"
                 value={this.state.localization}
                 onChange={(e) => this.setState({ localization: e.target.value })}
               >
