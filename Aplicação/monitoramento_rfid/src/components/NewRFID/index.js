@@ -17,6 +17,8 @@ import FormControl from '@material-ui/core/FormControl';
 import MenuItem from '@material-ui/core/MenuItem';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
+import CheckBox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 
 
@@ -50,12 +52,14 @@ class NewRFID extends Component {
       localizations: [],
       hrini: '',
       hrfim: '',
+      perm:''
     };
 
     this.register = this.register.bind(this);
     this.handleFile = this.handleFile.bind(this);
     this.handleClickOpen = this.handleClickOpen.bind(this);
     this.handleClose = this.handleClose.bind(this);
+    this.handleCheck = this.handleCheck.bind(this);
   }
 
 
@@ -153,7 +157,7 @@ class NewRFID extends Component {
           alert("Erro: " + JSON.stringify(error));
         })
       //Após enviar os dados pro banco, reencaminhar para a Dashboard
-      this.props.history.push('/dashboard');
+      this.props.history.push('/usersRFID');
 
     } else {
       //Caso algum campo não tenha sido preenchido, mostra mensagem de erro
@@ -178,7 +182,7 @@ class NewRFID extends Component {
         loc: this.state.localization,
         hrini: this.state.hrini,
         hrfim: this.state.hrfim,
-        perm: 's'
+        perm: this.state.perm
       })
       this.setState({ permissions: newPermissions })
     }
@@ -206,11 +210,15 @@ class NewRFID extends Component {
     this.setState({ permissions: deleteItem })
   }
 
+  handleCheck = async (event) =>{
+    this.setState({ perm: event.target.checked})
+  }
+
   render() {
     return (
       <div className="new-rfid-body">
         <header id="new">
-          <Link to="/dashboard">Voltar</Link>
+          <Link to="/usersRFID">Voltar</Link>
         </header>
         <form onSubmit={this.register} id="new-post">
           <h1>Cadastrar Novo Usuário</h1>
@@ -269,13 +277,12 @@ class NewRFID extends Component {
               value={this.state.office} onChange={(e) => this.setState({ office: e.target.value })} required
             />
 
-            <FormControl variant="outlined" style={{ backgroundColor: '#FFF', width: "40%", borderRadius: 8, height: 42 }}>
-              <InputLabel id="demo-simple-select-outlined-label">Permissão</InputLabel>
+            <FormControl style={{ background: '#FFF', borderRadius: 8, width: '20%', height: 42 }}>
+              <InputLabel id='labelTitle'>Permissão</InputLabel>
               <Select
-                style={{ height: 42 }}
-                labelId="demo-simple-select-outlined-label"
-                id="demo-simple-select-outlined"
-                label="Permissão"
+                variant='outlined'
+                labelId='labelTitle'
+                label='Permissão'
                 value={this.state.localization}
                 onChange={(e) => this.setState({ localization: e.target.value })}
               >
@@ -297,6 +304,7 @@ class NewRFID extends Component {
 
 
             <Button onClick={this.handleAddPermission} variant='contained' style={{ marginLeft: '2%', background: 'green', height: 42 }} ><AddIcon /></Button>
+            <FormControlLabel control={<CheckBox checked={this.state.perm} onChange={(e) => {this.handleCheck(e)}} />}label='Manter horário direto' />
             <div className='flatScroll'>
               <FlatList
                 renderWhenEmpty={() => <div></div>}
