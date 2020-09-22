@@ -134,7 +134,7 @@ class NewDevices extends Component {
 
             <div className="formArea">
                 <header id="new">
-                    <Link to="/dispositivos">Voltar</Link>
+                    <Link to="/devices">Voltar</Link>
                 </header>
 
                 <form id="formRFID">
