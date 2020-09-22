@@ -241,7 +241,7 @@ class Devices extends Component {
                             <ClearIcon />
                         </IconButton>
 
-                        <IconButton type="button" onClick={() => { this.props.history.push("/dispositivos/cadastro-dispositivo") }}>
+                        <IconButton type="button" onClick={() => { this.props.history.push("/devices/new") }}>
                             <AddIcon style={{ color: 'green' }} />
                         </IconButton>
                     </Paper>
