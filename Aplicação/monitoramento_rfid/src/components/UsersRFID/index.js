@@ -143,26 +143,10 @@ class UsersRFID extends Component {
             }
         })
     }
-
-    getUsers = () => {
-        this.setState({ users: [] });
-        this.state.selectedUser.map((allUsers) => {
-            allUsers.forEach((oneUser) => {
-                let list = {
-                    key: oneUser.key,
-                    name: oneUser.val().name,
-                    idade: oneUser.val().idade,
-                    status: oneUser.val().status,
-                    rfid: oneUser.val().rfid
-                }
-                this.setState({ users: [...this.state.users, list] });
-            })
-        })
-    }
     reactivateUser = () => {
         alert('usuario reativado');
         this.handleCloseReactivateUser();
-        this.getUsers();
+        this.getUsersRFID();
     }
     handleCloseReactivateUser = () => {
         this.setState({ modalReactivateOpen: false });
@@ -187,7 +171,7 @@ class UsersRFID extends Component {
     deactivateUser = async (key) => {
         alert('usuario desativado')
         this.handleCloseDeactivateUser();
-        this.getUsers();
+        this.getUsersRFID();
     }
     handleCloseDeactivate = () => {
         this.setState({ modalDeactivateOpen: false });
@@ -273,12 +257,6 @@ class UsersRFID extends Component {
                             <p><b>RFID:</b> {item.RFID}</p>
                             <div className="btnArea">
                                 <Button endIcon={<EditIcon />} onClick={() => { this.modalOpen(item) }} style={{ backgroundColor: 'green', color: '#FFF', marginRight: 10 }}>Editar</Button>
-                                {item.status == 'A' ? (
-                                    <Button endIcon={<EditIcon />} onClick={() => { this.handleDeactivateUser(item) }} style={{ backgroundColor: 'red', color: '#FFF' }}>Desativar</Button>
-                                ) : (
-                                        <Button endIcon={<EditIcon />} onClick={() => { this.handleReactivate(item) }} style={{ backgroundColor: 'blue', color: '#FFF' }}>Reativar</Button>
-                                    )
-                                }
                             </div>
                         </div>
 
