@@ -203,6 +203,7 @@ class Dashboard extends Component {
       }
     }
 
+    // PAREI AQUI!!!!!!!!!!!!!!!!
     console.log(perm);
 
     /* console.log(this.state.permissions); */

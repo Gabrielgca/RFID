@@ -10,9 +10,11 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-
+import DialogTitle from '@material-ui/core/DialogTitle'
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+
+import axios from 'axios';
+import baseURL from '../../service';
 
 import './NewSectors.css';
 
@@ -37,11 +39,26 @@ class NewSectors extends Component {
     }
 
     handleAddSector = () => {
-        alert(this.state.companyName);
+        /* alert(this.state.companyName);
         alert(this.state.roomName);
         alert(this.state.area);
         alert(this.state.floor);
-        alert(this.state.maxOccupation);
+        alert(this.state.maxOccupation); */
+        let params = {
+            companyName: this.state.companyName,
+            roomName: this.state.roomName,
+            floor: this.state.floor,
+            area: this.state.area
+        }
+
+        axios.post(baseURL + "registerLoc", params)
+        .then(response => {
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.log(error);
+        });
+
         this.handleCloseConfirmModal();
     }
 

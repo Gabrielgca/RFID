@@ -39,24 +39,22 @@ class Devices extends Component {
         this.state = {
             filterDevice: [],
             filter: '',
-            selectedDevice: { key: '', localization: '', nameDevice: '', status: '' },
             nome: localStorage.nomeDevice,
             modalDeactivateOpen: false,
             modalReactivateOpen: false,
             devices: [],
-            localization:[],
-
+            localization: [],
             selectedDevice: {
                 key: 0,
                 nameDevice: '',
                 localization: '',
                 status: '',
-
             }
         };
 
         this.logout = this.logout.bind(this);
         this.localizationDevice = this.localizationDevice.bind(this);
+        this.handleNameChange = this.handleNameChange.bind(this);
     }
 
     async componentDidMount() {
@@ -66,6 +64,12 @@ class Devices extends Component {
         }
         this.getDevices();
 
+    }
+
+    handleNameChange = (e) => {
+        let newSelectedDevice = this.state.selectedDevice;
+        newSelectedDevice.nameDevice = e.target.value;
+        this.setState({ selectedDevice: newSelectedDevice });
     }
 
     modalOpen = async (user) => {
@@ -82,7 +86,9 @@ class Devices extends Component {
     };
 
     modalClose = async () => {
+        this.setState({ selectedDevice: { key: '', localization: '', nameDevice: '', status: '' } });
         this.setState({ modalOpen: false });
+        this.getDevices();
     }
 
     logout = async () => {
@@ -109,8 +115,24 @@ class Devices extends Component {
     }
 
 
-    editDevice = async () => {
-        alert(JSON.stringify(this.state.selectedDevice))
+    handleUpdateDevice = async () => {
+        alert(JSON.stringify(this.state.selectedDevice));
+
+        let params = {
+            id_disp: this.state.selectedDevice.key,
+            disp: this.state.selectedDevice.nameDevice,
+            status: this.state.selectedDevice.status,
+            loc: this.state.selectedDevice.localization
+        }
+
+        await axios.post(baseURL + 'updateDisp', params)
+            .then(response => {
+                console.log(response.data);
+                this.modalClose();
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }
 
     searchDevice = () => {
@@ -185,14 +207,15 @@ class Devices extends Component {
             })
     }
 
-    getLocalization = async () =>{
+    getLocalization = async () => {
         await axios.get(baseURL + 'locInfo')
-        .then(response => {
-            this.setState({ localization: response.data.locinfo });
-        })
-        .catch(error => {
-            alert('Erro:' + JSON.stringify(error))
-        })
+            .then(response => {
+                //console.log(response.data.locinfo);
+                this.setState({ localization: response.data.locinfo });
+            })
+            .catch(error => {
+                alert('Erro:' + JSON.stringify(error))
+            })
     }
 
 
@@ -277,7 +300,7 @@ class Devices extends Component {
                             <Input value={this.state.selectedDevice.key} />
                         </FormControl>
                         <DialogContentText>
-                            <TextField variant='outlined' label='Desrição do dispositivo' value={this.state.selectedDevice.nameDevice} />
+                            <TextField variant='outlined' label='Descrição do dispositivo' value={this.state.selectedDevice.nameDevice} onChange={this.handleNameChange} />
                         </DialogContentText>
 
                         <DialogContentText id="alert-dialog-description">
@@ -287,11 +310,11 @@ class Devices extends Component {
                                 style={{ width: 180 }}
                                 label="localização"
                                 value={this.state.selectedDevice.localization}
-                                onChange={(event) => {this.localizationDevice(event)}}
+                                onChange={(event) => { this.localizationDevice(event) }}
                             >
-                                {this.state.localization.map((loc)=>{
-                                    return(
-                                        <MenuItem value={loc.id_loc}>{loc.id_loc} - {loc.loc} </MenuItem>
+                                {this.state.localization.map((loc) => {
+                                    return (
+                                        <MenuItem value={loc.roomName}>{loc.id_loc} - {loc.roomName} </MenuItem>
                                     )
                                 })}
 
@@ -313,7 +336,7 @@ class Devices extends Component {
 
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={this.editDevice} autoFocus style={{ backgroundColor: 'green', color: '#FFF' }}>Salvar</Button>
+                        <Button onClick={this.handleUpdateDevice} autoFocus style={{ backgroundColor: 'green', color: '#FFF' }}>Salvar</Button>
                         <Button onClick={this.modalClose} style={{ backgroundColor: 'red', color: '#FFF' }} autoFocus>
                             Cancelar
                         </Button>

@@ -25,6 +25,9 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 
 import FlatList from 'flatlist-react';
 import { FormGroup, FormControlLabel } from '@material-ui/core';
+import axios from 'axios';
+import baseURL from '../../service';
+
 
 class Sectors extends Component {
 
@@ -34,14 +37,10 @@ class Sectors extends Component {
             nome: localStorage.nome,
             cargo: localStorage.cargo,
             filter: '',
-            sectors: [
-                { key: 1, companyName: 'IBTI', roomName: 'Sala de Reuniões', area: 10, floor: 1, maxOccupation: 5 },
-                { key: 2, companyName: 'IBTI', roomName: 'Laboratório', area: 5, floor: 1, maxOccupation: 2 },
-                { key: 3, companyName: 'Voyageur', roomName: 'Laboratório', area: 3, floor: 2, maxOccupation: 1 }
-            ],
+            sectors: [],
             filteredSectors: [],
             selectedSector: {
-                key: 0,
+                id_loc: 0,
                 companyName: '',
                 roomName: '',
                 area: 0,
@@ -62,7 +61,7 @@ class Sectors extends Component {
         this.state.sectors.forEach((sector) => {
             if (sector.companyName.toUpperCase().includes(this.state.filter.toUpperCase()) || sector.companyName.toUpperCase() == this.state.filter.toUpperCase()) {
                 let list = {
-                    key: sector.key,
+                    id_loc: sector.id_loc,
                     companyName: sector.companyName,
                     roomName: sector.roomName,
                     area: sector.area,
@@ -83,20 +82,29 @@ class Sectors extends Component {
         this.setState({ filter: '' });
     };
 
-    getSectors = () => {
+    getAllSectors = () => {
+        this.setState({ sectors: [] });
+        axios.get(baseURL + "locInfo")
+            .then(response => {
+                console.log(response.data);
+                this.setState({ sectors: response.data.locinfo })
+            })
+            .catch(error => {
+                console.log(error);
+            })
         // Função que buscará os dados dos setores no servidor, e salvará os dados
         // na variável "sectors"
     }
 
     handleUpdateSector = async () => {
         this.handleCloseConfirmModal();
-        this.getSectors();
+        this.getAllSectors();
     }
 
     handleConfirmModalOpen = (sector) => {
         this.setState({ modalConfirmShow: true });
         let array = {
-            key: sector.key,
+            id_loc: sector.id_loc,
             companyName: sector.companyName,
             roomName: sector.roomName,
             area: sector.area,
@@ -108,8 +116,9 @@ class Sectors extends Component {
     }
 
     handleCloseConfirmModal = () => {
+        this.getAllSectors();
         this.setState({ modalConfirmShow: false });
-        this.setState({ selectedSector: { key: 0, companyName: '', roomName: '', area: 0, floor: 0, maxOccupation: 0 } });
+        this.setState({ selectedSector: { id_loc: 0, companyName: '', roomName: '', area: 0, floor: 0, maxOccupation: 0 } });
     }
 
     handleAreaUpdate = async (e) => {
@@ -126,13 +135,29 @@ class Sectors extends Component {
         let string = e.target.value.toString();
     }
 
-    handleValidateForm = () => {
+    handleValidateForm = async () => {
         if (this.state.selectedSector.companyName !== "" &&
             this.state.selectedSector.roomName !== "" &&
             this.state.selectedSector.area !== "" &&
             this.state.selectedSector.floor !== "" &&
             this.state.selectedSector.maxOccupation !== "") {
-            alert("Aqui enviará os dados ao servidor, e receberá uma resposta, de sucesso ou erro, que será exibida para o usuário!");
+            //alert("Aqui enviará os dados ao servidor, e receberá uma resposta, de sucesso ou erro, que será exibida para o usuário!");
+            let params = {
+                id_loc: this.state.selectedSector.id_loc,
+                companyName: this.state.selectedSector.companyName,
+                roomName: this.state.selectedSector.roomName,
+                area: this.state.selectedSector.area,
+                floor: this.state.selectedSector.floor
+                //maxOccupation: this.state.selectedSector.maxOccupation
+            }
+            await axios.post(baseURL + "updateLoc", params)
+                .then(response => {
+                    console.log(response.data);
+                    this.handleCloseConfirmModal();
+                })
+                .catch(error => {
+                    console.log(error)
+                });
         }
         else {
             alert("Dados inválidos. Revise o formulário");
@@ -155,6 +180,8 @@ class Sectors extends Component {
             localStorage.cargo = info.val().cargo;
             this.setState({ cargo: localStorage.cargo });
         });
+
+        this.getAllSectors();
 
         /* if (this.state.cargo === "Auxiliar" || this.state.cargo === "Operador") {
             this.props.history.replace("/dashboard");
@@ -198,10 +225,10 @@ class Sectors extends Component {
                 <FlatList
                     list={this.state.filteredSectors.length > 0 ? this.state.filteredSectors : this.state.sectors}
                     renderItem={(item) => (
-                        <div className={item.status === 'Ativo' ? "card" : "card"} key={item.key}>
+                        <div className={item.status === 'Ativo' ? "card" : "card"} key={item.id_loc}>
                             <FormGroup row style={{ justifyContent: "space-between" }}>
                                 <FormGroup>
-                                    <p><b>Empresa: </b>{item.companyName}</p>
+                                    <p><b>Nome da Empresa: </b>{item.companyName}</p>
                                     <p><b>Sala: </b>{item.roomName}</p>
                                     <p><b>Área: </b>{item.area}</p>
                                     <p><b>Andar: </b>{item.floor}</p>
@@ -227,7 +254,7 @@ class Sectors extends Component {
                     )}
                     renderWhenEmpty={() => <div>Carregando...</div>}
                     //sortBy={["item.cargo", { key: "lastName", descending: true }]}
-                    sortBy={["status", "nomeCargo"]}
+                    sortBy={["companyName"]}
                 //groupBy={person => person.info.age > 18 ? 'Over 18' : 'Under 18'}
                 />
 
@@ -243,7 +270,6 @@ class Sectors extends Component {
                             style={{ width: '100%' }}
                             autoFocus
                             margin="dense"
-                            id="name"
                             label="Nome da Empresa"
                             type="text"
                             fullWidth
@@ -255,7 +281,6 @@ class Sectors extends Component {
                             style={{ width: '100%' }}
                             autoFocus
                             margin="dense"
-                            id="name"
                             label="Nome da Sala"
                             type="text"
                             fullWidth
@@ -267,7 +292,6 @@ class Sectors extends Component {
                             style={{ width: '100%' }}
                             autoFocus
                             margin="dense"
-                            id="name"
                             label="Área"
                             type="number"
                             fullWidth
@@ -279,7 +303,6 @@ class Sectors extends Component {
                             style={{ width: '100%' }}
                             autoFocus
                             margin="dense"
-                            id="name"
                             label="Andar"
                             type="number"
                             fullWidth
@@ -291,7 +314,6 @@ class Sectors extends Component {
                             style={{ width: '100%' }}
                             autoFocus
                             margin="dense"
-                            id="name"
                             label="Ocupação máxima"
                             type="number"
                             fullWidth
