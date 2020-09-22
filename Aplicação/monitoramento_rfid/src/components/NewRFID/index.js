@@ -17,8 +17,7 @@ import FormControl from '@material-ui/core/FormControl';
 import MenuItem from '@material-ui/core/MenuItem';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
-import CheckBox from '@material-ui/core/Checkbox';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
+
 
 
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
@@ -48,16 +47,15 @@ class NewRFID extends Component {
       office: '',//Armazenará o cargo
       permissions: [],
       localization: '',
+      localizations: [],
       hrini: '',
       hrfim: '',
-      perm: ''
     };
 
     this.register = this.register.bind(this);
     this.handleFile = this.handleFile.bind(this);
     this.handleClickOpen = this.handleClickOpen.bind(this);
     this.handleClose = this.handleClose.bind(this);
-    this.handleCheck = this.handleCheck.bind(this);
   }
 
 
@@ -77,6 +75,8 @@ class NewRFID extends Component {
       this.setState({ cardStatus: true })
       console.log('Register: ' + response)
     })
+
+    this.getLocalizations();
 
   }
 
@@ -153,23 +153,13 @@ class NewRFID extends Component {
           alert("Erro: " + JSON.stringify(error));
         })
       //Após enviar os dados pro banco, reencaminhar para a Dashboard
-      this.props.history.push('/usersRFID');
+      this.props.history.push('/dashboard');
 
     } else {
       //Caso algum campo não tenha sido preenchido, mostra mensagem de erro
       this.setState({ alert: 'Preencha todos os campos!' });
     }
 
-  }
-
-  getLocalization = async () => {
-    await axios.get(baseURL + 'locInfo')
-      .then(response => {
-        this.setState({ localization: response.data.loc })
-      })
-      .catch(error => {
-        alert(error)
-      })
   }
 
   handleFile = async (e) => {
@@ -182,14 +172,13 @@ class NewRFID extends Component {
   }
 
   handleAddPermission = () => {
-    alert(JSON.stringify(this.state.perm))
     if ((this.state.hrini !== '' && this.state.hrfim !== '' && this.state.localization !== '') || (this.state.hrini === '' && this.state.hrfim === '' && this.state.localization !== '')) {
       let newPermissions = this.state.permissions;
       newPermissions.push({
         loc: this.state.localization,
         hrini: this.state.hrini,
         hrfim: this.state.hrfim,
-        perm: this.state.perm
+        perm: 's'
       })
       this.setState({ permissions: newPermissions })
     }
@@ -199,21 +188,29 @@ class NewRFID extends Component {
     }
   }
 
+  getLocalizations = async () => {
+    axios.get(baseURL + "locInfo")
+      .then(response => {
+        console.log("Responses");
+        console.log(response.data.locinfo);
+        this.setState({ localizations: response.data.locinfo });
+      })
+      .catch(error => {
+        console.log(error);
+      })
+  }
+
   removeEntrada = (index) => {
     let deleteItem = this.state.permissions;
     deleteItem.splice(index, 1)
     this.setState({ permissions: deleteItem })
   }
-  handleCheck = async (event) => {
-   this.setState({ perm: event.target.checked})
-  }
-
 
   render() {
     return (
       <div className="new-rfid-body">
         <header id="new">
-          <Link to="/usersRFID">Voltar</Link>
+          <Link to="/dashboard">Voltar</Link>
         </header>
         <form onSubmit={this.register} id="new-post">
           <h1>Cadastrar Novo Usuário</h1>
@@ -229,14 +226,14 @@ class NewRFID extends Component {
 
               {this.state.cardStatus === true ? (
                 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130.2 130.2">
-                  <circle class="path circle" fill="none" stroke="#318a04" stroke-width="6" stroke-miterlimit="10" cx="65.1" cy="65.1" r="62.1" />
-                  <polyline class="path check" fill="none" stroke="#318a04" stroke-width="6" stroke-linecap="round" stroke-miterlimit="10" points="100.2,40.2 51.5,88.8 29.8,67.5 " />
+                  <circle className="path circle" fill="none" stroke="#318a04" strokeWidth="6" strokeMiterlimit="10" cx="65.1" cy="65.1" r="62.1" />
+                  <polyline className="path check" fill="none" stroke="#318a04" strokeWidth="6" strokeLinecap="round" strokeMiterlimit="10" points="100.2,40.2 51.5,88.8 29.8,67.5 " />
                 </svg>
               ) : (
                   <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130.2 130.2">
-                    <circle class="path circle" fill="none" stroke="#FFA200" stroke-width="6" stroke-miterlimit="10" cx="65.1" cy="65.1" r="62.1" />
-                    <line class="path line" fill="none" stroke="#FFA200" stroke-width="6" stroke-linecap="round" stroke-miterlimit="10" x1="34.4" y1="37.9" x2="95.8" y2="92.3" />
-                    <line class="path line" fill="none" stroke="#FFA200" stroke-width="6" stroke-linecap="round" stroke-miterlimit="10" x1="95.8" y1="38" x2="34.4" y2="92.2" />
+                    <circle className="path circle" fill="none" stroke="#FFA200" strokeWidth="6" strokeMiterlimit="10" cx="65.1" cy="65.1" r="62.1" />
+                    <line className="path line" fill="none" stroke="#FFA200" strokeWidth="6" strokeLinecap="round" strokeMiterlimit="10" x1="34.4" y1="37.9" x2="95.8" y2="92.3" />
+                    <line className="path line" fill="none" stroke="#FFA200" strokeWidth="6" strokeLinecap="round" strokeMiterlimit="10" x1="95.8" y1="38" x2="34.4" y2="92.2" />
                   </svg>
                 )}
             </div>
@@ -244,8 +241,8 @@ class NewRFID extends Component {
           </div>
 
 
-          <div class='input-wrapper'>
-            <label for='input-file'>
+          <div className='input-wrapper'>
+            <label>
               Selecionar um arquivo
               </label>
             <input type="file" id="input-file" placeholder="Imagem de Perfil"
@@ -272,7 +269,7 @@ class NewRFID extends Component {
               value={this.state.office} onChange={(e) => this.setState({ office: e.target.value })} required
             />
 
-            <FormControl variant='outlined' style={{ background: '#FFF', borderRadius: 8, width: '20%', height: 42 }}>
+            <FormControl variant='outlined' style={{ background: '#FFF', borderRadius: 8, width: '20%' }}>
               <InputLabel id='labelTitle'>Permissão</InputLabel>
               <Select
                 labelId='labelTitle'
@@ -280,10 +277,11 @@ class NewRFID extends Component {
                 value={this.state.localization}
                 onChange={(e) => this.setState({ localization: e.target.value })}
               >
-
-                <MenuItem value='Laboratorio'>Laboratorio</MenuItem>
-                <MenuItem value='Sala do IBTI'>Sala do IBTI</MenuItem>
-                <MenuItem value='Sala Principal'>Sala Principal</MenuItem>
+                {this.state.localizations.map((localization) => {
+                  return (
+                    <MenuItem key={localization.roomName} value={localization.roomName}>{localization.roomName}</MenuItem>
+                  );
+                })}
               </Select>
             </FormControl>
 
@@ -293,8 +291,10 @@ class NewRFID extends Component {
             <TextField label='Hora de fim' variant='outlined' style={{ background: '#FFF', borderRadius: 8, width: '20%', marginLeft: '2%', marginBottom: 10 }}
               value={this.state.hrfim} onChange={(e) => this.setState({ hrfim: e.target.value })}
             />
+
+
+
             <Button onClick={this.handleAddPermission} variant='contained' style={{ marginLeft: '2%', background: 'green', height: 42 }} ><AddIcon /></Button>
-            <FormControlLabel control={<CheckBox checked={this.state.perm} onChange={(e) => {this.handleCheck(e)}} />}  label='Manter horário diario' />
             <div className='flatScroll'>
               <FlatList
                 renderWhenEmpty={() => <div></div>}
