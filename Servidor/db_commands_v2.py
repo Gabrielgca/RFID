@@ -121,6 +121,47 @@ class RfidCommands():
         if type(idLocalizacaoDisp) != list:
             idLocalizacaoDisp = [idLocalizacaoDisp]
         return s.query(ld).filter(ld.idLocalizacaoDisp.in_(idLocalizacaoDisp)).all()
+
+    #Comando inserido em: 21/09/2020 14:36
+    #Por: Saulo Silveira Corrêa
+    def selLocalizacaoDispByDisp(self,idDispositivo):
+        ld = self.ld
+        dl = self.dl
+        s = self.db.session
+        return s.query(ld).join(dl,ld.idLocalizacaoDisp == dl.idLocalizacaoDisp)\
+                          .filter(dl.idDispositivo == idDispositivo,
+                                  dl.stSituacao == 'A').scalar()
+
+    #Comando inserido em: 21/09/2020 10:37
+    #Por: Saulo Silveira Corrêa
+    def selPessoasDispositivo(self,idDispositivo):
+        rt = self.rt
+        cd = self.cd
+        s = self.db.session
+        ultRotaCadastros = []
+        for cadastro in self.selAllCadastros():
+            ultRotaCadastro = self.selUltRotaCadastro(cadastro.idCadastro)
+            if ultRotaCadastro is not None:
+                ultRotaCadastros.append(ultRotaCadastro.idRota)
+        return s.query(cd).join(rt, cd.idCadastro == rt.idCadastro)\
+                          .filter(rt.idRota.in_(ultRotaCadastros), rt.idDispositivo == idDispositivo)\
+                          .all()
+
+    #Comando inserido em: 21/09/2020 12:00
+    #Por: Saulo Silveira Corrêa
+    def selCountPessoasDispositivo(self,idDispositivo):
+        rt = self.rt
+        cd = self.cd
+        s = self.db.session
+        ultRotaCadastros = []
+        for cadastro in self.selAllCadastros():
+            ultRotaCadastro = self.selUltRotaCadastro(cadastro.idCadastro)
+            if ultRotaCadastro is not None:
+                ultRotaCadastros.append(ultRotaCadastro.idRota)
+        return s.query(cd).join(rt,cd.idCadastro == rt.idCadastro)\
+                          .filter(rt.idRota.in_(ultRotaCadastros), rt.idDispositivo == idDispositivo)\
+                          .count()
+
     #--------COMANDO GABRIEL--------#
     def selLocalizacaoDisp_no(self, noLocalizacao):
         ld = self.ld
@@ -156,6 +197,17 @@ class RfidCommands():
 
         return s.query (pud).join (dl, pud.idDispLocalizacao == dl.idDispLocalizacao) \
             .filter (pud.idCadastro.in_(idCadastro), pud.idDispLocalizacao.in_(idLocal), dl.stSituacao.in_('A')).all ()
+    
+    
+    
+    
+    #Comando inserido em: 22/09/2020 08:49
+    #Por: Renato Reis
+    def selDispLocalizacaoByDisp (self, idDispositivo):
+            dl = self.dl
+            s = self.db.session
+            return s.query (dl).filter (dl.idDispositivo == idDispositivo, dl.stSituacao == 'A').scalar ()
+				
     
     
     #-----------COMANDO GABRIEL-----------#
@@ -231,7 +283,7 @@ class RfidCommands():
         s = self.db.session
         if type(idCadastro) != list:
             idCadastro = [idCadastro]
-        cadastroCartao = s.query(cdct).filter(cdct.idCadastro.in_(idCadastro),cdct.stEstado == 'A').all()
+        cadastroCartao = s.query(cdct).filter(cdct.idCadastro.in_(idCadastro)).all()
         return cadastroCartao
 
      #-----------COMANDO GABRIEL-----------#

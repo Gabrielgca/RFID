@@ -1,4 +1,4 @@
-from db_commands import RfidCommands 
+from db_commands_v2 import RfidCommands 
 import numpy as np
 from numpy import random
 import json
@@ -507,22 +507,26 @@ def WiFIRFID ():
         available = is_available(idrfid)
         print(idrfid)
         print(available)
+        
         if not available:
             cadastroCartao = cmd.selCadastroCartaoAtivo(idrfid)
             ultOcorrencia = cmd.selUltOcorrenciaCadastro(cadastroCartao.idCadastro)
-            #VERIFICANDO PERMISSÕES
-            permissions_cadastro_local = cmd.selAllPermCadastroLocal (cadastroCartao.idCadastro, locDisp)
-            if len (permissions_cadastro_local) <= 0:
-                    # ACCESS DENIED
-                return jsonify (success = False)
-            else:
-                for i in permissions_cadastro_local:
-                    if i.idPermHorario is not None:
-                        permissions_by_time = cmd.selPermHorarioByTime (i.idPermHorario, db.func.current_time ())
-                        if len (permissions_by_time) <= 0:
-                            # ACCESS DENIED
-                            return jsonify (success = False)
-            
+            disp_loc = cmd.selDispLocalizacaoByDisp (locDisp)
+            permissions_cadastro_local = cmd.selAllPermCadastroLocal (cadastroCartao.idCadastro, disp_loc.idDispLocalizacao)
+
+		if len (permissions_cadastro_local) <= 0:
+
+            # ACCESS DENIED
+            print('SEM PERMISSÃO NA SALA.')
+            return jsonify (success = False)
+		else:
+				for i in permissions_cadastro_local:
+						if i.idPermHorario is not None:
+								permissions_by_time = cmd.selPermHorarioByTime (i.idPermHorario, db.func.current_time ())
+								if len (permissions_by_time) <= 0:
+										# ACCESS DENIED
+                                        print('SEM PERMISSÃO NA SALA NESTE HORÁRIO.')
+										return jsonify (success = False)        
             # ACCESS GRANTED, proceed to database insert
             if ultOcorrencia is not None:
                 if ultOcorrencia.idDispositivo == int(locDisp):
@@ -637,6 +641,8 @@ def register():
             try:
                 hr_perm_ini = list_perm[i]["hrini"]
                 hr_perm_fim = list_perm[i]["hrfim"]
+                print(f'horário recebido de início : { list_perm[i]["hrini"]}')
+                print(f'horário recebido de fim : { list_perm[i]["hrfim"]}')
                 perm_perm =list_perm[i]["perm"]
                 try:
                     perm_horario = PermHorario(hrInicial = hr_perm_ini, hrFinal = hr_perm_fim, stPermanente = perm_perm)
@@ -673,6 +679,83 @@ def register():
 #---------------------NOVAS ROTAS---------------------#
 #-----------------------------------------------------#
 
+
+@app.route ('/userInfo', methods = ['GET','POST'])
+def userInfo():
+    
+    info_user = {}
+    list_user= []
+    all_user = cmd.selAllCadastros()
+
+    for i in all_user:
+        dict_user = {}
+        dict_user["id_user"] = i.idCadastro
+        dict_user["nome"] = i.noUsuario
+        dict_user["idade"] = i.vlIdade
+        dict_user["cargo"] = i.noAreaTrabalho
+        if len(cmd.selCadastroCartao(i.idCadastro)) > 0:
+            cad_cat = cmd.selCadastroCartao(i.idCadastro)
+            nocartao = cmd.selnoCartao(cad_cat[0].idCartao)
+            dict_user["status"] = cad_cat[0].stEstado
+            dict_user["RFID"] = nocartao
+        
+        list_user.append(dict_user)
+
+    info_user['usuarios']=list_user
+
+    return jsonify(info_user)
+
+@app.route ('/updateUser', methods = ['GET','POST'])
+def updateUser():
+    if request.method == 'POST':
+        global old_id_disp_loc
+        try:
+            data = request.get_json ()
+        except (KeyError, TypeError, ValueError):
+            resp = jsonify (success = False)
+            return answer (app, 204, resp)
+        update_user = Cadastro()
+       # for key in data:
+           # if key == "id_user": id_user = data['id_user']  
+           # if key == "nome": update_user.noUsuario = data['nome']   
+           # if key == "idade": update_user.vlIdade = data['idade']  
+           # if key == "cargo": update_user.noAreaTrabalho = data['cargo']
+            #if key == "status":
+        id_user = data['id_user']
+        update_user.noUsuario = data['nome']
+        update_user.vlIdade = data['idade']
+        update_user.noAreaTrabalho = data['cargo']
+        #DESATIVANDO RFID ANTERIOR
+        vl_status = data['status']
+        old_user_card= cmd.selCadastroCartao(id_user)
+
+        id_old_user_card = old_user_card[0].idCadastroCartao
+
+        cmd.updateStEstadoCadastroCartao(id_old_user_card, vl_status)
+    #if key == "RFID":
+        #ATUALIZANDO NOVO RFID PARA O USUÁRIO
+        noRFID = data['RFID']
+        if len(cmd.selCadastroCartao(id_user)) > 0 :
+            user_card = cmd.selCadastroCartao(id_user)
+            
+            id_card_user =  user_card[0].idCartao
+            cartao = Cartao(noCartao = noRFID)
+            cmd.updateCartao(id_card_user, cartao)
+        else:
+            print('Não foi encontrado um id_cadastro Ativo na tabela')
+            return jsonify(success = False)
+            
+            #if key == "img": 
+               # str_img = data['img']
+              #  with open(os.getcwd().replace("\\","/")+"/static/imagens/{}.png".format(id_user),"wb") as png2:
+              #      png2.write(base64.b64decode(str_img))
+
+        cmd.updateCadastro(id_user, update_user)
+
+        return jsonify(success = True)
+        
+
+
 @app.route ('/registerDisp', methods = ['GET','POST'])
 def registerDisp():
     
@@ -687,16 +770,16 @@ def registerDisp():
         try:
             noDisp = data['desc']
             st_disp = data['status']
-            noLoc = 0
+            id_disp_loc = 0
         except Exception as e:
             print (e)
             return jsonify(success = False)
         try:
-            noLoc = data['loc']
-            disp_loc = cmd.selLocalizacaoDisp_no(noLoc)
+            id_disp_loc = data['loc']
+           # disp_loc = cmd.selLocalizacaoDisp_no(noLoc)
 
-            dict_disp_loc = disp_loc[0].getDict()
-            id_disp_loc = dict_disp_loc['idLocalizacaoDisp']
+           # dict_disp_loc = disp_loc[0].getDict()
+            # id_disp_loc = dict_disp_loc['idLocalizacaoDisp']
 
         except Exception as e:
             print(e)
@@ -707,7 +790,7 @@ def registerDisp():
         
         try:
             cmd.insertDispositivo(new_disp, refresh=True)
-            if noLoc != 0:
+            if id_disp_loc != 0:
                 dispLoca = DispLocalizacao(idDispositivo = new_disp.idDispositivo, idLocalizacaoDisp = id_disp_loc, stSituacao = st_disp)
                 
                 cmd.insertDispLocalizacao(dispLoca)
@@ -728,7 +811,7 @@ def updateDisp():
         update_disp = Dispositivo()
         noLoc = 0
         for key in data:
-            if key == "id_disp": id_disp = data['id_disp']  
+            if key == "id_disp": id_disp = data['id_disp']      
             if key == "disp": update_disp.noDispositivo = data['disp']   
             if key == "status": update_disp.stAtivo = data['status']  
             if key == "loc": noLoc = data['loc']
@@ -830,9 +913,9 @@ def registerLoc():
             resp = jsonify (success = False)
             return answer (app, 204, resp)
 
-        str_emp = data['emp']
-        str_loc = data['loc']
-        str_andar = data['andar']
+        str_emp = data['companyName']
+        str_loc = data['roomName']
+        str_andar = data['floor']
         str_area = data['area']
         
         try:
@@ -842,6 +925,7 @@ def registerLoc():
             insereDispLoc = LocalizacaoDisp(noEmpresa = str_emp,noLocalizacao = str_loc, vlAndar = andar, vlArea = area)
              
             cmd.insertLocalizacaoDisp(insereDispLoc, refresh = True)
+           
             return jsonify(success = True)
             #VERIFICAR COM A APLICAÇÃO SE PODERÃO ARMAZENAR ISSO
             #return jsonify(idLoc = insereDispLoc.idLocalizacaoDisp)
@@ -865,15 +949,19 @@ def updateLoc():
 
         update_loc_disp = LocalizacaoDisp(idLocalizacaoDisp = id_loc)
 
-        for key in data:
+        ''' for key in data:
             if key == "emp": update_loc_disp.noEmpresa = data['emp']   
             if key == "loc": update_loc_disp.noLocalizacao = data['loc']  
             if key == "andar": update_loc_disp.vlAndar = data['andar']
             if key == "area": update_loc_disp.vlArea = data['area']
                 
-        
+        '''
+        update_loc_disp.noEmpresa = data['companyName']   
+        update_loc_disp.noLocalizacao = data['roomName']  
+        update_loc_disp.vlAndar = data['floor']
+        update_loc_disp.vlArea = data['area']
         cmd.updateLocalizacaoDisp(int(id_loc), update_loc_disp)
-        print(update_loc_disp)
+        #print(update_loc_disp)
         return jsonify(success = True)
 
 
@@ -886,10 +974,11 @@ def locInfo():
     for i in all_loc_disp:
         dict_loc_disp = {}
         dict_loc_disp["id_loc"] = i.idLocalizacaoDisp
-        dict_loc_disp["emp"] = i.noEmpresa
-        dict_loc_disp["loc"] = i.noLocalizacao
-        dict_loc_disp["andar"] = i.vlAndar
+        dict_loc_disp["companyName"] = i.noEmpresa
+        dict_loc_disp["roomName"] = i.noLocalizacao
+        dict_loc_disp["floor"] = i.vlAndar
         dict_loc_disp["area"] = i.vlArea
+        dict_loc_disp["maxOccupation"] = int(i.vlArea/2)
         list_loc_disp.append(dict_loc_disp)
 
     info_loc_disp["locinfo"] = list_loc_disp
@@ -954,31 +1043,6 @@ def registerPerm():
                     return jsonify (success = False)
         return jsonify (success = True)
 
-
-@app.route ('/userInfo', methods = ['GET','POST'])
-def userInfo():
-    
-    info_user = {}
-    list_user= []
-    all_user = cmd.selAllCadastros()
-
-    for i in all_user:
-        dict_user = {}
-        dict_user["id_user"] = i.idCadastro
-        dict_user["nome"] = i.noUsuario
-        dict_user["idade"] = i.vlIdade
-        dict_user["cargo"] = i.noAreaTrabalho
-        if len(cmd.selCadastroCartao(i.idCadastro)) > 0:
-            cad_cat = cmd.selCadastroCartao(i.idCadastro)
-            nocartao = cmd.selnoCartao(cad_cat[0].idCartao)
-            dict_user["status"] = cad_cat[0].stEstado
-            dict_user["RFID"] = nocartao
-            
-        list_user.append(dict_user)
-
-    info_user['usuarios']=list_user
-
-    return jsonify(info_user)
 
 #---------------------------------#
 
