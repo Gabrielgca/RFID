@@ -508,25 +508,33 @@ def WiFIRFID ():
         print(idrfid)
         print(available)
         
-        if not available:
+        if available:
+            uplink = True
+            # Envia o ID para a aplicação e o possibilita ser cadastrado
+            socketio.emit('register', idrfid)
+            return jsonify (success = False)
+        
+            
+        if cmd.selDispLocalizacaoByDisp (locDisp) != None:
             cadastroCartao = cmd.selCadastroCartaoAtivo(idrfid)
             ultOcorrencia = cmd.selUltOcorrenciaCadastro(cadastroCartao.idCadastro)
+
             disp_loc = cmd.selDispLocalizacaoByDisp (locDisp)
             permissions_cadastro_local = cmd.selAllPermCadastroLocal (cadastroCartao.idCadastro, disp_loc.idDispLocalizacao)
+            
 
-		if len (permissions_cadastro_local) <= 0:
-
-            # ACCESS DENIED
-            print('SEM PERMISSÃO NA SALA.')
-            return jsonify (success = False)
-		else:
-				for i in permissions_cadastro_local:
-						if i.idPermHorario is not None:
-								permissions_by_time = cmd.selPermHorarioByTime (i.idPermHorario, db.func.current_time ())
-								if len (permissions_by_time) <= 0:
-										# ACCESS DENIED
-                                        print('SEM PERMISSÃO NA SALA NESTE HORÁRIO.')
-										return jsonify (success = False)        
+            if len (permissions_cadastro_local)<=0 :
+                # ACCESS DENIED
+                print('SEM PERMISSÃO NA SALA.')
+                return jsonify (success = False)
+            else:
+                    for i in permissions_cadastro_local:
+                            if i.idPermHorario is not None:
+                                    permissions_by_time = cmd.selPermHorarioByTime (i.idPermHorario, db.func.current_time ())
+                                    if len (permissions_by_time) <= 0:
+                                            # ACCESS DENIED
+                                            print('SEM PERMISSÃO NA SALA NESTE HORÁRIO.')
+                                            return jsonify (success = False)        
             # ACCESS GRANTED, proceed to database insert
             if ultOcorrencia is not None:
                 if ultOcorrencia.idDispositivo == int(locDisp):
@@ -535,30 +543,30 @@ def WiFIRFID ():
                     else:
                         stOc = 'E'
                     cmd.insertOcorrencia(Ocorrencia (idDispositivo=locDisp,
-                                                     idCadastro=cadastroCartao.idCadastro,
-                                                     dtOcorrencia=db.func.current_date(),
-                                                     hrOcorrencia=db.func.current_time(),
-                                                     stOcorrencia=stOc))
+                                                        idCadastro=cadastroCartao.idCadastro,
+                                                        dtOcorrencia=db.func.current_date(),
+                                                        hrOcorrencia=db.func.current_time(),
+                                                        stOcorrencia=stOc))
                     
                 else:
                     if ultOcorrencia.stOcorrencia == 'E':
                         cmd.insertOcorrencia(Ocorrencia (idDispositivo=ultOcorrencia.idDispositivo,
-                                                         idCadastro=cadastroCartao.idCadastro,
-                                                         dtOcorrencia=db.func.current_date(),
-                                                         hrOcorrencia=db.func.current_time(),
-                                                         stOcorrencia='S'))
+                                                            idCadastro=cadastroCartao.idCadastro,
+                                                            dtOcorrencia=db.func.current_date(),
+                                                            hrOcorrencia=db.func.current_time(),
+                                                            stOcorrencia='S'))
                     cmd.insertOcorrencia(Ocorrencia (idDispositivo=locDisp,
-                                                     idCadastro=cadastroCartao.idCadastro,
-                                                     dtOcorrencia=db.func.current_date(),
-                                                     hrOcorrencia=db.func.current_time(),
-                                                     stOcorrencia='E'))
+                                                        idCadastro=cadastroCartao.idCadastro,
+                                                        dtOcorrencia=db.func.current_date(),
+                                                        hrOcorrencia=db.func.current_time(),
+                                                        stOcorrencia='E'))
                     
             else:
                 cmd.insertOcorrencia(Ocorrencia (idDispositivo=locDisp,
-                                                 idCadastro=cadastroCartao.idCadastro,
-                                                 dtOcorrencia=db.func.current_date(),
-                                                 hrOcorrencia=db.func.current_time(),
-                                                 stOcorrencia='E'))
+                                                    idCadastro=cadastroCartao.idCadastro,
+                                                    dtOcorrencia=db.func.current_date(),
+                                                    hrOcorrencia=db.func.current_time(),
+                                                    stOcorrencia='E'))
                 
             ##Atualiza a quantidade de pessoas nas salas
             rooms_updates = findrooms()
@@ -571,13 +579,11 @@ def WiFIRFID ():
                 socketio.emit('news_from_roominfo', rooms)
             return jsonify (success = True)
         else:
-            uplink = True
-            # Envia o ID para a aplicação e o possibilita ser cadastrado
-            socketio.emit('register', idrfid)
-            return jsonify (success = False)
+            print('Dispositivo sem uma localização ativa.')
+            return 'Dispositivo sem uma localização ativa.'
+            
 
     except Exception as e:
-        
         print(e)
         return jsonify(answer = 'cannot read any ID')
 
@@ -628,7 +634,7 @@ def register():
             hr_perm_fim = 0
             perm_perm = "N"
             loc_perm = list_perm[i]["loc"]
-
+            print(f'loc_perm :{loc_perm}')
             loc_perm_no = cmd.selLocalizacaoDisp_no(loc_perm)
 
             dict_loc_perm = loc_perm_no[0].getDict()
@@ -638,7 +644,8 @@ def register():
             print(f'disp_loc:  {disp_loc}')
             dict_disp_loc = disp_loc[0].getDict()
             id_disp_loc = dict_disp_loc['idDispLocalizacao']
-            try:
+            
+            if len(list_perm[i]["hrini"]) != 0 or len(list_perm[i]["hrfim"]) != 0:
                 hr_perm_ini = list_perm[i]["hrini"]
                 hr_perm_fim = list_perm[i]["hrfim"]
                 print(f'horário recebido de início : { list_perm[i]["hrini"]}')
@@ -650,9 +657,9 @@ def register():
                     usu_disp = PermUsuDisp(idCadastro = cadastroCartao.idCadastro, idPermissao = 1, idDispLocalizacao = id_disp_loc, idPermHorario = perm_horario.idPermHorario, stStatus = 'A')
                     
                 except Exception as e:
-                    print(f'1 - {e}')
+                    print(f'register 1 - {e}')
                     return jsonify (success = False)
-            except:
+            else:
                 print(f'Sem horário definido para a permissão número {i} do usuário.')
                 try:
                     usu_disp = PermUsuDisp(idCadastro = cadastroCartao.idCadastro, idPermissao = 1, idDispLocalizacao = id_disp_loc, stStatus = 'A')
@@ -868,7 +875,7 @@ def updateDisp():
 
             return jsonify(success = True)
         except Exception as e:
-            print (f'1 - {e}')
+            print (f'updatedisp 1 - {e}')
             return jsonify(success = False)
 
 
