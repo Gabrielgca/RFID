@@ -1,14 +1,16 @@
-from db_commands import RfidCommands 
+from db_commands_v2 import RfidCommands 
 import numpy as np
 from numpy import random
 import json
 import ttn
 from flask import Flask, jsonify, request, url_for, render_template
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 from flask_socketio import SocketIO, emit, send
 import base64
 from flask_ngrok import run_with_ngrok
 import os
+
 
 # flask namespace
 app = Flask (__name__)
@@ -20,7 +22,7 @@ app.config['JSON_AS_ASCII'] = True
 #Inicializando o banco de dados
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:@localhost/db_rfid_v2'
 db = SQLAlchemy(app)
-
+CORS(app)
 #Mapeamentos dos objetos Flask-SQLAlchemy.
 class CadastroCartao(db.Model):
     __tablename__  = 'tb_cadastro_cartao'
@@ -81,6 +83,7 @@ no_area_trabalho = '{}',
 
         return self.dictionary
 
+
 class Cartao(db.Model):
     __tablename__ = 'tb_cartao'
 
@@ -99,6 +102,7 @@ class Cartao(db.Model):
         self.dictionary['idCartao'] = self.idCartao
         self.dictionary['noCartao'] = self.noCartao
         return self.dictionary
+
 
 class Dispositivo(db.Model):
     __tablename__ = 'tb_dispositivo'
@@ -153,6 +157,7 @@ class Rota(db.Model):
         self.dictionary['idCadastro'] = self.idCadastro
         return self.dictionary 
 
+
 class Ocorrencia(db.Model):
     __tablename__ = 'tb_ocorrencia'
 
@@ -185,6 +190,7 @@ class Ocorrencia(db.Model):
         self.dictionary['stOcorrencia'] = self.stOcorrencia
         return self.dictionary
 
+
 #MAPEAMENTO NOVO!
 class LocalizacaoDisp(db.Model):
     __tablename__ = 'tb_localizacao_disp' 
@@ -208,6 +214,7 @@ class LocalizacaoDisp(db.Model):
     def getDict(self):
         self.dictionary = {}
         self.dictionary['idLocalizacaoDisp'] = self.idLocalizacaoDisp
+        self.dictionary['noEmpresa'] = self.noEmpresa
         self.dictionary['noLocalizacao'] = self.noLocalizacao
         self.dictionary['vlAndar'] = self.vlAndar
         self.dictionary['vlArea'] = self.vlArea
@@ -241,6 +248,7 @@ class DispLocalizacao(db.Model):
         self.dictionary['idLocalizacaoDisp'] = self.idLocalizacaoDisp
         self.dictionary['stSituacao'] = self.stSituacao
         return self.dictionary
+
 
 #MAPEAMENTO NOVO!
 class Ocupacao(db.Model):
@@ -294,6 +302,7 @@ class PermissaoDisp(db.Model):
         self.dictionary['stStatus'] = self.stStatus
         return self.dictionary
 
+
 class PermHorario(db.Model):
     __tablename__ = 'tb_perm_horario' 
 
@@ -320,7 +329,7 @@ class PermHorario(db.Model):
         self.dictionary['idPermHorario'] = self.idPermHorario
         self.dictionary['dtInicio'] = self.dtInicio
         self.dictionary['dtFim'] = self.dtFim
-        self.dictionary['hrIncial'] = self.hrInicial
+        self.dictionary['hrInicial'] = self.hrInicial
         self.dictionary['hrFinal'] = self.hrFinal
         self.dictionary['stPermanente'] = self.stPermanente
         return self.dictionary
@@ -370,6 +379,7 @@ available = True
 uplink = False
 flag_roominfo = False
 
+
 # ttn variables
 appId = 'ibti-rfid'
 accessKey = 'ttn-account-v2.b5HZHWeC3DyZCA6XqT9_VpWuhmjJDEmdMrLNd50O13o'
@@ -411,13 +421,13 @@ def answer (app, http_code, json):
     )
     return responseServer
 
+
 def mqttClientSetup (handler):
     client = handler.data ()
     client.set_uplink_callback (uplinkCallback)
     return client
 
 #--------------------connect to ttn iot platform---------------------#
-
 print('PROGRAMA RODANDO...')
 try:
     handler = ttn.HandlerClient (appId, accessKey)
@@ -430,8 +440,9 @@ try:
     print ('Connected to TTN.')
 except:
     print ('Failed to connect to TTN.')
-
 #------------------------------------------------------------------#
+
+
 
 #-----------------------------------------------------#
 #--------------------EVENTOS SOCKET-------------------#
@@ -462,10 +473,11 @@ def roominfo(data):
     print(f'O ID da sala recebido foi: {id_sala}')
     room = fuc_roominfo(id_sala)
     emit('news_from_roominfo', room)
-
 #-----------------------------------------------------#
 #------------------------ROTAS------------------------#
 #-----------------------------------------------------#
+
+
 
 @app.route('/teste')
 def teste():
@@ -488,28 +500,61 @@ def WiFIRFID ():
         flag_roominfo = False
     else:
         id_sala = 0
-
     try:
         locDisp = request.args.get('LOC')
-        idrfid = request.args.get('RFID').upper()
+        idrfid = request.args.get('RFID')
+        idrfid = idrfid.upper()
         available = is_available(idrfid)
-
-        if not available:
+        print(idrfid)
+        print(available)
+        
+        if available:
+            uplink = True
+            # Envia o ID para a aplicação e o possibilita ser cadastrado
+            socketio.emit('register', idrfid)
+            return jsonify (success = False)
+        
+            
+        if cmd.selDispLocalizacaoByDisp (locDisp) != None:
             cadastroCartao = cmd.selCadastroCartaoAtivo(idrfid)
             ultOcorrencia = cmd.selUltOcorrenciaCadastro(cadastroCartao.idCadastro)
 
-            permissions_cadastro_local = cmd.selAllPermCadastroLocal (cadastroCartao.idCadastro, locDisp)
-                if len (permissions_cadastro_local) <= 0:
-                     # ACCESS DENIED
-                    return jsonify (success = False)
-                else:
-                    for i in permissions_cadastro_local:
-                        if i.idPermHorario is not None:
-                            permissions_by_time = cmd.selPermHorarioByTime (i.idPermHorario, db.func.current_time ())
-                            if len (permissions_by_time) <= 0:
+            disp_loc = cmd.selDispLocalizacaoByDisp (locDisp)
+            perm_usu_disp = cmd.selAllPermCadastroLocal (cadastroCartao.idCadastro, disp_loc.idDispLocalizacao)
+            print (f'PERM_USU_DISP: {perm_usu_disp}')
+
+            if len (perm_usu_disp) <= 0:
+                # ACCESS DENIED
+                return jsonify (success = False)
+            else:
+                for i in perm_usu_disp:
+                    perm_disp = cmd.selPermissaoDisp (i.idPermissao)
+                    print (f'PERM_DISP: {perm_disp}')
+
+                    if len (perm_disp) <= 0:
+                        # ACCESS DENIED
+                        return jsonify (success = False)
+                    else:
+                        for j in perm_disp:
+                            if j.stStatus.lower () == 'bloqueado':
                                 # ACCESS DENIED
                                 return jsonify (success = False)
-            
+                                
+                    if i.idPermHorario is not None:
+                        permissions_by_date = cmd.selPermHorarioOutOfDate (i.idPermHorario, db.func.current_date ())
+                        print (f'PERMISSIONS OUT OF CURRENT DATE: {permissions_by_date}')
+
+                        if len (permissions_by_date) > 0:
+                            # ACCESS DENIED
+                            return jsonify (success = False)
+                        
+                        permissions_by_time = cmd.selPermHorarioByTime (i.idPermHorario, db.func.current_time ())
+                        print (f'PERMISSIONS BY TIME: {permissions_by_time}')
+
+                        if len (permissions_by_time) <= 0:
+                            # ACCESS DENIED
+                            return jsonify (success = False)
+
             # ACCESS GRANTED, proceed to database insert
             if ultOcorrencia is not None:
                 if ultOcorrencia.idDispositivo == int(locDisp):
@@ -518,30 +563,30 @@ def WiFIRFID ():
                     else:
                         stOc = 'E'
                     cmd.insertOcorrencia(Ocorrencia (idDispositivo=locDisp,
-                                                     idCadastro=cadastroCartao.idCadastro,
-                                                     dtOcorrencia=db.func.current_date(),
-                                                     hrOcorrencia=db.func.current_time(),
-                                                     stOcorrencia=stOc))
+                                                        idCadastro=cadastroCartao.idCadastro,
+                                                        dtOcorrencia=db.func.current_date(),
+                                                        hrOcorrencia=db.func.current_time(),
+                                                        stOcorrencia=stOc))
                     
                 else:
                     if ultOcorrencia.stOcorrencia == 'E':
                         cmd.insertOcorrencia(Ocorrencia (idDispositivo=ultOcorrencia.idDispositivo,
-                                                         idCadastro=cadastroCartao.idCadastro,
-                                                         dtOcorrencia=db.func.current_date(),
-                                                         hrOcorrencia=db.func.current_time(),
-                                                         stOcorrencia='S'))
+                                                            idCadastro=cadastroCartao.idCadastro,
+                                                            dtOcorrencia=db.func.current_date(),
+                                                            hrOcorrencia=db.func.current_time(),
+                                                            stOcorrencia='S'))
                     cmd.insertOcorrencia(Ocorrencia (idDispositivo=locDisp,
-                                                     idCadastro=cadastroCartao.idCadastro,
-                                                     dtOcorrencia=db.func.current_date(),
-                                                     hrOcorrencia=db.func.current_time(),
-                                                     stOcorrencia='E'))
+                                                        idCadastro=cadastroCartao.idCadastro,
+                                                        dtOcorrencia=db.func.current_date(),
+                                                        hrOcorrencia=db.func.current_time(),
+                                                        stOcorrencia='E'))
                     
             else:
                 cmd.insertOcorrencia(Ocorrencia (idDispositivo=locDisp,
-                                                 idCadastro=cadastroCartao.idCadastro,
-                                                 dtOcorrencia=db.func.current_date(),
-                                                 hrOcorrencia=db.func.current_time(),
-                                                 stOcorrencia='E'))
+                                                    idCadastro=cadastroCartao.idCadastro,
+                                                    dtOcorrencia=db.func.current_date(),
+                                                    hrOcorrencia=db.func.current_time(),
+                                                    stOcorrencia='E'))
                 
             ##Atualiza a quantidade de pessoas nas salas
             rooms_updates = findrooms()
@@ -554,14 +599,13 @@ def WiFIRFID ():
                 socketio.emit('news_from_roominfo', rooms)
             return jsonify (success = True)
         else:
-            uplink = True
-            # Envia o ID para a aplicação e o possibilita ser cadastrado
-            socketio.emit('register', idrfid)
-            return jsonify (success = False)
-
+            print('Dispositivo sem uma localização ativa.')
+            return 'Dispositivo sem uma localização ativa.'
+            
     except Exception as e:
         print(e)
         return jsonify(answer = 'cannot read any ID')
+
 
 @app.route ('/register', methods = ['GET','POST'])
 def register():
@@ -580,7 +624,6 @@ def register():
         #str_img = data['imgPerfil']
         
         list_perm = data['permissoes']
-
 
 
         cadastroCartao = CadastroCartao (stEstado = 'A')
@@ -607,7 +650,7 @@ def register():
             hr_perm_fim = 0
             perm_perm = "N"
             loc_perm = list_perm[i]["loc"]
-
+            print(f'loc_perm :{loc_perm}')
             loc_perm_no = cmd.selLocalizacaoDisp_no(loc_perm)
 
             dict_loc_perm = loc_perm_no[0].getDict()
@@ -617,9 +660,12 @@ def register():
             print(f'disp_loc:  {disp_loc}')
             dict_disp_loc = disp_loc[0].getDict()
             id_disp_loc = dict_disp_loc['idDispLocalizacao']
-            try:
+            
+            if len(list_perm[i]["hrini"]) != 0 or len(list_perm[i]["hrfim"]) != 0:
                 hr_perm_ini = list_perm[i]["hrini"]
                 hr_perm_fim = list_perm[i]["hrfim"]
+                print(f'horário recebido de início : { list_perm[i]["hrini"]}')
+                print(f'horário recebido de fim : { list_perm[i]["hrfim"]}')
                 perm_perm =list_perm[i]["perm"]
                 try:
                     perm_horario = PermHorario(hrInicial = hr_perm_ini, hrFinal = hr_perm_fim, stPermanente = perm_perm)
@@ -627,9 +673,9 @@ def register():
                     usu_disp = PermUsuDisp(idCadastro = cadastroCartao.idCadastro, idPermissao = 1, idDispLocalizacao = id_disp_loc, idPermHorario = perm_horario.idPermHorario, stStatus = 'A')
                     
                 except Exception as e:
-                    print(f'1 - {e}')
+                    print(f'register 1 - {e}')
                     return jsonify (success = False)
-            except:
+            else:
                 print(f'Sem horário definido para a permissão número {i} do usuário.')
                 try:
                     usu_disp = PermUsuDisp(idCadastro = cadastroCartao.idCadastro, idPermissao = 1, idDispLocalizacao = id_disp_loc, stStatus = 'A')
@@ -643,15 +689,95 @@ def register():
                     print(f'3 - {e}')
                     return jsonify (success = False)
 
+
+
         return jsonify(success = True)
 
         
         if request.method == 'GET':
             return jsonify(get = True)
 
+
 #-----------------------------------------------------#
 #---------------------NOVAS ROTAS---------------------#
 #-----------------------------------------------------#
+
+
+@app.route ('/userInfo', methods = ['GET','POST'])
+def userInfo():
+    
+    info_user = {}
+    list_user= []
+    all_user = cmd.selAllCadastros()
+
+    for i in all_user:
+        dict_user = {}
+        dict_user["id_user"] = i.idCadastro
+        dict_user["nome"] = i.noUsuario
+        dict_user["idade"] = i.vlIdade
+        dict_user["cargo"] = i.noAreaTrabalho
+        if len(cmd.selCadastroCartao(i.idCadastro)) > 0:
+            cad_cat = cmd.selCadastroCartao(i.idCadastro)
+            nocartao = cmd.selnoCartao(cad_cat[0].idCartao)
+            dict_user["status"] = cad_cat[0].stEstado
+            dict_user["RFID"] = nocartao
+        
+        list_user.append(dict_user)
+
+    info_user['usuarios']=list_user
+
+    return jsonify(info_user)
+
+@app.route ('/updateUser', methods = ['GET','POST'])
+def updateUser():
+    if request.method == 'POST':
+        global old_id_disp_loc
+        try:
+            data = request.get_json ()
+        except (KeyError, TypeError, ValueError):
+            resp = jsonify (success = False)
+            return answer (app, 204, resp)
+        update_user = Cadastro()
+       # for key in data:
+           # if key == "id_user": id_user = data['id_user']  
+           # if key == "nome": update_user.noUsuario = data['nome']   
+           # if key == "idade": update_user.vlIdade = data['idade']  
+           # if key == "cargo": update_user.noAreaTrabalho = data['cargo']
+            #if key == "status":
+        id_user = data['id_user']
+        update_user.noUsuario = data['nome']
+        update_user.vlIdade = data['idade']
+        update_user.noAreaTrabalho = data['cargo']
+        #DESATIVANDO RFID ANTERIOR
+        vl_status = data['status']
+        old_user_card= cmd.selCadastroCartao(id_user)
+
+        id_old_user_card = old_user_card[0].idCadastroCartao
+
+        cmd.updateStEstadoCadastroCartao(id_old_user_card, vl_status)
+    #if key == "RFID":
+        #ATUALIZANDO NOVO RFID PARA O USUÁRIO
+        noRFID = data['RFID']
+        if len(cmd.selCadastroCartao(id_user)) > 0 :
+            user_card = cmd.selCadastroCartao(id_user)
+            
+            id_card_user =  user_card[0].idCartao
+            cartao = Cartao(noCartao = noRFID)
+            cmd.updateCartao(id_card_user, cartao)
+        else:
+            print('Não foi encontrado um id_cadastro Ativo na tabela')
+            return jsonify(success = False)
+            
+            #if key == "img": 
+               # str_img = data['img']
+              #  with open(os.getcwd().replace("\\","/")+"/static/imagens/{}.png".format(id_user),"wb") as png2:
+              #      png2.write(base64.b64decode(str_img))
+
+        cmd.updateCadastro(id_user, update_user)
+
+        return jsonify(success = True)
+        
+
 
 @app.route ('/registerDisp', methods = ['GET','POST'])
 def registerDisp():
@@ -664,25 +790,30 @@ def registerDisp():
             resp = jsonify (success = False)
             return answer (app, 204, resp)
     
-        noDisp = data['disp']
-        st_disp = data['status']
-        noLoc = 0
         try:
-            noLoc = data['loc']
-            disp_loc = cmd.selLocalizacaoDisp_no(noLoc)
+            noDisp = data['desc']
+            st_disp = data['status']
+            id_disp_loc = 0
+        except Exception as e:
+            print (e)
+            return jsonify(success = False)
+        try:
+            id_disp_loc = data['loc']
+           # disp_loc = cmd.selLocalizacaoDisp_no(noLoc)
 
-            dict_disp_loc = disp_loc[0].getDict()
-            id_disp_loc = dict_disp_loc['idLocalizacaoDisp']
+           # dict_disp_loc = disp_loc[0].getDict()
+            # id_disp_loc = dict_disp_loc['idLocalizacaoDisp']
 
         except Exception as e:
             print(e)
             print('Nenhuma sala enviada ou sala não encontrada.')
         
         new_disp = Dispositivo(noDispositivo = noDisp, stAtivo = st_disp)
+
         
         try:
             cmd.insertDispositivo(new_disp, refresh=True)
-            if noLoc != 0:
+            if id_disp_loc != 0:
                 dispLoca = DispLocalizacao(idDispositivo = new_disp.idDispositivo, idLocalizacaoDisp = id_disp_loc, stSituacao = st_disp)
                 
                 cmd.insertDispLocalizacao(dispLoca)
@@ -690,6 +821,110 @@ def registerDisp():
         except Exception as e:
             print(e)
             return jsonify(success = False)
+
+@app.route ('/updateDisp', methods = ['GET','POST'])
+def updateDisp():
+    if request.method == 'POST':
+        global old_id_disp_loc
+        try:
+            data = request.get_json ()
+        except (KeyError, TypeError, ValueError):
+            resp = jsonify (success = False)
+            return answer (app, 204, resp)
+        update_disp = Dispositivo()
+        noLoc = 0
+        for key in data:
+            if key == "id_disp": id_disp = data['id_disp']      
+            if key == "disp": update_disp.noDispositivo = data['disp']   
+            if key == "status": update_disp.stAtivo = data['status']  
+            if key == "loc": noLoc = data['loc']
+                
+        try:
+            cmd.updateDispositivo(int(id_disp), update_disp)
+
+            if update_disp.stAtivo == "I" and len(cmd.selDispLocalizacao_disp(id_disp)) != 0:
+                update_disp_loc = DispLocalizacao()
+                
+                old_disp_loc = cmd.selDispLocalizacao_disp(id_disp)
+
+                for i in range(len(old_disp_loc)):
+                    dict_old_disp_loc = old_disp_loc[i].getDict()
+                    old_id_disp_loc = dict_old_disp_loc['idDispLocalizacao']
+
+                    cmd.updateStSituacaoDispLoc(old_id_disp_loc, update_disp.stAtivo)
+            
+            if noLoc != 0:
+                    old_disp_loc = cmd.selDispLocalizacao_disp(id_disp)
+
+                    new_loc_disp = cmd.selLocalizacaoDisp_no(noLoc)
+
+                    dict_new_loc_disp = new_loc_disp[0].getDict()
+                    new_id_loc_disp = dict_new_loc_disp['idLocalizacaoDisp']
+
+                    #print(f'AQUIIIIIII     {cmd.selDispLocalizacao_disp_loc(id_disp, new_id_loc_disp)}')
+                    
+                    #CASO HAJA UMA CONEXÃO PRÉVIA AINDA ATIVA
+                    if len(old_disp_loc) != 0:
+                        for i in range(len(old_disp_loc)):
+                            dict_old_disp_loc = old_disp_loc[i].getDict()
+                            old_id_disp_loc = dict_old_disp_loc['idDispLocalizacao']
+
+                            cmd.updateStSituacaoDispLoc(old_id_disp_loc, "I")
+                    #VERIFICA SE JÁ EXISTE UMA CONEXÃO COM A LOCALIZAÇÃO ENVIADA
+                    if len(cmd.selDispLocalizacao_disp_loc(id_disp, new_id_loc_disp)) != 0:
+                        update_disp_loc = cmd.selDispLocalizacao_disp_loc(id_disp, new_id_loc_disp)
+                        dict_update_disp_loc = update_disp_loc[0].getDict()
+
+                        update_id_disp_loc = dict_update_disp_loc['idDispLocalizacao']
+
+                        cmd.updateStSituacaoDispLoc(update_id_disp_loc, "A")
+                    #CASO NÃO HAJA UMA CONEXÃO, FARÁ UMA
+                    else :
+                        new_loc_disp = cmd.selLocalizacaoDisp_no(noLoc)
+
+                        dict_new_loc_disp = new_loc_disp[0].getDict()
+                        new_id_loc_disp = dict_new_loc_disp['idLocalizacaoDisp']
+                        
+                        
+                        dispLoca = DispLocalizacao(idDispositivo = id_disp, idLocalizacaoDisp = new_id_loc_disp, stSituacao = "A")  
+                        cmd.insertDispLocalizacao(dispLoca)
+
+            return jsonify(success = True)
+        except Exception as e:
+            print (f'updatedisp 1 - {e}')
+            return jsonify(success = False)
+
+
+
+@app.route ('/dispInfo', methods = ['GET','POST'])
+def dispInfo():
+    all_disp = cmd.selAllDispositivos(include_inactive = True)
+
+    info_disp = {}
+    list_disp = []
+    for i in all_disp:
+        dict_disp = {}
+        dict_disp["id_disp"] = i.idDispositivo
+        dict_disp["desc"] = i.noDispositivo
+        dict_disp["status"] = i.stAtivo
+        if len(cmd.selDispLocalizacao_disp(i.idDispositivo)) != 0:
+            disp_loc = cmd.selDispLocalizacao_disp(i.idDispositivo)
+            id_loc_disp = disp_loc[0].idLocalizacaoDisp
+
+            dict_disp["id_loc"] = id_loc_disp
+
+            loc_disp = cmd.selLocalizacaoDisp(id_loc_disp)
+            dict_disp["no_loc"] = loc_disp[0].noLocalizacao
+
+            
+        list_disp.append(dict_disp)
+
+    info_disp["dispinfo"] = list_disp
+    return jsonify (info_disp)
+
+
+
+
 
 @app.route ('/registerLoc', methods = ['GET','POST'])
 def registerLoc():
@@ -701,9 +936,9 @@ def registerLoc():
             resp = jsonify (success = False)
             return answer (app, 204, resp)
 
-        str_emp = data['emp']
-        str_loc = data['loc']
-        str_andar = data['andar']
+        str_emp = data['companyName']
+        str_loc = data['roomName']
+        str_andar = data['floor']
         str_area = data['area']
         
         try:
@@ -712,12 +947,70 @@ def registerLoc():
             area = int(str_area)
             insereDispLoc = LocalizacaoDisp(noEmpresa = str_emp,noLocalizacao = str_loc, vlAndar = andar, vlArea = area)
              
-            cmd.insertLocalizacaoDisp(insereDispLoc)
+            cmd.insertLocalizacaoDisp(insereDispLoc, refresh = True)
+           
             return jsonify(success = True)
+            #VERIFICAR COM A APLICAÇÃO SE PODERÃO ARMAZENAR ISSO
+            #return jsonify(idLoc = insereDispLoc.idLocalizacaoDisp)
 
         except Exception as e:
             print(e)
             return jsonify(success = False)
+
+
+@app.route ('/updateLoc', methods = ['GET','POST'])
+def updateLoc():
+    if request.method == 'POST':
+        try:
+            data = request.get_json ()
+        except (KeyError, TypeError, ValueError):
+            resp = jsonify (success = False)
+            return answer (app, 204, resp)
+        
+
+        id_loc = data['id_loc']
+
+        update_loc_disp = LocalizacaoDisp(idLocalizacaoDisp = id_loc)
+
+        ''' for key in data:
+            if key == "emp": update_loc_disp.noEmpresa = data['emp']   
+            if key == "loc": update_loc_disp.noLocalizacao = data['loc']  
+            if key == "andar": update_loc_disp.vlAndar = data['andar']
+            if key == "area": update_loc_disp.vlArea = data['area']
+                
+        '''
+        update_loc_disp.noEmpresa = data['companyName']   
+        update_loc_disp.noLocalizacao = data['roomName']  
+        update_loc_disp.vlAndar = data['floor']
+        update_loc_disp.vlArea = data['area']
+        cmd.updateLocalizacaoDisp(int(id_loc), update_loc_disp)
+        #print(update_loc_disp)
+        return jsonify(success = True)
+
+
+@app.route ('/locInfo', methods = ['GET','POST'])
+def locInfo():
+
+    info_loc_disp = {}
+    list_loc_disp = []
+    all_loc_disp = cmd.selAllLocalizacaoDisps()
+    for i in all_loc_disp:
+        dict_loc_disp = {}
+        dict_loc_disp["id_loc"] = i.idLocalizacaoDisp
+        dict_loc_disp["companyName"] = i.noEmpresa
+        dict_loc_disp["roomName"] = i.noLocalizacao
+        dict_loc_disp["floor"] = i.vlAndar
+        dict_loc_disp["area"] = i.vlArea
+        dict_loc_disp["maxOccupation"] = int(i.vlArea/2)
+        list_loc_disp.append(dict_loc_disp)
+
+    info_loc_disp["locinfo"] = list_loc_disp
+    return jsonify (info_loc_disp)
+        
+    
+
+
+
 
 @app.route ('/registerPerm', methods = ['GET','POST'])
 def registerPerm():
@@ -773,7 +1066,9 @@ def registerPerm():
                     return jsonify (success = False)
         return jsonify (success = True)
 
+
 #---------------------------------#
+
 
 #-----------------------------------------------------#
 #-----------------------FUNÇÕES-----------------------#
