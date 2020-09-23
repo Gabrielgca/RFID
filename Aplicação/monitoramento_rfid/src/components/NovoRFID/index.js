@@ -194,7 +194,7 @@ class NewRFID extends Component {
   }
 
   handleHora(h) {
-    this.setState({ hrini: maskHr(h.target.value)})
+    this.setState({ hrini: maskHr(h.target.value) })
 
   }
 
@@ -203,7 +203,10 @@ class NewRFID extends Component {
     return (
       <div className="new-rfid-body">
         <header id="new">
-          <Link to="/dashboard">Voltar</Link>
+          {/* <Link to="/offices">Voltar</Link> */}
+          <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.goBack() }}>
+            Voltar
+                    </Button>
         </header>
         <form onSubmit={this.register} id="new-post">
           <h1>Cadastrar Novo Usuário</h1>

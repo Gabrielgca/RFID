@@ -18,6 +18,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import CheckBox from '@material-ui/core/Checkbox';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 
@@ -52,7 +53,7 @@ class NewRFID extends Component {
       localizations: [],
       hrini: '',
       hrfim: '',
-      perm:''
+      perm: ''
     };
 
     this.register = this.register.bind(this);
@@ -210,15 +211,18 @@ class NewRFID extends Component {
     this.setState({ permissions: deleteItem })
   }
 
-  handleCheck = async (event) =>{
-    this.setState({ perm: event.target.checked})
+  handleCheck = async (event) => {
+    this.setState({ perm: event.target.checked })
   }
 
   render() {
     return (
       <div className="new-rfid-body">
         <header id="new">
-          <Link to="/usersRFID">Voltar</Link>
+          {/* <Link to="/offices">Voltar</Link> */}
+          <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.goBack() }}>
+            Voltar
+                    </Button>
         </header>
         <form onSubmit={this.register} id="new-post">
           <h1>Cadastrar Novo Usuário</h1>
@@ -304,7 +308,7 @@ class NewRFID extends Component {
 
 
             <Button onClick={this.handleAddPermission} variant='contained' style={{ marginLeft: '2%', background: 'green', height: 42 }} ><AddIcon /></Button>
-            <FormControlLabel control={<CheckBox checked={this.state.perm} onChange={(e) => {this.handleCheck(e)}} />}label='Manter horário direto' />
+            <FormControlLabel control={<CheckBox checked={this.state.perm} onChange={(e) => { this.handleCheck(e) }} />} label='Manter horário direto' />
             <div className='flatScroll'>
               <FlatList
                 renderWhenEmpty={() => <div></div>}

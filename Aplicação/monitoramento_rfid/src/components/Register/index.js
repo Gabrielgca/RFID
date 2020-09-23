@@ -70,7 +70,10 @@ class Register extends Component {
     return (
       <div>
         <header id="new">
-          <Link to="/users">Voltar</Link>
+          {/* <Link to="/dashboard">Voltar</Link> */}
+          <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.push('/dashboard') }}>
+            Voltar
+                    </Button>
         </header>
         <h1 className="register-h1" style={{ color: '#FFF' }}>Novo Usuario</h1>
         <form onSubmit={this.register} id="register">

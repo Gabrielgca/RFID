@@ -30,7 +30,7 @@ import Input from '@material-ui/core/Input';
 import AddIcon from '@material-ui/icons/Add';
 import ClearIcon from '@material-ui/icons/Clear';
 import EditIcon from '@material-ui/icons/Edit';
-
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 class Devices extends Component {
 
@@ -224,6 +224,12 @@ class Devices extends Component {
     render() {
         return (
             <div id="area">
+                <header id="new">
+                    {/* <Link to="/dashboard">Voltar</Link> */}
+                    <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.push('/dashboard') }}>
+                        Voltar
+                    </Button>
+                </header>
                 <h1>Dispositivos Cadastrados</h1>
                 <div className="pesquisa">
                     <Paper style={{ marginTop: 50 }}>

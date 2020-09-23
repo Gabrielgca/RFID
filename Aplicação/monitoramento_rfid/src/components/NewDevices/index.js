@@ -13,6 +13,7 @@ import TextField from '@material-ui/core/TextField';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { InputLabel } from '@material-ui/core';
 
 
@@ -134,7 +135,10 @@ class NewDevices extends Component {
 
             <div className="formArea">
                 <header id="new">
-                    <Link to="/devices">Voltar</Link>
+                    {/* <Link to="/offices">Voltar</Link> */}
+                    <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.goBack() }}>
+                        Voltar
+                    </Button>
                 </header>
 
                 <form id="formRFID">
