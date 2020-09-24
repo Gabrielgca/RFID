@@ -30,6 +30,8 @@ import baseURL from "../../service";
 import io from 'socket.io-client';
 import ENDPOINT from '../../socketAPIService';
 
+import utils from '../../utils';
+
 
 /*const actions = [
   { icon: <AddIcon />, name: 'Novo RFID', action: 1 },
@@ -44,6 +46,8 @@ class Dashboard extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      isMounted: false,
+      officePermissions: [],
       updateCounter: 30,
       modalOpen: false, //Controla o estado do modal de detalhes do usuário
       open: false, //Controla o estado do botão flutuante que funciona como menu
@@ -68,233 +72,159 @@ class Dashboard extends Component {
         imgMapaSala: '',
         ocupantes: [],
       },
+      loggedOffice: {
+        key: '',
+        nomeCargo: '',
+        status: '',
+        permissoes: {
+          cargo: [],
+          conta: [],
+          dispositivo: [],
+          setor: [],
+          usuario: [],
+          dashboard: []
+        }
+      },
       actions: [
-        { icon: <AccountCircleIcon />, name: 'Gerenciar Usuários', action: 1 },
+        /* { icon: <AccountCircleIcon />, name: 'Gerenciar Usuários', action: 1 },
         { icon: <HowToRegIcon />, name: 'Gerenciar Permissões', action: 3 },
         { icon: <TapAndPlayIcon />, name: 'Gerenciar Usuários RFID', action: 4 },
         { icon: <ApartmentIcon />, name: "Gerenciar Setores", action: 5 },
-        { icon: <QueuePlayNextIcon />, name: 'Gerenciar Dispositivos', action: 6 },
+        { icon: <QueuePlayNextIcon />, name: 'Gerenciar Dispositivos', action: 6 }, */
         { icon: <ExitToApp />, name: 'Sair', action: 2 }
       ]
     };
 
     this.logout = this.logout.bind(this);
-    this.checkCategory = this.checkCategory.bind(this);
+    /* this.checkCategory = this.checkCategory.bind(this); */
   }
 
-  async getAllPermissions() {
-    /* await firebase.getCategoryPermissions("cargo", (allPermissions) => {
-      this.ordenatePermissions(allPermissions);
-    });
-
-    await firebase.getCategoryPermissions("conta", (allPermissions) => {
-      this.ordenatePermissions(allPermissions)
-    });
-
-    await firebase.getCategoryPermissions("setor", (allPermissions) => {
-      this.ordenatePermissions(allPermissions)
-    });
-
-    await firebase.getCategoryPermissions("dispositivo", (allPermissions) => {
-      this.ordenatePermissions(allPermissions)
-    });
-
-    await firebase.getCategoryPermissions("usuario", (allPermissions) => {
-      this.ordenatePermissions(allPermissions)
-    });
-
-    await firebase.getCategoryPermissions("dashboard", (allPermissions) => {
-      this.ordenatePermissions(allPermissions)
-    }); */
-
-    await firebase.getOfficePermissions((officePermissions) => {
-      officePermissions.forEach((category) => {
-        //console.log(JSON.stringify(category.key));
-        category.forEach((permission) => {
-          //console.log(JSON.stringify(permission))
-        })
-        this.ordenatePermissions(category);
+/*   async getOffice() {
+    await firebase.getAllOffices((allOffices) => {
+      allOffices.forEach((office) => {
+        if (office.val().nomeCargo === this.state.cargo) {
+          let list = {
+            key: office.key,
+            nomeCargo: office.val().nomeCargo,
+            permissoes: office.val().permissoes,
+            status: office.val().status
+          }
+          /* alert(JSON.stringify(list));
+          if (this.state.isMounted === true) {
+            this.setState({ loggedOffice: list });
+          }
+        }
       })
     });
-  }
+  } */
 
-  ordenatePermissions(category) {
-    /* console.log(category.key)
-    category.forEach((permission) => {
-      console.log(permission.val().nomePermissao);
-    })
-    console.log("\n"); */
-
-    /* console.log("Nome da categoria: " + category.key) */
-
-    let perm;
-    if (category.key === "cargo") {
-      perm = this.state.permissions.cargo;
-    }
-    else {
-      if (category.key === "conta") {
-        perm = this.state.permissions.conta;
+  /*   checkCategory(categoryName) {
+      let perm;
+      if (categoryName === "cargo") {
+        perm = this.state.loggedOffice.permissoes.cargo;
       }
       else {
-        if (category.key === "dispositivo") {
-          perm = this.state.permissions.dispositivo;
+        if (categoryName === "conta") {
+          perm = this.state.loggedOffice.permissoes.conta;
         }
         else {
-          if (category.key === "setor") {
-            perm = this.state.permissions.setor;
+          if (categoryName === "dispositivo") {
+            perm = this.state.loggedOffice.permissoes.dispositivo;
           }
           else {
-            if (category.key === "usuario") {
-              perm = this.state.permissions.usuario;
+            if (categoryName === "setor") {
+              perm = this.state.loggedOffice.permissoes.setor;
             }
             else {
-              if (category.key === "dashboard") {
-                perm = this.state.permissions.dashboard;
+              if (categoryName === "usuario") {
+                perm = this.state.loggedOffice.permissoes.usuario;
+              }
+              else {
+                if (categoryName === "dashboard") {
+                  perm = this.state.loggedOffice.permissoes.dashboard;
+                }
               }
             }
           }
         }
       }
-    }
-
-    var newPermissions = this.state.permissions;
-
-    category.forEach((permission) => {
-      /* console.log(JSON.stringify(permission)); */
-      let list = {
-        key: permission.val().key,
-        nomePermissao: permission.val().nomePermissao,
-        status: permission.val().status
-      }
-      //console.log(list)
-      perm.push(list);
-    });
-    this.setState({ permissions: newPermissions });
-  }
-
-  checkCategory(categoryName) { //Função que irá verificar se o usuário possui alguma permissão em uma categoria específica desejada
-    let perm;
-    if (categoryName === "cargo") {
-      perm = this.state.permissions.cargo;
-    }
-    else {
-      if (categoryName === "conta") {
-        perm = this.state.permissions.conta;
+  
+      let encontrou = 0;
+      perm.map((permission) => {
+        if (permission.status === true) {
+          encontrou = 1;
+        }
+      });
+  
+      if (encontrou === 0) {
+        return false;
       }
       else {
-        if (categoryName === "dispositivo") {
-          perm = this.state.permissions.dispositivo;
-        }
-        else {
-          if (categoryName === "setor") {
-            perm = this.state.permissions.setor;
-          }
-          else {
-            if (categoryName === "usuario") {
-              perm = this.state.permissions.usuario;
-            }
-            else {
-              if (categoryName === "dashboard") {
-                perm = this.state.permissions.dashboard;
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // PAREI AQUI!!!!!!!!!!!!!!!!
-    console.log(perm);
-
-    /* console.log(this.state.permissions); */
-
-    perm.map((permission) => {
-      //console.log(JSON.stringify(permission))
-      if (permission.status === true) {
-        console.log("true")
         return true;
       }
-      //return false;
-    })
+    } */
 
-
-
+  componentWillUnmount() {
+    this.setState({ isMounted: false });
   }
 
   async componentDidMount() {
+    this.setState({ isMounted: true });
+
     if (!firebase.getCurrent()) {
       this.props.history.replace('/login');
       return null;
     }
 
-    firebase.getUserName((info) => {
+    await firebase.getUserName((info) => {
       localStorage.nome = info.val().nome;
       this.setState({ nome: localStorage.nome });
     });
 
-    firebase.getUserPerfil((info) => {
+    await firebase.getUserPerfil((info) => {
       localStorage.cargo = info.val();
       this.setState({ cargo: localStorage.cargo });
       //console.log("Valor recebido: " + info.val());
     });
 
-    await this.getAllPermissions();
+    //await this.getOffice();
+    let result = await utils.getOffice(this.state.cargo);
+    if (this.state.isMounted === true) {
+      this.setState({ loggedOffice: result });
+    }
 
-    this.checkCategory("cargo");
-
-    if (this.state.cargo === 'Administrador') {
-      let newActions = [
-        { icon: <AccountCircleIcon />, name: 'Gerenciar Usuários', action: 1 },
-        { icon: <HowToRegIcon />, name: 'Gerenciar Permissões', action: 3 },
-        { icon: <TapAndPlayIcon />, name: 'Gerenciar Usuários RFID', action: 4 },
-        { icon: <ApartmentIcon />, name: "Gerenciar Setores", action: 5 },
-        { icon: <QueuePlayNextIcon />, name: 'Gerenciar Dispositivos', action: 6 },
-        { icon: <ExitToApp />, name: 'Sair', action: 2 }
-      ]
+    if (utils.checkCategory(this.state.loggedOffice.permissoes.usuario) === true) {
+      let newActions = this.state.actions;
+      newActions.unshift({ icon: <TapAndPlayIcon />, name: 'Gerenciar Usuários RFID', action: 4 })
       this.setState({ actions: newActions });
     }
-    else {
-      if (this.state.cargo === "Auxiliar") {
-        let newActions = [
-          { icon: <ExitToApp />, name: 'Sair', action: 2 }
-        ]
-        this.setState({ actions: newActions });
-      }
-      else {
-        if (this.state.cargo === "Operador") {
-          let newActions = [
-            { icon: <TapAndPlayIcon />, name: 'Gerenciar Usuários RFID', action: 4 },
-            { icon: <ExitToApp />, name: 'Sair', action: 2 }
-          ]
-          this.setState({ actions: newActions });
-        }
-        else {
-          if (this.state.cargo === "Operador Master") {
-            let newActions = [
-              { icon: <TapAndPlayIcon />, name: 'Gerenciar Usuários RFID', action: 4 },
-              { icon: <ApartmentIcon />, name: "Gerenciar Setores", action: 5 },
-              { icon: <QueuePlayNextIcon />, name: 'Gerenciar Dispositivos', action: 6 },
-              { icon: <ExitToApp />, name: 'Sair', action: 2 }
-            ]
-            this.setState({ actions: newActions });
-          }
-          else {
-            if (this.state.cargo === "Gestor") {
-              let newActions = [
-                { icon: <AccountCircleIcon />, name: 'Gerenciar Usuários', action: 1 },
-                { icon: <TapAndPlayIcon />, name: 'Gerenciar Usuários RFID', action: 4 },
-                { icon: <ApartmentIcon />, name: "Gerenciar Setores", action: 5 },
-                { icon: <QueuePlayNextIcon />, name: 'Gerenciar Dispositivos', action: 6 },
-              ]
-              this.setState({ actions: newActions });
-            }
-          }
-        }
-      }
+
+    if (utils.checkCategory(this.state.loggedOffice.permissoes.setor) === true) {
+      let newActions = this.state.actions;
+      newActions.unshift({ icon: <ApartmentIcon />, name: "Gerenciar Setores", action: 5 })
+      this.setState({ actions: newActions });
+    }
+
+    if (utils.checkCategory(this.state.loggedOffice.permissoes.dispositivo) === true) {
+      let newActions = this.state.actions;
+      newActions.unshift({ icon: <QueuePlayNextIcon />, name: 'Gerenciar Dispositivos', action: 6 })
+      this.setState({ actions: newActions });
+    }
+
+    if (utils.checkCategory(this.state.loggedOffice.permissoes.conta) === true) {
+      let newActions = this.state.actions;
+      newActions.unshift({ icon: <AccountCircleIcon />, name: 'Gerenciar Usuários', action: 1 })
+      this.setState({ actions: newActions });
+    }
+
+    if (utils.checkCategory(this.state.loggedOffice.permissoes.cargo) === true) {
+      let newActions = this.state.actions;
+      newActions.unshift({ icon: <HowToRegIcon />, name: 'Gerenciar Permissões', action: 3 })
+      this.setState({ actions: newActions });
     }
 
     this.getRooms();
-    this.setState({ updateCounter: 30 });
+    //this.setState({ updateCounter: 30 });
 
     /* setInterval(() => {
       let count = this.state.updateCounter;

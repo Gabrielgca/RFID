@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import firebase from '../../firebase';
+import utils from '../../utils';
 import axios from 'axios';
 import baseURL from '../../service';
 import './devices.css';
@@ -32,6 +33,7 @@ import ClearIcon from '@material-ui/icons/Clear';
 import EditIcon from '@material-ui/icons/Edit';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
+
 class Devices extends Component {
 
     constructor(props) {
@@ -49,7 +51,21 @@ class Devices extends Component {
                 nameDevice: '',
                 localization: '',
                 status: '',
-            }
+            },
+            loggedOffice: {
+                key: '',
+                nomeCargo: '',
+                status: '',
+                permissoes: {
+                    cargo: [],
+                    conta: [],
+                    dispositivo: [],
+                    setor: [],
+                    usuario: [],
+                    dashboard: []
+                }
+            },
+            pageLoading: true
         };
 
         this.logout = this.logout.bind(this);
@@ -58,12 +74,39 @@ class Devices extends Component {
     }
 
     async componentDidMount() {
+        this.setState({ isMounted: true });
+
         if (!firebase.getCurrent()) {
             this.props.history.replace('/login');
             return null;
         }
-        this.getDevices();
 
+        /* await firebase.getUserPerfil((info) => {
+            localStorage.cargo = info.val();
+            this.setState({ cargo: localStorage.cargo });
+            //console.log("Valor recebido: " + info.val());
+        }); */
+
+        let result = await utils.getOffice(localStorage.cargo);
+        if (this.state.isMounted === true) {
+            this.setState({ loggedOffice: result });
+        }
+
+        if (utils.checkCategory(this.state.loggedOffice.permissoes.dispositivo) !== true) {
+            /* alert("Você não possui permissão para acessar esta página!"); */
+            this.props.history.replace('/dashboard');
+            return null;
+        }
+        else {
+            this.setState({ pageLoading: false });
+        }
+
+        /*         await firebase.getUserName((info) => {
+                    localStorage.nome = info.val().nome;
+                    this.setState({ nome: localStorage.nome });
+                }); */
+
+        //this.getDevices();
     }
 
     handleNameChange = (e) => {
@@ -222,165 +265,182 @@ class Devices extends Component {
 
 
     render() {
-        return (
-            <div id="area">
-                <header id="new">
-                    {/* <Link to="/dashboard">Voltar</Link> */}
-                    <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.push('/dashboard') }}>
-                        Voltar
-                    </Button>
-                </header>
-                <h1>Dispositivos Cadastrados</h1>
-                <div className="pesquisa">
-                    <Paper style={{ marginTop: 50 }}>
-                        <InputBase
-                            value={this.state.filter}
-                            style={{ paddingLeft: 20, width: 500 }}
-                            onChange={(e) => this.setState({ filter: e.target.value })}
-                            placeholder="Faça uma pesquisa..."
-                        />
-                        <IconButton type="button" onClick={this.searchDevice}>
-                            <SearchIcon />
-                        </IconButton>
+        if (this.state.pageLoading === true) {
+            return (
+                <div className="page-loader">
+                    <Loader
+                        type="Oval"
+                        //color="#ffa200"
+                        color="#FFF"
+                        height={100}
+                        width={100}
+                    //timeout={3000} //3 secs
 
-                        <IconButton type="button" onClick={this.handleClearFilter}>
-                            <ClearIcon />
-                        </IconButton>
-
-                        <IconButton type="button" onClick={() => { this.props.history.push("/devices/new") }}>
-                            <AddIcon style={{ color: 'green' }} />
-                        </IconButton>
-                    </Paper>
+                    />
                 </div>
-                <FlatList
-                    list={this.state.filterDevice.length > 0 ? this.state.filterDevice : this.state.devices}
-                    renderItem={(item) => (
-                        <div className="room-list">
-                            <div className={item.status === "A" ? "card" : "card-disabled"}>
-                                <p><b>ID:</b> {item.id_disp}</p>
-                                <p><b>Descrição do Dispositivo:</b> {item.desc}</p>
-                                <p><b>Localização do Dispositivo:</b> {item.no_loc}</p>
-                                {item.status === 'A' ? (<p><b>Status:</b> Ativo</p>) : (<p></p>)}
-                                {item.status === 'I' ? (<p><b>Status:</b> Inativo</p>) : (<p></p>)}
-                                <div className="btnArea">
-                                    <Button endIcon={<EditIcon />} onClick={() => { this.modalOpen(item) }} style={{ backgroundColor: 'green', color: '#FFF', marginRight: 10 }}>Editar</Button>
-                                    {item.status == 'A' ? (
-                                        <Button endIcon={<EditIcon />} onClick={() => { this.handleDeactiveDevice(item) }} style={{ backgroundColor: 'red', color: '#FFF' }}>Desativar</Button>
-                                    ) : (
-                                            <Button endIcon={<EditIcon />} onClick={() => { this.handleReative(item) }} style={{ backgroundColor: 'blue', color: '#FFF' }}>Reativar</Button>
-                                        )
-                                    }
+            );
+        }
+        else {
+            return (
+                <div id="area">
+                    <header id="new">
+                        {/* <Link to="/dashboard">Voltar</Link> */}
+                        <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.push('/dashboard') }}>
+                            Voltar
+                    </Button>
+                    </header>
+                    <h1>Dispositivos Cadastrados</h1>
+                    <div className="pesquisa">
+                        <Paper style={{ marginTop: 50 }}>
+                            <InputBase
+                                value={this.state.filter}
+                                style={{ paddingLeft: 20, width: 500 }}
+                                onChange={(e) => this.setState({ filter: e.target.value })}
+                                placeholder="Faça uma pesquisa..."
+                            />
+                            <IconButton type="button" onClick={this.searchDevice}>
+                                <SearchIcon />
+                            </IconButton>
+
+                            <IconButton type="button" onClick={this.handleClearFilter}>
+                                <ClearIcon />
+                            </IconButton>
+
+                            <IconButton type="button" onClick={() => { this.props.history.push("/dispositivos/cadastro-dispositivo") }}>
+                                <AddIcon style={{ color: 'green' }} />
+                            </IconButton>
+                        </Paper>
+                    </div>
+                    <FlatList
+                        list={this.state.filterDevice.length > 0 ? this.state.filterDevice : this.state.devices}
+                        renderItem={(item) => (
+                            <div className="room-list">
+                                <div className={item.status === "A" ? "card" : "card-disabled"}>
+                                    <p><b>ID:</b> {item.id_disp}</p>
+                                    <p><b>Descrição do Dispositivo:</b> {item.desc}</p>
+                                    <p><b>Localização do Dispositivo:</b> {item.no_loc}</p>
+                                    {item.status === 'A' ? (<p><b>Status:</b> Ativo</p>) : (<p></p>)}
+                                    {item.status === 'I' ? (<p><b>Status:</b> Inativo</p>) : (<p></p>)}
+                                    <div className="btnArea">
+                                        <Button endIcon={<EditIcon />} onClick={() => { this.modalOpen(item) }} style={{ backgroundColor: 'green', color: '#FFF', marginRight: 10 }}>Editar</Button>
+                                        {item.status == 'A' ? (
+                                            <Button endIcon={<EditIcon />} onClick={() => { this.handleDeactiveDevice(item) }} style={{ backgroundColor: 'red', color: '#FFF' }}>Desativar</Button>
+                                        ) : (
+                                                <Button endIcon={<EditIcon />} onClick={() => { this.handleReative(item) }} style={{ backgroundColor: 'blue', color: '#FFF' }}>Reativar</Button>
+                                            )
+                                        }
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                    )}
-                    renderWhenEmpty={() => (
-                        <div className="div-loader">
-                            <Loader
-                                type="Oval"
-                                //color="#ffa200"
-                                color="#FFF"
-                                height={100}
-                                width={100}
-                            //timeout={3000} //3 secs
+                        )}
+                        renderWhenEmpty={() => (
+                            <div className="div-loader">
+                                <Loader
+                                    type="Oval"
+                                    //color="#ffa200"
+                                    color="#FFF"
+                                    height={100}
+                                    width={100}
+                                //timeout={3000} //3 secs
 
-                            />
-                        </div>)}
-                />
-                {/* Modal */}
-                <Dialog
-                    fullWidth={true}
-                    className="detailsModal"
-                    open={this.state.modalOpen}
-                    onClose={this.modalClose}
-                    aria-labelledby="alert-dialog-title"
-                    aria-aria-describedby="alert-dialog-description"
+                                />
+                            </div>)}
+                    />
+                    {/* Modal */}
+                    <Dialog
+                        fullWidth={true}
+                        className="detailsModal"
+                        open={this.state.modalOpen}
+                        onClose={this.modalClose}
+                        aria-labelledby="alert-dialog-title"
+                        aria-aria-describedby="alert-dialog-description"
 
-                >
-                    <DialogTitle id="alert-dialog-title">{"Detalhes do dispositivo"}</DialogTitle>
-                    <DialogContent>
+                    >
+                        <DialogTitle id="alert-dialog-title">{"Detalhes do dispositivo"}</DialogTitle>
+                        <DialogContent>
 
-                        <FormControl disabled style={{ marginBottom: 25 }}>
-                            <InputLabel>ID</InputLabel>
-                            <Input value={this.state.selectedDevice.key} />
-                        </FormControl>
-                        <DialogContentText>
-                            <TextField variant='outlined' label='Descrição do dispositivo' value={this.state.selectedDevice.nameDevice} onChange={this.handleNameChange} />
-                        </DialogContentText>
+                            <FormControl disabled style={{ marginBottom: 25 }}>
+                                <InputLabel>ID</InputLabel>
+                                <Input value={this.state.selectedDevice.key} />
+                            </FormControl>
+                            <DialogContentText>
+                                <TextField variant='outlined' label='Descrição do dispositivo' value={this.state.selectedDevice.nameDevice} onChange={this.handleNameChange} />
+                            </DialogContentText>
 
-                        <DialogContentText id="alert-dialog-description">
-                            <InputLabel>Localização</InputLabel>
+                            <DialogContentText id="alert-dialog-description">
+                                <InputLabel>Localização</InputLabel>
 
+                                <Select
+                                    style={{ width: 180 }}
+                                    label="localização"
+                                    value={this.state.selectedDevice.localization}
+                                    onChange={(event) => { this.localizationDevice(event) }}
+                                >
+                                    {this.state.localization.map((loc) => {
+                                        return (
+                                            <MenuItem value={loc.roomName}>{loc.id_loc} - {loc.roomName} </MenuItem>
+                                        )
+                                    })}
+
+
+                                </Select>
+                            </DialogContentText>
+
+
+                            <InputLabel className="selectLabel">Status</InputLabel>
                             <Select
-                                style={{ width: 180 }}
-                                label="localização"
-                                value={this.state.selectedDevice.localization}
-                                onChange={(event) => { this.localizationDevice(event) }}
+                                value={this.state.selectedDevice.status}
+                                onChange={this.statusDevice}
                             >
-                                {this.state.localization.map((loc) => {
-                                    return (
-                                        <MenuItem value={loc.roomName}>{loc.id_loc} - {loc.roomName} </MenuItem>
-                                    )
-                                })}
-
-
+                                <MenuItem value="A">Ativo</MenuItem>
+                                <MenuItem value="I">Inativo</MenuItem>
                             </Select>
-                        </DialogContentText>
-
-
-                        <InputLabel className="selectLabel">Status</InputLabel>
-                        <Select
-                            value={this.state.selectedDevice.status}
-                            onChange={this.statusDevice}
-                        >
-                            <MenuItem value="A">Ativo</MenuItem>
-                            <MenuItem value="I">Inativo</MenuItem>
-                        </Select>
 
 
 
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={this.handleUpdateDevice} autoFocus style={{ backgroundColor: 'green', color: '#FFF' }}>Salvar</Button>
-                        <Button onClick={this.modalClose} style={{ backgroundColor: 'red', color: '#FFF' }} autoFocus>
-                            Cancelar
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={this.handleUpdateDevice} autoFocus style={{ backgroundColor: 'green', color: '#FFF' }}>Salvar</Button>
+                            <Button onClick={this.modalClose} style={{ backgroundColor: 'red', color: '#FFF' }} autoFocus>
+                                Cancelar
                         </Button>
-                    </DialogActions>
-                </Dialog>
+                        </DialogActions>
+                    </Dialog>
 
 
-                {/* Desativar usuário */}
-                <Dialog open={this.state.modalDeactivateOpen} onClose={this.handleDeactiveDevice} arial-label-title="form-dialog-title">
-                    <DialogTitle id='form-dialog-title'>Desetivar Usuário</DialogTitle>
-                    <DialogContent>
-                        <DialogContentText>
-                            Tem certeza que deseja desativar o usuário <b>{this.state.selectedDevice.nameDevice} </b>?
+                    {/* Desativar usuário */}
+                    <Dialog open={this.state.modalDeactivateOpen} onClose={this.handleDeactiveDevice} arial-label-title="form-dialog-title">
+                        <DialogTitle id='form-dialog-title'>Desetivar Usuário</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                Tem certeza que deseja desativar o usuário <b>{this.state.selectedDevice.nameDevice} </b>?
                     </DialogContentText>
-                    </DialogContent>
+                        </DialogContent>
 
 
-                    <DialogActions>
-                        <Button onClick={() => { this.deactiveUser(this.state.selectedDevice.nameDevice) }} style={{ backgroundColor: 'green', color: '#FFF' }}>Sim</Button>
-                        <Button onClick={this.handleCloseDeactivate} style={{ backgroundColor: 'red', color: '#FFF' }}>Cancelar</Button>
-                    </DialogActions>
-                </Dialog>
+                        <DialogActions>
+                            <Button onClick={() => { this.deactiveUser(this.state.selectedDevice.nameDevice) }} style={{ backgroundColor: 'green', color: '#FFF' }}>Sim</Button>
+                            <Button onClick={this.handleCloseDeactivate} style={{ backgroundColor: 'red', color: '#FFF' }}>Cancelar</Button>
+                        </DialogActions>
+                    </Dialog>
 
-                {/* Reativar usuario */}
-                <Dialog open={this.state.modalReactivateOpen} onClose={this.handleReative} arial-label-title='form-ialog-title'>
-                    <DialogTitle>
-                        Reativar Usuário
+                    {/* Reativar usuario */}
+                    <Dialog open={this.state.modalReactivateOpen} onClose={this.handleReative} arial-label-title='form-ialog-title'>
+                        <DialogTitle>
+                            Reativar Usuário
                     </DialogTitle>
-                    <DialogContent>
-                        <DialogContentText>Deseja reativar usuário <b>{this.state.selectedDevice.nameDevice}</b>?</DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={() => { this.reativeUser(this.state.selectedDevice.key) }} style={{ backgroundColor: 'green', color: '#FFF' }}>Sim</Button>
-                        <Button onClick={this.handleCloseReactivateDevice} style={{ backgroundColor: 'red', color: '#FFF' }}>Cancelar</Button>
-                    </DialogActions>
-                </Dialog>
-            </div>
-        );
+                        <DialogContent>
+                            <DialogContentText>Deseja reativar usuário <b>{this.state.selectedDevice.nameDevice}</b>?</DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={() => { this.reativeUser(this.state.selectedDevice.key) }} style={{ backgroundColor: 'green', color: '#FFF' }}>Sim</Button>
+                            <Button onClick={this.handleCloseReactivateDevice} style={{ backgroundColor: 'red', color: '#FFF' }}>Cancelar</Button>
+                        </DialogActions>
+                    </Dialog>
+                </div>
+            );
+        }
     }
 }
 
