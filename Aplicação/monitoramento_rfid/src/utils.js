@@ -35,6 +35,22 @@ class Utils {
         });
         return list;
     }
+
+    async checkSpecificPermission(permissionName, category) {
+        let encontrou = 0;
+        category.map((permission) => {
+            if (permission.nomePermissao.toUpperCase().includes(permissionName.toUpperCase()) && permission.status === true) {
+                encontrou = 1;
+            }
+        });
+
+        if (encontrou === 0) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
 }
 
 

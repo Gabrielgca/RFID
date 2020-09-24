@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import firebase from '../../firebase';
+import utils from '../../utils';
 import './NewOffice.css';
 
 import TextField from '@material-ui/core/TextField';
@@ -12,6 +13,8 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+
+import Loader from 'react-loader-spinner';
 
 import FlatList from 'flatlist-react';
 
@@ -41,7 +44,21 @@ class NewOffice extends Component {
             ],
             officeName: '',
             modalSuccessOpen: false,
-            modalConfirmOpen: false
+            modalConfirmOpen: false,
+            loggedOffice: {
+                key: '',
+                nomeCargo: '',
+                status: '',
+                permissoes: {
+                    cargo: [],
+                    conta: [],
+                    dispositivo: [],
+                    setor: [],
+                    usuario: [],
+                    dashboard: []
+                }
+            },
+            pageLoading: true
         };
 
         this.reducePermissions = this.reducePermissions.bind(this);
@@ -295,214 +312,229 @@ class NewOffice extends Component {
     }
 
     async componentDidMount() {
+        this.setState({ isMounted: true });
+
         if (!firebase.getCurrent()) {
-            this.props.history.replace('/login');
+            this.props.history.replace('/');
             return null;
         }
 
-        firebase.getUserName((info) => {
-            localStorage.nome = info.val().nome;
-            this.setState({ loggedName: localStorage.nome });
-        });
+        let result = await utils.getOffice(localStorage.cargo);
+        if (this.state.isMounted === true) {
+            this.setState({ loggedOffice: result });
+        }
 
-        firebase.getUserPerfil((info) => {
-            localStorage.cargo = info.val().cargo;
-            this.setState({ loggedCargo: localStorage.cargo });
-        });
-
-        /* if (this.state.cargo === "Administrador") {
-            alert("Acesso autorizado");
+        if (utils.checkSpecificPermission("Cadastrar", this.state.loggedOffice.permissoes.cargo) !== true) {
+            /* alert("Você não possui permissão para acessar esta página!"); */
+            this.props.history.replace('/dashboard');
+            return null;
         }
         else {
-            this.props.history.replace("/dashboard");
-            return null;
-        } */
+            this.setState({ pageLoading: false });
+        }
 
         this.getPermissions();
     }
 
     render() {
-        return (
-            <div>
-                <header id="new">
-                    {/* <Link to="/offices">Voltar</Link> */}
-                    <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.goBack() }}>
-                        Voltar
-                    </Button>
-                </header>
-                <h1 className="register-h1" style={{ color: '#FFF' }}>Cadastrar Novo Cargo</h1>
+        if (this.state.pageLoading === true) {
+            return (
+                <div className="page-loader">
+                    <Loader
+                        type="Oval"
+                        //color="#ffa200"
+                        color="#FFF"
+                        height={100}
+                        width={100}
+                    //timeout={3000} //3 secs
 
-                <form onSubmit={this.register} className="form">
-                    <TextField
-                        value={this.state.officeName}
-                        onChange={(e) => { this.setState({ officeName: e.target.value }) }}
-                        style={{ width: '100%' }}
-                        autoFocus
-                        margin="dense"
-                        id="name"
-                        label="Nome do Cargo"
-                        type="text"
-                        fullWidth
-                    //disabled={this.state.editDisable}
                     />
-
-                    <p>Cargo</p>
-                    <FormGroup row style={{ marginBottom: 10 }}>
-                        {/* <FlatList
-                            list={this.state.permissions}
-                            renderItem={(item) => (
-                                <FormControlLabel
-                                    style={{ width: '49%', paddingLeft: 5 }}
-                                    control={<Checkbox color="primary" checked={this.searchPermissionStatus(item.key)} onChange={this.handlePermissionChange} name={item.key} />}
-                                    label={item.nomePermissao}
-                                    disabled={this.state.editDisable}
-                                />
-                            )}
-                            renderWhenEmpty={() => <div>Carregando...</div>}
-                            //sortBy={["item.cargo", { key: "lastName", descending: true }]}
-                            sortBy={["nomePermissao"]}
-                        //groupBy={person => person.info.age > 18 ? 'Over 18' : 'Under 18'}
-                        /> */}
-                        <FlatList
-                            list={this.state.permissions.cargo}
-                            renderItem={(item) => (
-                                <FormControlLabel
-                                    style={{ width: '32.5%', paddingLeft: 5 }}
-                                    control={<Checkbox color="primary" checked={this.searchPermissionStatus("cargo", item.key)} onChange={(e) => { this.handlePermissionChange("cargo", e) }} name={item.key} />}
-                                    label={item.nomePermissao}
-                                    disabled={this.state.editDisable}
-                                />
-                            )}
-                            renderWhenEmpty={() => <div>Carregando...</div>}
-                            //sortBy={["item.cargo", { key: "lastName", descending: true }]}
-                            sortBy={["nomePermissao"]}
-                        //groupBy={person => person.info.age > 18 ? 'Over 18' : 'Under 18'}
-                        />
-                    </FormGroup>
-
-                    <p>Conta</p>
-                    <FormGroup row style={{ marginBottom: 10 }}>
-                        <FlatList
-                            list={this.state.permissions.conta}
-                            renderItem={(item) => (
-                                <FormControlLabel
-                                    style={{ width: '32.5%', paddingLeft: 5 }}
-                                    control={<Checkbox color="primary" checked={this.searchPermissionStatus("conta",item.key)} onChange={(e) => { this.handlePermissionChange("conta", e) }} name={item.key} />}
-                                    label={item.nomePermissao}
-                                    disabled={this.state.editDisable}
-                                />
-                            )}
-                            renderWhenEmpty={() => <div>Carregando...</div>}
-                            sortBy={["nomePermissao"]}
-                        />
-                    </FormGroup>
-
-                    <p>Setor</p>
-                    <FormGroup row style={{ marginBottom: 10 }}>
-                        <FlatList
-                            list={this.state.permissions.setor}
-                            renderItem={(item) => (
-                                <FormControlLabel
-                                    style={{ width: '32.5%', paddingLeft: 5 }}
-                                    control={<Checkbox color="primary" checked={this.searchPermissionStatus("setor", item.key)} onChange={(e) => { this.handlePermissionChange("setor", e) }} name={item.key} />}
-                                    label={item.nomePermissao}
-                                    disabled={this.state.editDisable}
-                                />
-                            )}
-                            renderWhenEmpty={() => <div>Carregando...</div>}
-                            sortBy={["nomePermissao"]}
-                        />
-                    </FormGroup>
-
-                    <p>Dispositivo</p>
-                    <FormGroup row style={{ marginBottom: 10 }}>
-                        <FlatList
-                            list={this.state.permissions.dispositivo}
-                            renderItem={(item) => (
-                                <FormControlLabel
-                                    style={{ width: '32.5%', paddingLeft: 5 }}
-                                    control={<Checkbox color="primary" checked={this.searchPermissionStatus("dispositivo", item.key)} onChange={(e) => { this.handlePermissionChange("dispositivo", e) }} name={item.key} />}
-                                    label={item.nomePermissao}
-                                    disabled={this.state.editDisable}
-                                />
-                            )}
-                            renderWhenEmpty={() => <div>Carregando...</div>}
-                            sortBy={["nomePermissao"]}
-                        />
-                    </FormGroup>
-
-                    <p>Dashboard</p>
-                    <FormGroup row style={{ marginBottom: 10 }}>
-                        <FlatList
-                            list={this.state.permissions.dashboard}
-                            renderItem={(item) => (
-                                <FormControlLabel
-                                    style={{ width: '32.5%', paddingLeft: 5 }}
-                                    control={<Checkbox color="primary" checked={this.searchPermissionStatus("dashboard", item.key)} onChange={(e) => { this.handlePermissionChange("dashboard", e) }} name={item.key} />}
-                                    label={item.nomePermissao}
-                                    disabled={this.state.editDisable}
-                                />
-                            )}
-                            renderWhenEmpty={() => <div>Carregando...</div>}
-                            sortBy={["nomePermissao"]}
-                        />
-                    </FormGroup>
-
-                    <p>Usuário (RFID)</p>
-                    <FormGroup row style={{ marginBottom: 10 }}>
-                        <FlatList
-                            list={this.state.permissions.usuario}
-                            renderItem={(item) => (
-                                <FormControlLabel
-                                    style={{ width: '32.5%', paddingLeft: 5 }}
-                                    control={<Checkbox color="primary" checked={this.searchPermissionStatus("usuario", item.key)} onChange={(e) => { this.handlePermissionChange("usuario", e) }} name={item.key} />}
-                                    label={item.nomePermissao}
-                                    disabled={this.state.editDisable}
-                                />
-                            )}
-                            renderWhenEmpty={() => <div>Carregando...</div>}
-                            sortBy={["nomePermissao"]}
-                        />
-                    </FormGroup>
-
-                    <Button onClick={() => { this.setState({ modalConfirmOpen: true }) }} style={{ backgroundColor: 'green', color: '#FFF', width: '100%', marginTop: 30 }}>
-                        Cadastrar
-                    </Button>
-                </form>
-
-
-                {/* Modal para confirmação de operação de desativação do usuário */}
-                <Dialog open={this.state.modalSuccessOpen} onClose={() => { this.setState({ modalSuccessOpen: false }) }} aria-labelledby="form-dialog-title">
-                    <DialogTitle id="form-dialog-title">Cargo cadastrado com sucesso!</DialogTitle>
-                    <DialogActions>
-                        <Button onClick={() => { this.setState({ modalSuccessOpen: false }) }} style={{ backgroundColor: 'green', color: '#FFF' }}>
-                            Ok
+                </div>
+            );
+        }
+        else {
+            return (
+                <div>
+                    <header id="new">
+                        {/* <Link to="/offices">Voltar</Link> */}
+                        <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.goBack() }}>
+                            Voltar
                         </Button>
-                    </DialogActions>
-                </Dialog>
+                    </header>
+                    <h1 className="register-h1" style={{ color: '#FFF' }}>Cadastrar Novo Cargo</h1>
 
-                {/* Modal para confirmação de operação de reativação do usuário */}
-                <Dialog open={this.state.modalConfirmOpen} onClose={() => { this.setState({ modalConfirmOpen: false }) }} aria-labelledby="form-dialog-title">
-                    <DialogTitle id="form-dialog-title">Cadastrar Cargo</DialogTitle>
-                    <DialogContent>
-                        <DialogContentText>
-                            Tem certeza de que deseja cadastrar o cargo <b>{this.state.officeName}</b>?
-                        </DialogContentText>
+                    <form onSubmit={this.register} className="form">
+                        <TextField
+                            value={this.state.officeName}
+                            onChange={(e) => { this.setState({ officeName: e.target.value }) }}
+                            style={{ width: '100%' }}
+                            autoFocus
+                            margin="dense"
+                            id="name"
+                            label="Nome do Cargo"
+                            type="text"
+                            fullWidth
+                        //disabled={this.state.editDisable}
+                        />
 
+                        <p>Cargo</p>
+                        <FormGroup row style={{ marginBottom: 10 }}>
+                            {/* <FlatList
+                                list={this.state.permissions}
+                                renderItem={(item) => (
+                                    <FormControlLabel
+                                        style={{ width: '49%', paddingLeft: 5 }}
+                                        control={<Checkbox color="primary" checked={this.searchPermissionStatus(item.key)} onChange={this.handlePermissionChange} name={item.key} />}
+                                        label={item.nomePermissao}
+                                        disabled={this.state.editDisable}
+                                    />
+                                )}
+                                renderWhenEmpty={() => <div>Carregando...</div>}
+                                //sortBy={["item.cargo", { key: "lastName", descending: true }]}
+                                sortBy={["nomePermissao"]}
+                            //groupBy={person => person.info.age > 18 ? 'Over 18' : 'Under 18'}
+                            /> */}
+                            <FlatList
+                                list={this.state.permissions.cargo}
+                                renderItem={(item) => (
+                                    <FormControlLabel
+                                        style={{ width: '32.5%', paddingLeft: 5 }}
+                                        control={<Checkbox color="primary" checked={this.searchPermissionStatus("cargo", item.key)} onChange={(e) => { this.handlePermissionChange("cargo", e) }} name={item.key} />}
+                                        label={item.nomePermissao}
+                                        disabled={this.state.editDisable}
+                                    />
+                                )}
+                                renderWhenEmpty={() => <div>Carregando...</div>}
+                                //sortBy={["item.cargo", { key: "lastName", descending: true }]}
+                                sortBy={["nomePermissao"]}
+                            //groupBy={person => person.info.age > 18 ? 'Over 18' : 'Under 18'}
+                            />
+                        </FormGroup>
 
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={this.handleRegister} style={{ backgroundColor: 'green', color: '#FFF' }}>
-                            Sim
+                        <p>Conta</p>
+                        <FormGroup row style={{ marginBottom: 10 }}>
+                            <FlatList
+                                list={this.state.permissions.conta}
+                                renderItem={(item) => (
+                                    <FormControlLabel
+                                        style={{ width: '32.5%', paddingLeft: 5 }}
+                                        control={<Checkbox color="primary" checked={this.searchPermissionStatus("conta", item.key)} onChange={(e) => { this.handlePermissionChange("conta", e) }} name={item.key} />}
+                                        label={item.nomePermissao}
+                                        disabled={this.state.editDisable}
+                                    />
+                                )}
+                                renderWhenEmpty={() => <div>Carregando...</div>}
+                                sortBy={["nomePermissao"]}
+                            />
+                        </FormGroup>
+
+                        <p>Setor</p>
+                        <FormGroup row style={{ marginBottom: 10 }}>
+                            <FlatList
+                                list={this.state.permissions.setor}
+                                renderItem={(item) => (
+                                    <FormControlLabel
+                                        style={{ width: '32.5%', paddingLeft: 5 }}
+                                        control={<Checkbox color="primary" checked={this.searchPermissionStatus("setor", item.key)} onChange={(e) => { this.handlePermissionChange("setor", e) }} name={item.key} />}
+                                        label={item.nomePermissao}
+                                        disabled={this.state.editDisable}
+                                    />
+                                )}
+                                renderWhenEmpty={() => <div>Carregando...</div>}
+                                sortBy={["nomePermissao"]}
+                            />
+                        </FormGroup>
+
+                        <p>Dispositivo</p>
+                        <FormGroup row style={{ marginBottom: 10 }}>
+                            <FlatList
+                                list={this.state.permissions.dispositivo}
+                                renderItem={(item) => (
+                                    <FormControlLabel
+                                        style={{ width: '32.5%', paddingLeft: 5 }}
+                                        control={<Checkbox color="primary" checked={this.searchPermissionStatus("dispositivo", item.key)} onChange={(e) => { this.handlePermissionChange("dispositivo", e) }} name={item.key} />}
+                                        label={item.nomePermissao}
+                                        disabled={this.state.editDisable}
+                                    />
+                                )}
+                                renderWhenEmpty={() => <div>Carregando...</div>}
+                                sortBy={["nomePermissao"]}
+                            />
+                        </FormGroup>
+
+                        <p>Dashboard</p>
+                        <FormGroup row style={{ marginBottom: 10 }}>
+                            <FlatList
+                                list={this.state.permissions.dashboard}
+                                renderItem={(item) => (
+                                    <FormControlLabel
+                                        style={{ width: '32.5%', paddingLeft: 5 }}
+                                        control={<Checkbox color="primary" checked={this.searchPermissionStatus("dashboard", item.key)} onChange={(e) => { this.handlePermissionChange("dashboard", e) }} name={item.key} />}
+                                        label={item.nomePermissao}
+                                        disabled={this.state.editDisable}
+                                    />
+                                )}
+                                renderWhenEmpty={() => <div>Carregando...</div>}
+                                sortBy={["nomePermissao"]}
+                            />
+                        </FormGroup>
+
+                        <p>Usuário (RFID)</p>
+                        <FormGroup row style={{ marginBottom: 10 }}>
+                            <FlatList
+                                list={this.state.permissions.usuario}
+                                renderItem={(item) => (
+                                    <FormControlLabel
+                                        style={{ width: '32.5%', paddingLeft: 5 }}
+                                        control={<Checkbox color="primary" checked={this.searchPermissionStatus("usuario", item.key)} onChange={(e) => { this.handlePermissionChange("usuario", e) }} name={item.key} />}
+                                        label={item.nomePermissao}
+                                        disabled={this.state.editDisable}
+                                    />
+                                )}
+                                renderWhenEmpty={() => <div>Carregando...</div>}
+                                sortBy={["nomePermissao"]}
+                            />
+                        </FormGroup>
+
+                        <Button onClick={() => { this.setState({ modalConfirmOpen: true }) }} style={{ backgroundColor: 'green', color: '#FFF', width: '100%', marginTop: 30 }}>
+                            Cadastrar
                         </Button>
-                        <Button onClick={() => { this.setState({ modalConfirmOpen: false }) }} style={{ backgroundColor: 'red', color: '#FFF' }}>
-                            Cancelar
-                        </Button>
-                    </DialogActions>
-                </Dialog>
+                    </form>
 
-            </div>
-        );
+
+                    {/* Modal para confirmação de operação de desativação do usuário */}
+                    <Dialog open={this.state.modalSuccessOpen} onClose={() => { this.setState({ modalSuccessOpen: false }) }} aria-labelledby="form-dialog-title">
+                        <DialogTitle id="form-dialog-title">Cargo cadastrado com sucesso!</DialogTitle>
+                        <DialogActions>
+                            <Button onClick={() => { this.setState({ modalSuccessOpen: false }) }} style={{ backgroundColor: 'green', color: '#FFF' }}>
+                                Ok
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+
+                    {/* Modal para confirmação de operação de reativação do usuário */}
+                    <Dialog open={this.state.modalConfirmOpen} onClose={() => { this.setState({ modalConfirmOpen: false }) }} aria-labelledby="form-dialog-title">
+                        <DialogTitle id="form-dialog-title">Cadastrar Cargo</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                Tem certeza de que deseja cadastrar o cargo <b>{this.state.officeName}</b>?
+                            </DialogContentText>
+
+
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={this.handleRegister} style={{ backgroundColor: 'green', color: '#FFF' }}>
+                                Sim
+                            </Button>
+                            <Button onClick={() => { this.setState({ modalConfirmOpen: false }) }} style={{ backgroundColor: 'red', color: '#FFF' }}>
+                                Cancelar
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+
+                </div>
+            );
+        }
     }
 }
 

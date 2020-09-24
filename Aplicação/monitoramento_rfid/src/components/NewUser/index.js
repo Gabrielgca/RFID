@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import firebase from '../../firebase';
+import utils from '../../utils';
 import './register.css';
 
 import Button from '@material-ui/core/Button';
@@ -9,6 +10,7 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
+import Loader from 'react-loader-spinner';
 
 
 class NewUser extends Component {
@@ -23,7 +25,21 @@ class NewUser extends Component {
       cargo: 'Auxiliar',
       password: '',
       selectValue: 'Auxiliar',
-      offices: []
+      offices: [],
+      loggedOffice: {
+        key: '',
+        nomeCargo: '',
+        status: '',
+        permissoes: {
+          cargo: [],
+          conta: [],
+          dispositivo: [],
+          setor: [],
+          usuario: [],
+          dashboard: []
+        }
+      },
+      pageLoading: true
     };
 
     this.register = this.register.bind(this);
@@ -69,20 +85,26 @@ class NewUser extends Component {
   }
 
   async componentDidMount() {
+    this.setState({ isMounted: true });
+
     if (!firebase.getCurrent()) {
-      this.props.history.replace('/login');
+      this.props.history.replace('/');
       return null;
     }
 
-    firebase.getUserName((info) => {
-      localStorage.nome = info.val().nome;
-      this.setState({ loggedName: localStorage.nome });
-    });
+    let result = await utils.getOffice(localStorage.cargo);
+    if (this.state.isMounted === true) {
+      this.setState({ loggedOffice: result });
+    }
 
-    firebase.getUserPerfil((info) => {
-      localStorage.cargo = info.val().cargo;
-      this.setState({ loggedCargo: localStorage.cargo });
-    });
+    if (utils.checkSpecificPermission("Cadastrar", this.state.loggedOffice.permissoes.conta) !== true) {
+      /* alert("Você não possui permissão para acessar esta página!"); */
+      this.props.history.replace('/dashboard');
+      return null;
+    }
+    else {
+      this.setState({ pageLoading: false });
+    }
 
     /* if (this.state.cargo === "Administrador" || this.state.cargo === "Gestor") {
       alert("Acesso autorizado");
@@ -96,29 +118,45 @@ class NewUser extends Component {
   }
 
   render() {
-    return (
-      <div>
-        <header id="new">
-          {/* <Link to="/users">Voltar</Link> */}
-          <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.goBack() }}>
-            Voltar
+    if (this.state.pageLoading === true) {
+      return (
+        <div className="page-loader">
+          <Loader
+            type="Oval"
+            //color="#ffa200"
+            color="#FFF"
+            height={100}
+            width={100}
+          //timeout={3000} //3 secs
+
+          />
+        </div>
+      );
+    }
+    else {
+      return (
+        <div>
+          <header id="new">
+            {/* <Link to="/users">Voltar</Link> */}
+            <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.goBack() }}>
+              Voltar
           </Button>
-        </header>
-        <h1 className="register-h1" style={{ color: '#FFF' }}>Novo Usuario</h1>
-        <form onSubmit={this.register} id="register">
-          <label>Nome:</label><br />
-          <input type="text" value={this.state.nome} autoFocus autoComplete="off"
-            onChange={(e) => this.setState({ nome: e.target.value })} placeholder="Nome" /><br />
+          </header>
+          <h1 className="register-h1" style={{ color: '#FFF' }}>Novo Usuario</h1>
+          <form onSubmit={this.register} id="register">
+            <label>Nome:</label><br />
+            <input type="text" value={this.state.nome} autoFocus autoComplete="off"
+              onChange={(e) => this.setState({ nome: e.target.value })} placeholder="Nome" /><br />
 
-          <label>Email:</label><br />
-          <input type="text" value={this.state.email} autoComplete="off"
-            onChange={(e) => this.setState({ email: e.target.value })} placeholder="teste@teste.com" /><br />
+            <label>Email:</label><br />
+            <input type="text" value={this.state.email} autoComplete="off"
+              onChange={(e) => this.setState({ email: e.target.value })} placeholder="teste@teste.com" /><br />
 
-          <label>Senha:</label><br />
-          <input type="password" value={this.state.password} autoComplete="off"
-            onChange={(e) => this.setState({ password: e.target.value })} placeholder="123123" /><br />
+            <label>Senha:</label><br />
+            <input type="password" value={this.state.password} autoComplete="off"
+              onChange={(e) => this.setState({ password: e.target.value })} placeholder="123123" /><br />
 
-          {/*}
+            {/*}
           <label>
             Cargo:
           <select value={this.state.cargo} onChange={this.handleChange}>
@@ -131,28 +169,29 @@ class NewUser extends Component {
           </label>
     {*/}
 
-          <InputLabel id="demo-simple-select-label">Cargo</InputLabel>
-          <Select
-            style={{ marginBottom: 20 }}
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={this.state.cargo}
-            onChange={this.handleChange}
-          >
+            <InputLabel id="demo-simple-select-label">Cargo</InputLabel>
+            <Select
+              style={{ marginBottom: 20 }}
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={this.state.cargo}
+              onChange={this.handleChange}
+            >
 
-            {this.state.offices.map((office) => {
-              return (
-                <MenuItem value={office.key}>{office.nomeCargo}</MenuItem>
-              );
-            })}
-          </Select>
+              {this.state.offices.map((office) => {
+                return (
+                  <MenuItem value={office.key}>{office.nomeCargo}</MenuItem>
+                );
+              })}
+            </Select>
 
-          <button type="submit">Cadastrar</button>
+            <button type="submit">Cadastrar</button>
 
-        </form>
+          </form>
 
-      </div>
-    );
+        </div>
+      );
+    }
   }
 }
 

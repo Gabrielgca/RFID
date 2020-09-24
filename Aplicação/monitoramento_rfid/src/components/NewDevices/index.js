@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import firebase from '../../firebase';
+import utils from '../../utils';
 import './NewDevices.css';
 
 import Button from '@material-ui/core/Button';
@@ -39,44 +40,74 @@ class NewDevices extends Component {
 
             selectLocazation: {
                 localization: '',
-                status:''
-            }
-
+                status: ''
+            },
+            loggedOffice: {
+                key: '',
+                nomeCargo: '',
+                status: '',
+                permissoes: {
+                    cargo: [],
+                    conta: [],
+                    dispositivo: [],
+                    setor: [],
+                    usuario: [],
+                    dashboard: []
+                }
+            },
+            pageLoading: true
         }
 
 
         this.registerDevices = this.registerDevices.bind(this)
     }
 
-    componentDidMount() {
+    async componentDidMount() {
+        this.setState({ isMounted: true });
+
         if (!firebase.getCurrent()) {
             this.props.history.replace('/');
             return null;
         }
+
+        let result = await utils.getOffice(localStorage.cargo);
+        if (this.state.isMounted === true) {
+            this.setState({ loggedOffice: result });
+        }
+
+        if (utils.checkSpecificPermission("Cadastrar", this.state.loggedOffice.permissoes.dispositivo) !== true) {
+            /* alert("Você não possui permissão para acessar esta página!"); */
+            this.props.history.replace('/dashboard');
+            return null;
+        }
+        else {
+            this.setState({ pageLoading: false });
+        }
+
         this.getLocalization();
     }
 
 
-    localizationDevices = async (event) =>{
+    localizationDevices = async (event) => {
         let newLocalization = this.state.selectLocazation;
         newLocalization.localization = event.target.value;
         this.setState({ selectLocazation: newLocalization })
     }
 
-    statusDevice = async (event) =>{
+    statusDevice = async (event) => {
         let newStatus = this.state.selectLocazation;
         newStatus.status = event.target.value;
         this.setState({ selectLocazation: newStatus })
     }
 
-    getStatusDevices = async () =>{
+    getStatusDevices = async () => {
         await axios.get(baseURL + 'dispInfo')
-        .then(response =>{
-            this.setState({ status: response.data.status})
-        })
-        .catch(error =>{
-            alert('Erro:' + JSON.stringify(error))
-        })
+            .then(response => {
+                this.setState({ status: response.data.status })
+            })
+            .catch(error => {
+                alert('Erro:' + JSON.stringify(error))
+            })
     }
 
     getLocalization = async () => {
@@ -89,35 +120,32 @@ class NewDevices extends Component {
             })
     }
 
-    getStatus = async (user) =>{
+    getStatus = async (user) => {
         await this.setState({
-            selectLocazation:{
+            selectLocazation: {
                 status: user.status,
                 localization: user.loc
             }
         })
     }
 
-
-
     registerDevices = async (e) => {
         e.preventDefault();
         if (this.state.selectLocazation.status !== '' &&
             this.state.nomeDispositivo !== '') {
-                
+
             const params = {
                 desc: this.state.nomeDispositivo,
                 status: this.state.selectLocazation.status,
                 loc: this.state.selectLocazation.localization
 
             }
-            
-            
-            await axios.post(baseURL + 'registerDisp' , params)
+
+            await axios.post(baseURL + 'registerDisp', params)
                 .then(response => {
                     alert("Usuário salvo com sucesso")
                     console.log(response);
-                    
+
                 })
                 .catch(error => {
                     alert("Erro: " + JSON.stringify(error))
@@ -129,57 +157,72 @@ class NewDevices extends Component {
         }
     }
 
-
     render() {
-        return (
+        if (this.state.pageLoading === true) {
+            return (
+                <div className="page-loader">
+                    <Loader
+                        type="Oval"
+                        //color="#ffa200"
+                        color="#FFF"
+                        height={100}
+                        width={100}
+                    //timeout={3000} //3 secs
 
-            <div className="formArea">
-                <header id="new">
-                    {/* <Link to="/offices">Voltar</Link> */}
-                    <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.goBack() }}>
-                        Voltar
-                    </Button>
-                </header>
+                    />
+                </div>
+            );
+        }
+        else {
+            return (
+                <div className="formArea">
+                    <header id="new">
+                        {/* <Link to="/offices">Voltar</Link> */}
+                        <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.goBack() }}>
+                            Voltar
+                        </Button>
+                    </header>
 
-                <form id="formRFID">
-                    <h1>Cadastro de dispositivo RFID</h1>
-                    <TextField label='Descrição do Dispositivo' variant='outlined' style={{ marginBottom: 20 }} onChange={(e) => this.setState({ nomeDispositivo: e.target.value }) } />
-                    <FormControl variant="outlined" style={{ marginBottom: 20 }}>
-                        <InputLabel>Localização</InputLabel>
-                        <Select
-                            value={this.state.selectLocazation.localization}
-                            onChange={this.localizationDevices}
-                            label="Localização"
-                        >
-                            {this.state.localization.map((loc) => {
-                                return (
-                                    <MenuItem value={loc.id_loc}>{loc.id_loc} - {loc.loc}</MenuItem>
-                                )
-                            })}
-                        </Select>
-                    </FormControl>
+                    <form id="formRFID">
+                        <h1>Cadastro de dispositivo RFID</h1>
+                        <TextField label='Descrição do Dispositivo' variant='outlined' style={{ marginBottom: 20 }} onChange={(e) => this.setState({ nomeDispositivo: e.target.value })} />
+                        <FormControl variant="outlined" style={{ marginBottom: 20 }}>
+                            <InputLabel>Localização</InputLabel>
+                            <Select
+                                value={this.state.selectLocazation.localization}
+                                onChange={this.localizationDevices}
+                                label="Localização"
+                            >
+                                {this.state.localization.map((loc) => {
+                                    return (
+                                        <MenuItem value={loc.id_loc}>{loc.id_loc} - {loc.loc}</MenuItem>
+                                    )
+                                })}
+                            </Select>
+                        </FormControl>
 
-                    <FormControl variant="outlined">
-                        <InputLabel>Status</InputLabel>
-                        <Select
-                            style={{ marginBottom: 20, width: 100 }}
-                            autoFocus
-                            margin='dense'
-                            label='Status'
-                            type='text'
-                            value={this.state.selectLocazation.status}
-                            onChange={this.statusDevice}
-                        >
-                            <MenuItem value='A'>Ativo</MenuItem>
-                            <MenuItem value='I'>Inativo</MenuItem>
-                        </Select>
-                    </FormControl>
+                        <FormControl variant="outlined">
+                            <InputLabel>Status</InputLabel>
+                            <Select
+                                style={{ marginBottom: 20, width: 100 }}
+                                autoFocus
+                                margin='dense'
+                                label='Status'
+                                type='text'
+                                value={this.state.selectLocazation.status}
+                                onChange={this.statusDevice}
+                            >
+                                <MenuItem value='A'>Ativo</MenuItem>
+                                <MenuItem value='I'>Inativo</MenuItem>
+                            </Select>
+                        </FormControl>
 
-                    <Button onClick={this.registerDevices} variant="contained" disableElevation style={{ height: 50, background: 'green', color: '#FFF' }}>Salvar</Button>
-                </form>
+                        <Button onClick={this.registerDevices} variant="contained" disableElevation style={{ height: 50, background: 'green', color: '#FFF' }}>Salvar</Button>
+                    </form>
 
-            </div>
-        )
+                </div>
+            );
+        }
     }
 }
 
