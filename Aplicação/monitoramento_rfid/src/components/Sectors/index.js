@@ -194,7 +194,7 @@ class Sectors extends Component {
             this.setState({ loggedOffice: result });
         }
 
-        if (utils.checkCategory(this.state.loggedOffice.permissoes.dispositivo) !== true) {
+        if (utils.checkCategory(this.state.loggedOffice.permissoes.setor) !== true) {
             /* alert("Você não possui permissão para acessar esta página!"); */
             this.props.history.replace('/dashboard');
             return null;
