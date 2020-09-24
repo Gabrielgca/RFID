@@ -30,6 +30,8 @@
 ---------------------------------
  * serverRFID_sessionRefr.py
    * Servidor em si com as rotas de comunicação com o dispositivo e aplicação. Utilizando o SQLAlchemy para se comunicar com o banco de dados já mapeado. Código inclui rotina para lidar com o fechamento de sessões.
+ * db_commands.py
+   * Biblioteca contendo todos os comandos do SQLAlchemy utilizados para a comunicação com o banco de dados.
  * db_control.py
    * Realizar o controle da comunicação com banco de dados MySql usando o orm SQLAlchemy. Código inclui rotina para lidar com o fechamento de sessões.
  * db_mapped_objects.py
