@@ -255,13 +255,30 @@ class RfidCommands():
             idPermHorario = [idPermHorario]
 
         return s.query (ph).filter (ph.idPermHorario.in_(idPermHorario), self.db.between (currentTime, ph.hrInicial, ph.hrFinal)).all ()
-    def selPermissaoDisp(self, idPermissaoDisp):
+    
+
+    
+    # COMANDO NOVO
+    # Renato Reis, 23/09/2020
+    def selPermHorarioOutOfDate (self, idPermHorario, currentDate):
+        ph = self.ph
+        s = self.db.session
+
+        if type(idPermHorario) != list:
+            idPermHorario = [idPermHorario]
+
+        return s.query (ph).filter (ph.idPermHorario.in_(idPermHorario), ~(self.db.between (currentDate, ph.dtInicio, ph.dtFim)), ph.stPermanente == 'N').all ()
+        
+    # COMANDO MOTIFICADO
+    # Renato Reis, 23/09/2020
+    def selPermissaoDisp(self, idPermissao):
         pd = self.pd
         s = self.db.session
-        if type(idPermissaoDisp) != list:
-            idPermissaoDisp = [idPermissaoDisp]
-        return s.query(pd).filter(pd.idPermissaoDisp.in_(idPermissaoDisp)).all()
 
+        if type(idPermissao) != list:
+            idPermissao = [idPermissao]
+        
+        return s.query (pd).filter (pd.idPermissao.in_(idPermissao), pd.stStatus == 'A').all ()
     def selCountCartoesAtivos(self,rfid):
         ct = self.ct
         cdct = self.cdct

@@ -500,92 +500,121 @@ def WiFIRFID ():
         flag_roominfo = False
     else:
         id_sala = 0
-    try:
-        locDisp = request.args.get('LOC')
-        idrfid = request.args.get('RFID')
-        idrfid = idrfid.upper()
-        available = is_available(idrfid)
-        print(idrfid)
-        print(available)
+    #try:
+    locDisp = request.args.get('LOC')
+    idrfid = request.args.get('RFID')
+    idrfid = idrfid.upper()
+    available = is_available(idrfid)
+    print(idrfid)
+    print(available)
+    
+    if available:
+        uplink = True
+        # Envia o ID para a aplicação e o possibilita ser cadastrado
+        socketio.emit('register', idrfid)
+        return jsonify (success = False)
+    
         
-        if available:
-            uplink = True
-            # Envia o ID para a aplicação e o possibilita ser cadastrado
-            socketio.emit('register', idrfid)
+    if cmd.selDispLocalizacaoByDisp (locDisp) != None:
+        cadastroCartao = cmd.selCadastroCartaoAtivo(idrfid)
+        ultOcorrencia = cmd.selUltOcorrenciaCadastro(cadastroCartao.idCadastro)
+
+        disp_loc = cmd.selDispLocalizacaoByDisp (locDisp)
+        perm_usu_disp = cmd.selAllPermCadastroLocal (cadastroCartao.idCadastro, disp_loc.idDispLocalizacao)
+        print (f'PERM_USU_DISP: {perm_usu_disp}')
+
+        if len (perm_usu_disp) <= 0:
+            # ACCESS DENIED
+            print('1 - SEM PERMISSÃO PARA AQUELA SALA.')
             return jsonify (success = False)
-        
-            
-        if cmd.selDispLocalizacaoByDisp (locDisp) != None:
-            cadastroCartao = cmd.selCadastroCartaoAtivo(idrfid)
-            ultOcorrencia = cmd.selUltOcorrenciaCadastro(cadastroCartao.idCadastro)
+        else:
+            #EXISTE ALGUM REGISTRO DE PERMISSÃO NA SALA
+            for i in perm_usu_disp:
+                #VERIFICAR SE EXISTE PERMISSÃO ATIVA
+                perm_disp = cmd.selPermissaoDisp (i.idPermissao)
+                print (f'PERM_DISP: {perm_disp}')
 
-            disp_loc = cmd.selDispLocalizacaoByDisp (locDisp)
-            permissions_cadastro_local = cmd.selAllPermCadastroLocal (cadastroCartao.idCadastro, disp_loc.idDispLocalizacao)
-            
-
-            if len (permissions_cadastro_local)<=0 :
-                # ACCESS DENIED
-                print('SEM PERMISSÃO NA SALA.')
-                return jsonify (success = False)
-            else:
-                    for i in permissions_cadastro_local:
-                            if i.idPermHorario is not None:
-                                    permissions_by_time = cmd.selPermHorarioByTime (i.idPermHorario, db.func.current_time ())
-                                    if len (permissions_by_time) <= 0:
-                                            # ACCESS DENIED
-                                            print('SEM PERMISSÃO NA SALA NESTE HORÁRIO.')
-                                            return jsonify (success = False)        
-            # ACCESS GRANTED, proceed to database insert
-            if ultOcorrencia is not None:
-                if ultOcorrencia.idDispositivo == int(locDisp):
-                    if ultOcorrencia.stOcorrencia == 'E':
-                        stOc = 'S'
-                    else:
-                        stOc = 'E'
-                    cmd.insertOcorrencia(Ocorrencia (idDispositivo=locDisp,
-                                                        idCadastro=cadastroCartao.idCadastro,
-                                                        dtOcorrencia=db.func.current_date(),
-                                                        hrOcorrencia=db.func.current_time(),
-                                                        stOcorrencia=stOc))
-                    
+                if len (perm_disp) <= 0: 
+                    # ACCESS DENIED
+                    print('2 - SEM ALGUM TIPO DE PERMISSÃO ATIVA NA SALA.')
+                    return jsonify (success = False)
                 else:
-                    if ultOcorrencia.stOcorrencia == 'E':
-                        cmd.insertOcorrencia(Ocorrencia (idDispositivo=ultOcorrencia.idDispositivo,
-                                                            idCadastro=cadastroCartao.idCadastro,
-                                                            dtOcorrencia=db.func.current_date(),
-                                                            hrOcorrencia=db.func.current_time(),
-                                                            stOcorrencia='S'))
-                    cmd.insertOcorrencia(Ocorrencia (idDispositivo=locDisp,
+                    #EXISTE PERMISSÃO ATIVA
+                    for j in perm_disp:
+                        #VERIFICA SE O TIPO DE PERMISSÃO É DE BLOQUEIO  
+                        if j.noPermissao.lower () == 'bloqueado':
+                            # ACCESS DENIED
+                            print('3 - TIPO DE PERMISSÃO DE BLOQUEIO. ACESSO NEGADO.')
+                            return jsonify (success = False)
+                            
+                if i.idPermHorario is not None:
+                    permissions_by_date = cmd.selPermHorarioOutOfDate (i.idPermHorario, db.func.current_date ())
+                    print (f'PERMISSIONS OUT OF CURRENT DATE: {permissions_by_date}')
+
+                    if len (permissions_by_date) > 0:
+                        # ACCESS DENIED
+                        print('4 - SEM PERMISSÃO PARA O DIA CORRENTE.')
+                        return jsonify (success = False)
+                    
+                    permissions_by_time = cmd.selPermHorarioByTime (i.idPermHorario, db.func.current_time ())
+                    print (f'PERMISSIONS BY TIME: {permissions_by_time}')
+
+                    if len (permissions_by_time) <= 0:
+                        # ACCESS DENIED
+                        print('5 - SEM PERMISSÃO PARA O HORÁRIO ATUAL.')
+                        return jsonify (success = False)
+            
+        # ACCESS GRANTED, proceed to database insert
+        if ultOcorrencia is not None:
+            if ultOcorrencia.idDispositivo == int(locDisp):
+                if ultOcorrencia.stOcorrencia == 'E':
+                    stOc = 'S'
+                else:
+                    stOc = 'E'
+                cmd.insertOcorrencia(Ocorrencia (idDispositivo=locDisp,
+                                                    idCadastro=cadastroCartao.idCadastro,
+                                                    dtOcorrencia=db.func.current_date(),
+                                                    hrOcorrencia=db.func.current_time(),
+                                                    stOcorrencia=stOc))
+                
+            else:
+                if ultOcorrencia.stOcorrencia == 'E':
+                    cmd.insertOcorrencia(Ocorrencia (idDispositivo=ultOcorrencia.idDispositivo,
                                                         idCadastro=cadastroCartao.idCadastro,
                                                         dtOcorrencia=db.func.current_date(),
                                                         hrOcorrencia=db.func.current_time(),
-                                                        stOcorrencia='E'))
-                    
-            else:
+                                                        stOcorrencia='S'))
                 cmd.insertOcorrencia(Ocorrencia (idDispositivo=locDisp,
                                                     idCadastro=cadastroCartao.idCadastro,
                                                     dtOcorrencia=db.func.current_date(),
                                                     hrOcorrencia=db.func.current_time(),
                                                     stOcorrencia='E'))
                 
-            ##Atualiza a quantidade de pessoas nas salas
-            rooms_updates = findrooms()
-            print('EMITI')
-            print(type(rooms_updates))
-            socketio.emit('rooms_update', rooms_updates)
-            #Verifica se atualização na sala selecionada
-            if int(locDisp) == int(id_sala):
-                rooms = fuc_roominfo(locDisp)
-                socketio.emit('news_from_roominfo', rooms)
-            return jsonify (success = True)
         else:
-            print('Dispositivo sem uma localização ativa.')
-            return 'Dispositivo sem uma localização ativa.'
+            cmd.insertOcorrencia(Ocorrencia (idDispositivo=locDisp,
+                                                idCadastro=cadastroCartao.idCadastro,
+                                                dtOcorrencia=db.func.current_date(),
+                                                hrOcorrencia=db.func.current_time(),
+                                                stOcorrencia='E'))
+            
+        ##Atualiza a quantidade de pessoas nas salas
+        rooms_updates = findrooms()
+        print('EMITI')
+        print(type(rooms_updates))
+        socketio.emit('rooms_update', rooms_updates)
+        #Verifica se atualização na sala selecionada
+        if int(locDisp) == int(id_sala):
+            rooms = fuc_roominfo(locDisp)
+            socketio.emit('news_from_roominfo', rooms)
+        return jsonify (success = True)
+    else:
+        print('Dispositivo sem uma localização ativa.')
+        return 'Dispositivo sem uma localização ativa.'
             
 
-    except Exception as e:
-        print(e)
-        return jsonify(answer = 'cannot read any ID')
+    #except Exception as e:
+        #print(e)
+       # return jsonify(answer = 'cannot read any ID')
 
 @app.route ('/register', methods = ['GET','POST'])
 def register():
