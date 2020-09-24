@@ -14,7 +14,6 @@ import SearchIcon from '@material-ui/icons/Search';
 import FlatList from 'flatlist-react';
 import Loader from 'react-loader-spinner';
 
-
 //modal
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -32,7 +31,6 @@ import AddIcon from '@material-ui/icons/Add';
 import ClearIcon from '@material-ui/icons/Clear';
 import EditIcon from '@material-ui/icons/Edit';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-
 
 class Devices extends Component {
 

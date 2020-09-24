@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import firebase from '../../firebase';
+import utils from '../../utils';
 import './users.css';
 
 import Paper from '@material-ui/core/Paper';
@@ -26,6 +27,8 @@ import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 
+import Loader from 'react-loader-spinner';
+
 
 import FlatList from 'flatlist-react';
 
@@ -44,7 +47,21 @@ class Users extends Component {
             filter: '',
             modalOpen: false,
             modalDeactivateOpen: false,
-            modalReactivateOpen: false
+            modalReactivateOpen: false,
+            loggedOffice: {
+                key: '',
+                nomeCargo: '',
+                status: '',
+                permissoes: {
+                    cargo: [],
+                    conta: [],
+                    dispositivo: [],
+                    setor: [],
+                    usuario: [],
+                    dashboard: []
+                }
+            },
+            pageLoading: true
         }
 
         this.handleChange = this.handleChange.bind(this);
@@ -105,20 +122,26 @@ class Users extends Component {
     }
 
     async componentDidMount() {
+        this.setState({ isMounted: true });
+
         if (!firebase.getCurrent()) {
             this.props.history.replace('/login');
             return null;
         }
 
-        firebase.getUserName((info) => {
-            localStorage.nome = info.val().nome;
-            this.setState({ nome: localStorage.nome });
-        });
+        let result = await utils.getOffice(localStorage.cargo);
+        if (this.state.isMounted === true) {
+            this.setState({ loggedOffice: result });
+        }
 
-        firebase.getUserPerfil((info) => {
-            localStorage.cargo = info.val().cargo;
-            this.setState({ cargo: localStorage.cargo });
-        });
+        if (utils.checkCategory(this.state.loggedOffice.permissoes.dispositivo) !== true) {
+            /* alert("Você não possui permissão para acessar esta página!"); */
+            this.props.history.replace('/dashboard');
+            return null;
+        }
+        else {
+            this.setState({ pageLoading: false });
+        }
 
         /* if (this.state.cargo === "Administrador" || this.state.cargo === "Gestor") {
             alert("Acesso autorizado");
@@ -216,168 +239,185 @@ class Users extends Component {
     }
 
     render() {
-        return (
-            <div className="container">
-                <header id="new">
-                    {/* <Link to="/dashboard">Voltar</Link> */}
-                    <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.push('/dashboard') }}>
-                        Voltar
-                    </Button>
-                </header>
-                <h1 style={{ color: '#FFF' }}>Usuários de Conta</h1>
-                <Paper style={{ marginTop: 50 }}>
-                    <InputBase
-                        value={this.state.filter}
-                        style={{ paddingLeft: 20, width: 500 }}
-                        onChange={(e) => this.setState({ filter: e.target.value })}
-                        placeholder="Faça uma pesquisa..."
+        if (this.state.pageLoading === true) {
+            return (
+                <div className="page-loader">
+                    <Loader
+                        type="Oval"
+                        //color="#ffa200"
+                        color="#FFF"
+                        height={100}
+                        width={100}
+                    //timeout={3000} //3 secs
+
                     />
-                    <IconButton type="button" onClick={this.searchUser}>
-                        <SearchIcon />
-                    </IconButton>
+                </div>
+            );
+        }
+        else {
+            return (
+                <div className="container">
+                    <header id="new">
+                        {/* <Link to="/dashboard">Voltar</Link> */}
+                        <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.push('/dashboard') }}>
+                            Voltar
+                        </Button>
+                    </header>
+                    <h1 style={{ color: '#FFF' }}>Usuários de Conta</h1>
+                    <Paper style={{ marginTop: 50 }}>
+                        <InputBase
+                            value={this.state.filter}
+                            style={{ paddingLeft: 20, width: 500 }}
+                            onChange={(e) => this.setState({ filter: e.target.value })}
+                            placeholder="Faça uma pesquisa..."
+                        />
+                        <IconButton type="button" onClick={this.searchUser}>
+                            <SearchIcon />
+                        </IconButton>
 
-                    <IconButton type="button" onClick={this.handleClearFilter}>
-                        <ClearIcon />
-                    </IconButton>
+                        <IconButton type="button" onClick={this.handleClearFilter}>
+                            <ClearIcon />
+                        </IconButton>
 
-                    <IconButton type="button" onClick={() => { this.props.history.push("/users/new") }}>
-                        <AddIcon style={{ color: 'green' }} />
-                    </IconButton>
-                </Paper>
+                        <IconButton type="button" onClick={() => { this.props.history.push("/users/new") }}>
+                            <AddIcon style={{ color: 'green' }} />
+                        </IconButton>
+                    </Paper>
 
-                <FlatList
-                    list={this.state.filteredUsers.length > 0 ? this.state.filteredUsers : this.state.users}
-                    renderItem={(item) => (
-                        <div className={item.status === 'Ativo' ? "card" : "card-disabled"} key={item.key}>
-                            <p><b>Nome: </b>{item.nome}</p>
-                            <p><b>Cargo: </b>{item.cargo}</p>
-                            <p><b>Status: </b>{item.status}</p>
-                            <div className="buttonsArea">
-                                {/* <button className="addButton" onClick={() => { this.handleClickOpen(item) }}>Editar</button> */}
-                                <Button endIcon={<EditIcon />} onClick={() => { this.handleClickOpen(item) }} style={{ backgroundColor: 'green', color: '#FFF', marginRight: 10 }}>
-                                    Editar
-                                </Button>
-
-                                {item.status === 'Ativo' ? (
-                                    <Button endIcon={<BlockIcon />} onClick={() => { this.handleDeactivateUserOpen(item) }} style={{ backgroundColor: 'red', color: '#FFF' }}>
-                                        Desativar
+                    <FlatList
+                        list={this.state.filteredUsers.length > 0 ? this.state.filteredUsers : this.state.users}
+                        renderItem={(item) => (
+                            <div className={item.status === 'Ativo' ? "card" : "card-disabled"} key={item.key}>
+                                <p><b>Nome: </b>{item.nome}</p>
+                                <p><b>Cargo: </b>{item.cargo}</p>
+                                <p><b>Status: </b>{item.status}</p>
+                                <div className="buttonsArea">
+                                    {/* <button className="addButton" onClick={() => { this.handleClickOpen(item) }}>Editar</button> */}
+                                    <Button endIcon={<EditIcon />} onClick={() => { this.handleClickOpen(item) }} style={{ backgroundColor: 'green', color: '#FFF', marginRight: 10 }}>
+                                        Editar
                                     </Button>
-                                ) : (
-                                        <Button endIcon={<CheckCircleOutlineIcon />} onClick={() => { this.handleReactivateUser(item) }} style={{ backgroundColor: 'blue', color: '#FFF' }}>
-                                            Reativar
+
+                                    {item.status === 'Ativo' ? (
+                                        <Button endIcon={<BlockIcon />} onClick={() => { this.handleDeactivateUserOpen(item) }} style={{ backgroundColor: 'red', color: '#FFF' }}>
+                                            Desativar
                                         </Button>
-                                    )
-                                }
-                                {/* <button className="deleteButton" onClick={() => { this.handleDeactivateUserOpen(item) }}>Excluir</button> */}
+                                    ) : (
+                                            <Button endIcon={<CheckCircleOutlineIcon />} onClick={() => { this.handleReactivateUser(item) }} style={{ backgroundColor: 'blue', color: '#FFF' }}>
+                                                Reativar
+                                            </Button>
+                                        )
+                                    }
+                                    {/* <button className="deleteButton" onClick={() => { this.handleDeactivateUserOpen(item) }}>Excluir</button> */}
+                                </div>
                             </div>
-                        </div>
-                    )}
-                    renderWhenEmpty={() => <div>Carregando...</div>}
-                    //sortBy={["item.cargo", { key: "lastName", descending: true }]}
-                    sortBy={["status", "cargo", "nome"]}
-                //groupBy={person => person.info.age > 18 ? 'Over 18' : 'Under 18'}
-                />
+                        )}
+                        renderWhenEmpty={() => <div>Carregando...</div>}
+                        //sortBy={["item.cargo", { key: "lastName", descending: true }]}
+                        sortBy={["status", "cargo", "nome"]}
+                    //groupBy={person => person.info.age > 18 ? 'Over 18' : 'Under 18'}
+                    />
 
-                {/* Modal para edição dos dados da conta selecionada */}
-                <Dialog open={this.state.modalOpen} onClose={this.handleClose} aria-labelledby="form-dialog-title">
-                    <DialogTitle id="form-dialog-title">Editar Usuário</DialogTitle>
-                    <DialogContent>
-                        <DialogContentText>
-                            Faça as alterações necessárias abaixo e clique em Salvar.
-                        </DialogContentText>
-                        <TextField
-                            disabled={true}
-                            value={this.state.selectedUser.status}
-                            //onChange={(e) => { let array = this.state.selectedUser; array.nome = e.target.value; this.setState({ selectedUser: array }) }}
-                            style={{ width: 500 }}
-                            autoFocus
-                            margin="dense"
-                            id="name"
-                            label="Status"
-                            type="text"
-                            fullWidth
-                        />
+                    {/* Modal para edição dos dados da conta selecionada */}
+                    <Dialog open={this.state.modalOpen} onClose={this.handleClose} aria-labelledby="form-dialog-title">
+                        <DialogTitle id="form-dialog-title">Editar Usuário</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                Faça as alterações necessárias abaixo e clique em Salvar.
+                            </DialogContentText>
+                            <TextField
+                                disabled={true}
+                                value={this.state.selectedUser.status}
+                                //onChange={(e) => { let array = this.state.selectedUser; array.nome = e.target.value; this.setState({ selectedUser: array }) }}
+                                style={{ width: 500 }}
+                                autoFocus
+                                margin="dense"
+                                id="name"
+                                label="Status"
+                                type="text"
+                                fullWidth
+                            />
 
-                        <TextField
-                            value={this.state.selectedUser.nome}
-                            onChange={(e) => { let array = this.state.selectedUser; array.nome = e.target.value; this.setState({ selectedUser: array }) }}
-                            style={{ width: 500 }}
-                            autoFocus
-                            margin="dense"
-                            id="name"
-                            label="Nome do Usuário"
-                            type="text"
-                            fullWidth
-                        />
+                            <TextField
+                                value={this.state.selectedUser.nome}
+                                onChange={(e) => { let array = this.state.selectedUser; array.nome = e.target.value; this.setState({ selectedUser: array }) }}
+                                style={{ width: 500 }}
+                                autoFocus
+                                margin="dense"
+                                id="name"
+                                label="Nome do Usuário"
+                                type="text"
+                                fullWidth
+                            />
 
-                        <InputLabel id="demo-simple-select-label">Cargo</InputLabel>
-                        <Select
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            value={this.state.selectedUser.cargo}
-                            onChange={this.handleChange}
-                        >
+                            <InputLabel id="demo-simple-select-label">Cargo</InputLabel>
+                            <Select
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                value={this.state.selectedUser.cargo}
+                                onChange={this.handleChange}
+                            >
 
-                            {this.state.offices.map((office) => {
-                                return (
-                                    <MenuItem value={office.key}>{office.nomeCargo}</MenuItem>
-                                );
-                            })}
-                        </Select>
+                                {this.state.offices.map((office) => {
+                                    return (
+                                        <MenuItem value={office.key}>{office.nomeCargo}</MenuItem>
+                                    );
+                                })}
+                            </Select>
 
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={this.handleUpdate} style={{ backgroundColor: 'green', color: '#FFF' }}>
-                            Salvar
-                        </Button>
-                        <Button onClick={this.handleClose} style={{ backgroundColor: 'red', color: '#FFF' }}>
-                            Cancelar
-                        </Button>
-                    </DialogActions>
-                </Dialog>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={this.handleUpdate} style={{ backgroundColor: 'green', color: '#FFF' }}>
+                                Salvar
+                            </Button>
+                            <Button onClick={this.handleClose} style={{ backgroundColor: 'red', color: '#FFF' }}>
+                                Cancelar
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
 
-                {/* Modal para confirmação de operação de desativação do usuário */}
-                <Dialog open={this.state.modalDeactivateOpen} onClose={this.handleCloseDeactivate} aria-labelledby="form-dialog-title">
-                    <DialogTitle id="form-dialog-title">Editar Usuário</DialogTitle>
-                    <DialogContent>
-                        <DialogContentText>
-                            Tem certeza de que deseja desativar o <b> {this.state.selectedUser.cargo} {this.state.selectedUser.nome} </b> ?
-                        </DialogContentText>
-
-
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={() => { this.deactivateUser(this.state.selectedUser.key) }} style={{ backgroundColor: 'green', color: '#FFF' }}>
-                            Sim
-                        </Button>
-                        <Button onClick={this.handleCloseDeactivate} style={{ backgroundColor: 'red', color: '#FFF' }}>
-                            Cancelar
-                        </Button>
-                    </DialogActions>
-                </Dialog>
-
-                {/* Modal para confirmação de operação de reativação do usuário */}
-                <Dialog open={this.state.modalReactivateOpen} onClose={this.handleCloseDeactivate} aria-labelledby="form-dialog-title">
-                    <DialogTitle id="form-dialog-title">Reativar Usuário</DialogTitle>
-                    <DialogContent>
-                        <DialogContentText>
-                            Tem certeza de que deseja reativar o <b> {this.state.selectedUser.cargo} {this.state.selectedUser.nome} </b> ?
-                        </DialogContentText>
+                    {/* Modal para confirmação de operação de desativação do usuário */}
+                    <Dialog open={this.state.modalDeactivateOpen} onClose={this.handleCloseDeactivate} aria-labelledby="form-dialog-title">
+                        <DialogTitle id="form-dialog-title">Editar Usuário</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                Tem certeza de que deseja desativar o <b> {this.state.selectedUser.cargo} {this.state.selectedUser.nome} </b> ?
+                            </DialogContentText>
 
 
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={() => { this.reactivateUser(this.state.selectedUser.key) }} style={{ backgroundColor: 'green', color: '#FFF' }}>
-                            Sim
-                        </Button>
-                        <Button onClick={this.handleCloseReactivate} style={{ backgroundColor: 'red', color: '#FFF' }}>
-                            Cancelar
-                        </Button>
-                    </DialogActions>
-                </Dialog>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={() => { this.deactivateUser(this.state.selectedUser.key) }} style={{ backgroundColor: 'green', color: '#FFF' }}>
+                                Sim
+                            </Button>
+                            <Button onClick={this.handleCloseDeactivate} style={{ backgroundColor: 'red', color: '#FFF' }}>
+                                Cancelar
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
 
-            </div>
-        );
+                    {/* Modal para confirmação de operação de reativação do usuário */}
+                    <Dialog open={this.state.modalReactivateOpen} onClose={this.handleCloseDeactivate} aria-labelledby="form-dialog-title">
+                        <DialogTitle id="form-dialog-title">Reativar Usuário</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                Tem certeza de que deseja reativar o <b> {this.state.selectedUser.cargo} {this.state.selectedUser.nome} </b> ?
+                            </DialogContentText>
+
+
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={() => { this.reactivateUser(this.state.selectedUser.key) }} style={{ backgroundColor: 'green', color: '#FFF' }}>
+                                Sim
+                            </Button>
+                            <Button onClick={this.handleCloseReactivate} style={{ backgroundColor: 'red', color: '#FFF' }}>
+                                Cancelar
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+
+                </div>
+            );
+        }
     }
 }
 
