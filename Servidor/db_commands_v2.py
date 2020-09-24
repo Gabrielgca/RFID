@@ -101,6 +101,16 @@ class RfidCommands():
             idCadastro = [idCadastro]
         return s.query(cd).filter(cd.idCadastro.in_(idCadastro)).all()
 
+    
+    #Comando inserido em: 24/09/2020 11:41
+    #Por: Gabriel de Castro Araújo
+    def selnoCartao(self, noCartao):
+        ct = self.ct
+        s = self.db.session
+        if type(noCartao) != list:
+            noCartao = [noCartao]
+        return s.query(ct).filter(ct.noCartao.in_(noCartao)).scalar()
+
     def selOcorrencia(self, idOcorrencia):
         oc = self.oc
         s = self.db.session
@@ -303,8 +313,21 @@ class RfidCommands():
         cadastroCartao = s.query(cdct).filter(cdct.idCadastro.in_(idCadastro)).all()
         return cadastroCartao
 
+    
+    #Comando inserido em: 24/09/2020 15:09
+    #Por: Gabriel de Castro Araújo
+    def selidCadastroidCartao (self,idCadastro, idCartao):
+        cdct = self.cdct
+        s = self.db.session
+        if type(idCadastro) != list:
+            idCadastro = [idCadastro]
+        if type(idCartao) != list:
+            idCartao = [idCartao]
+        cadastroCartao = s.query(cdct).filter(cdct.idCadastro.in_(idCadastro), cdct.idCartao.in_(idCartao)).all()
+        return cadastroCartao
+
      #-----------COMANDO GABRIEL-----------#
-    def selnoCartao (self,idCartao):
+    def selCartao (self,idCartao):
         ct = self.ct
         s = self.db.session
         if type(idCartao) != list:
@@ -532,6 +555,15 @@ class RfidCommands():
         if refresh:
             s.refresh(cadastroCartao)
 
+    #Comando inserido em: 24/09/2020 11:41
+    #Por: Gabriel de Castro Araújo
+    def insertCadastroCartao_byid(self,cadastroCartao, refresh=False):
+        s = self.db.session
+        s.add(cadastroCartao)
+        s.commit()
+        if refresh:
+            s.refresh(cadastroCartao)
+
     def insertOcorrencia(self,ocorrencia,refresh=False):
         s = self.db.session
         s.add(ocorrencia)
@@ -680,6 +712,23 @@ class RfidCommands():
         cadastroCartaoUpdt.stEstado = newStatus
         s.commit()
 
+    def updateCadastroCartao(self ,idCadastroCartao, newCadastroCartao):
+
+        
+        s = self.db.session
+        cdct = self.cdct
+        CadastroCartaoUpdt = s.query(cdct)\
+                               .filter(cdct.idCadastroCartao == idCadastroCartao)\
+                               .scalar()
+        s.add(CadastroCartaoUpdt)
+        newCadastroCartaoDict = newCadastroCartao.getDict()
+        for key in CadastroCartaoUpdt.getDict():
+            print(key)
+            if newLocalizacaoDispDict[key] is not None:
+                setattr(CadastroCartaoUpdt, key, newCadastroCartao[key])
+ 
+        s.commit()
+    
     #COMANDO NOVO!
     def updateStSituacaoDispLoc(self, idDispLocalizacao, newStatus):
         s = self.db.session

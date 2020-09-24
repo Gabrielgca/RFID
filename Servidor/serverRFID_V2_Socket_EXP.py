@@ -643,10 +643,21 @@ def register():
         cartao = Cartao (noCartao = str_card)
         usuario = Cadastro (noUsuario = str_user, vlIdade = str_age, noAreaTrabalho = str_trab)
         try:
-            cmd.insertCadastroCartao(cadastroCartao = cadastroCartao,
-                                    cadastro = usuario,
-                                    cartao = cartao,
-                                    refresh = True)
+            if cmd.selnoCartao(str_card) != None:
+                #CARTAO JÁ TINHA SIDO CADASTRADO
+                print('1')
+                cmd.insertCadastro(usuario, refresh = True)
+                id_cartao = cmd.selnoCartao(str_card).idCartao
+                cadastroCartao = CadastroCartao(idCadastro = usuario.idCadastro, idCartao = id_cartao, stEstado = 'A')
+                cmd.insertCadastroCartao_byid(cadastroCartao, refresh=True)
+                #cmd.updateCadastroImg(cadastro = cadastroCartao.idCadastro,
+            #                     imgUrl = url_for("static",filename = "imagens/"+str(cadastroCartao.idCadastro)+".png",_external = True))
+            else:
+                #CARTAO NÃO TINHA SIDO CADASTRADO
+                cmd.insertCadastroCartao(cadastroCartao = cadastroCartao,
+                                        cadastro = usuario,
+                                        cartao = cartao,
+                                        refresh = True)
             #cmd.updateCadastroImg(cadastro = cadastroCartao.idCadastro,
             #                     imgUrl = url_for("static",filename = "imagens/"+str(cadastroCartao.idCadastro)+".png",_external = True))
         except Exception as e:
@@ -731,8 +742,8 @@ def userInfo():
         dict_user["cargo"] = i.noAreaTrabalho
         if len(cmd.selCadastroCartao(i.idCadastro)) > 0:
             cad_cat = cmd.selCadastroCartao(i.idCadastro)
-            nocartao = cmd.selnoCartao(cad_cat[0].idCartao)
-            dict_user["status"] = cad_cat[0].stEstado
+            nocartao = cmd.selCartao(cad_cat[-1].idCartao)
+            dict_user["status"] = cad_cat[-1].stEstado
             dict_user["RFID"] = nocartao
         
         list_user.append(dict_user)
@@ -751,34 +762,63 @@ def updateUser():
             resp = jsonify (success = False)
             return answer (app, 204, resp)
         update_user = Cadastro()
-       # for key in data:
-           # if key == "id_user": id_user = data['id_user']  
-           # if key == "nome": update_user.noUsuario = data['nome']   
-           # if key == "idade": update_user.vlIdade = data['idade']  
-           # if key == "cargo": update_user.noAreaTrabalho = data['cargo']
-            #if key == "status":
+
         id_user = data['id_user']
         update_user.noUsuario = data['nome']
         update_user.vlIdade = data['idade']
         update_user.noAreaTrabalho = data['cargo']
+  
+        
         #DESATIVANDO RFID ANTERIOR
         vl_status = data['status']
-        old_user_card= cmd.selCadastroCartao(id_user)
+        user_card= cmd.selCadastroCartao(id_user)
 
-        id_old_user_card = old_user_card[0].idCadastroCartao
-
-        cmd.updateStEstadoCadastroCartao(id_old_user_card, vl_status)
-    #if key == "RFID":
+        id_user_card = user_card[-1].idCadastroCartao
+        vl_user_card = user_card[-1].stEstado
+        
+        
         #ATUALIZANDO NOVO RFID PARA O USUÁRIO
         noRFID = data['RFID']
-        if len(cmd.selCadastroCartao(id_user)) > 0 :
-            user_card = cmd.selCadastroCartao(id_user)
-            
-            id_card_user =  user_card[0].idCartao
-            cartao = Cartao(noCartao = noRFID)
-            cmd.updateCartao(id_card_user, cartao)
+        #VERIFICA SE O USUÁRIO JÁ ESTÁ CADASTRADO
+        if len(cmd.selCadastroCartao(id_user)) > 0:
+
+            #VERIFICA SE O RFID JÁ FOI CADASTRADO
+            if cmd.selnoCartao(noRFID) == None:
+                #CARTAO NAO TINHA SIDO CADASTRADO AINDA
+                #CADASTRO SERÁ FEITO
+                print('1')
+                cmd.updateStEstadoCadastroCartao(id_user_card, 'I')
+                cartao = Cartao(noCartao = noRFID)
+                cmd.insertCartao(cartao, refresh = True)
+                cadastro_cartao = CadastroCartao(idCadastro = id_user, idCartao = cartao.idCartao, stEstado = 'A')
+                cmd.insertCadastroCartao_byid(cadastro_cartao)
+
+            else:
+                try:
+                    #TENTA ATUALIZAR O CADASTRO DO USUÁRIO COM AQUELE RFID, CASO EXISTA
+                    if vl_user_card == 'A' and vl_status != 'A':
+                        print('2')
+                        cmd.updateStEstadoCadastroCartao(id_user_card, 'I')
+                    else:    
+                        print('3')
+                        cartao = cmd.selnoCartao(noRFID)
+                        id_cartao = cartao.idCartao
+                        if len(cmd.selidCadastroidCartao(id_user, id_cartao)) != 0:
+                            cmd.updateStEstadoCadastroCartao(id_user_card, 'I')
+                            cadastro_cartao = CadastroCartao(idCadastro = id_user, idCartao = id_cartao, stEstado = 'A')
+                            cmd.insertCadastroCartao(cadastro_cartao)
+                        else:
+                            cmd.updateStEstadoCadastroCartao(id_user_card, 'A')
+                except:
+                    #CASO NÃO HAJA O CADASTRO DO USUÁRIO COM AQUELE RFID, SERÁ INSERIDO
+                    print('4')
+                    cartao = cmd.selnoCartao(noRFID)
+                    id_cartao = cartao.idCartao
+                    cadastro_cartao = CadastroCartao(idCadastro = id_user, idCartao = id_cartao, stEstado = 'A')
+                    cmd.insertCadastroCartao_byid(cadastro_cartao)
+
         else:
-            print('Não foi encontrado um id_cadastro Ativo na tabela')
+            print('Não foi encontrado um id_cadastro na tabela tb_cadastro_cartao.')
             return jsonify(success = False)
             
             #if key == "img": 
