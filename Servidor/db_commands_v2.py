@@ -170,7 +170,7 @@ class RfidCommands():
             if ultRotaCadastro is not None:
                 ultRotaCadastros.append(ultRotaCadastro.idRota)
         return s.query(cd).join(rt,cd.idCadastro == rt.idCadastro)\
-                          .filter(rt.idRota.in_(ultRotaCadastros), rt.idDispositivo == idDispositivo)\
+                          .filter(rt.idRota.in_(ultRotaCadastros), rt.idDispositivoDestino == idDispositivo)\
                           .count()
 
     #--------COMANDO GABRIEL--------#

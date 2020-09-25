@@ -1,6 +1,4 @@
 from db_commands_v2 import RfidCommands 
-import numpy as np
-from numpy import random
 import json
 import ttn
 from flask import Flask, jsonify, request, url_for, render_template
@@ -72,7 +70,7 @@ no_usuario='{}',
 vl_idade = '{}',
 no_area_trabalho = '{}',
     ed_arquivo_imagem='{}')>'''.format(self.idCadastro, self.noUsuario, self.edArquivoImagem, self.vlIdade, self.noAreaTrabalho)
-
+    
     def getDict(self):
         self.dictionary = {}
         self.dictionary['idCadastro'] = self.idCadastro
@@ -137,6 +135,8 @@ class Rota(db.Model):
     idDispositivoOrigem = db.Column('id_dispositivo_origem', db.Integer, db.ForeignKey('tb_dispositivo.id_dispositivo'), nullable=False, comment='''Identificador do dispositvo(origem)''')
     idDispositivoDestino = db.Column('id_dispositivo_destino', db.Integer,  db.ForeignKey('tb_dispositivo.id_dispositivo'), nullable=False, comment='''Identificador do dispositvo(destino)''')
     idCadastro = db.Column('id_cadastro', db.Integer,  db.ForeignKey('tb_cadastro.id_cadastro'), nullable=False, comment='''Identificador do cadastro''')
+    dtRota = db.Column('dt_rota', db.Date, nullable=True, comment='Data em que a rota foi registrada.')
+    hrRota = db.Column('hr_rota', db.Time, nullable=True, comment='Hora em que a rota foi registrada.')
 
     dispositivoOrigem = db.relationship('Dispositivo', back_populates='rotasOrigem', foreign_keys=[idDispositivoOrigem])
     dispositivoDestino = db.relationship('Dispositivo', back_populates='rotasDestino', foreign_keys=[idDispositivoDestino])
@@ -147,7 +147,9 @@ class Rota(db.Model):
     (id_rota='{}',
     id_dispositivo_origem='{}',
     id_dispositivo_destino='{}',
-    id_cadastro='{}')>'''.format(self.idRota,self.idDispositivoOrigem,self.idDispositivoDestino,self.idCadastro)
+    id_cadastro='{}',
+    dt_rota='{}',
+    hr_rota='{}')>'''.format(self.idRota, self.idDispositivoOrigem, self.idDispositivoDestino, self.idCadastro, self.dtRota, self.hrRota)
 
     def getDict(self):
         self.dictionary = {}
@@ -155,8 +157,9 @@ class Rota(db.Model):
         self.dictionary['idDispositivoOrigem'] = self.idDispositivoOrigem
         self.dictionary['idDispositivoDestino'] = self.idDispositivoDestino
         self.dictionary['idCadastro'] = self.idCadastro
+        self.dictionary['dtRota'] = self.dtRota
+        self.dictionary['hrRota'] = self.hrRota
         return self.dictionary 
-
 
 class Ocorrencia(db.Model):
     __tablename__ = 'tb_ocorrencia'
@@ -191,38 +194,41 @@ class Ocorrencia(db.Model):
         return self.dictionary
 
 
-#MAPEAMENTO ATUALIZADO POR RENATO REIS DIA 25/09/2020
+#MAPEAMENTO NOVO!
 class LocalizacaoDisp(db.Model):
     __tablename__ = 'tb_localizacao_disp' 
 
     idLocalizacaoDisp = db.Column('id_localizacao_disp', db.Integer, primary_key=True, unique=True, nullable=False, comment='''Identificação da localização do dispositivo''')
-    noEmpresa = db.Column('no_empresa', db.String(40), nullable=False, comment='''Nome da empresa em que se encontra a localização''')
-    noLocalizacao = db.Column('no_localizacao', db.String(40), nullable=False, comment='''Nome da localização do dispositivo''')  
+    noEmpresa = db.Column('no_empresa', db.String(40), primary_key=True, unique=True, comment='''Nome da empresa em que se encontra a localização.''')
+    noLocalizacao = db.Column('no_localizacao', db.String(40), nullable=False, comment='''Nome da localização do dispositivo''')
     vlAndar = db.Column('vl_andar', db.Integer, nullable=True,default=None, comment='''Indicação do andar da localização''')
-    vlArea = db.Column('vl_area', db.Integer, nullable=False, comment='''Tamanho em metros quadrados de localização''')
-    stAtivo = db.Column('st_ativo', db.String(1), nullable=False, default='A', comment='''Status ativo ou inativo da localização.''')
+    vlArea = db.Column('vl_area', db.Integer, nullable=False, comment='''Quantidade de pessoas na localização''')
+    vlQtdeLampadas = db.Column('vl_qtde_lampadas', db.Integer, nullable=False, comment='''Quantidade de lâmpadas instaladas na localização.''')
+    vlConsumoLamp = db.Column('vl_consumo_lamp', db.Integer, nullable=False, comment='''Consumo total por lâmpada instalada, em watts.''')
+    stStatus = db.Column('st_status', db.Integer, nullable=False, default='A')
 
     dispositivos = db.relationship('DispLocalizacao', back_populates='localizacaoDisp')
 
     def __repr__(self):
         return '''<Localizacao_disp
-	(id_localizacao_disp='{}',
-    no_empresa='{}',
-	no_localizacao='{}',
-	vl_andar='{}',
-	vl_area='{}'),
-    st_ativo='{}')>'''.format(self.idLocalizacaoDisp, self.noEmpresa,self.noLocalizacao, self.vlAndar, self.vlArea, self.stAtivo)
+    (id_localizacao_disp='{}',
+    no_localizacao='{}',
+    vl_andar='{}',
+    vl_area='{}',
+    vl_qtde_lampadas='{}',
+    vl_consumo_lamp='{}',
+    st_status='{}')>'''.format(self.idLocalizacaoDisp, self.noLocalizacao, self.vlAndar, self.vlArea, self.vlQtdeLampadas, self.vlConsumoLamp, self.stStatus)
 
     def getDict(self):
         self.dictionary = {}
         self.dictionary['idLocalizacaoDisp'] = self.idLocalizacaoDisp
-        self.dictionary['noEmpresa'] = self.noEmpresa
         self.dictionary['noLocalizacao'] = self.noLocalizacao
         self.dictionary['vlAndar'] = self.vlAndar
         self.dictionary['vlArea'] = self.vlArea
-        self.dictionary['stAtivo'] = self.stAtivo
+        self.dictionary['vlQtdeLampadas'] = self.vlQtdeLampadas
+        self.dictionary['vlConsumoLamp'] = self.vlConsumoLamp
+        self.dictionary['stStatus'] = self.stStatus
         return self.dictionary
-
 #MAPEAMENTO NOVO!
 class DispLocalizacao(db.Model):
     __tablename__ = 'tb_disp_localizacao' 
@@ -374,7 +380,6 @@ class PermUsuDisp(db.Model):
 
 #Inicializando o objeto com os comandos Flask - SQLAlchemy
 cmd = RfidCommands(db)
-
 #Variáveis Globais
 global available, idrfid, uplink, id_sala, flag_roominfo
 
@@ -568,6 +573,114 @@ def WiFIRFID ():
                         return jsonify (success = False)
             
         # ACCESS GRANTED, proceed to database insert
+        newRota = Rota(idCadastro=cadastroCartao.idCadastro,
+                                        dtRota=db.func.current_date(),
+                                        hrRota=db.func.current_time())
+
+        newOcorrencia = Ocorrencia(idCadastro=cadastroCartao.idCadastro,
+                                dtOcorrencia=db.func.current_date(),
+                                hrOcorrencia=db.func.current_time())
+
+        newOcupacao = Ocupacao(dtOcupacao=db.func.current_date(),
+                            hrOcupacao=db.func.current_time())
+
+        if ultOcorrencia is not None:
+            if ultOcorrencia.idDispositivo == int(locDisp):
+                if ultOcorrencia.stOcorrencia == 'E':
+                    stOc = 'S'
+                    ultRota = cmd.selUltRotaCadastro(idCadastro=cadastroCartao.idCadastro)
+                    newRota.idDispositivoOrigem = ultRota.idDispositivoDestino
+                    newRota.idDispositivoDestino = ultRota.idDispositivoOrigem
+                    cmd.insertRota(newRota)
+
+                    newOcupacao.idDispLocalizacao = cmd.selDispLocalizacao_disp(idDispositivo=locDisp)[0].idDispLocalizacao
+                    newOcupacao.nrPessoas = cmd.selCountPessoasDispositivo(idDispositivo=locDisp)
+                    cmd.insertOcupacao(ocupacao=newOcupacao, expunge=True, transient=True)
+
+
+                    if ultRota.idDispositivoOrigem is not None:
+                        newOcupacao.dtOcupacao = db.func.current_date()
+                        newOcupacao.hrOcupacao = db.func.current_time()
+                        newOcupacao.idDispLocalizacao = cmd.selDispLocalizacao_disp(idDispositivo=ultRota.idDispositivoOrigem)[0].idDispLocalizacao
+                        newOcupacao.nrPessoas = cmd.selCountPessoasDispositivo(idDispositivo=ultRota.idDispositivoOrigem)
+                        cmd.insertOcupacao(newOcupacao)
+                else:
+                    stOc = 'E'
+                    ultRota = cmd.selUltRotaCadastro(idCadastro=cadastroCartao.idCadastro)
+                    if ultRota is not None:
+                        newRota.idDispositivoOrigem = ultRota.idDispositivoDestino
+                        newRota.idDispositivoDestino = locDisp
+                        cmd.insertRota(newRota)
+                    else:
+                        newRota.idDispositivoOrigem = None
+                        newRota.idDispositivoDestino = locDisp
+                        cmd.insertRota(newRota)
+
+                    newOcupacao.idDispLocalizacao = cmd.selDispLocalizacao_disp(idDispositivo=locDisp)[0].idDispLocalizacao
+                    newOcupacao.nrPessoas = cmd.selCountPessoasDispositivo(idDispositivo=locDisp)
+                    cmd.insertOcupacao(newOcupacao)
+                newOcorrencia.idDispositivo = locDisp
+                newOcorrencia.stOcorrencia = stOc
+                cmd.insertOcorrencia(newOcorrencia)
+            else:
+                ultRota = cmd.selUltRotaCadastro(idCadastro=cadastroCartao.idCadastro)
+                if ultOcorrencia.stOcorrencia == 'E':
+                    newOcorrencia.idDispositivo = ultOcorrencia.idDispositivo
+                    newOcorrencia.stOcorrencia = 'S'
+                    cmd.insertOcorrencia(ocorrencia=newOcorrencia, expunge=True, transient=True)
+                    if ultRota.idDispositivoOrigem is not None:
+                        newRota.idDispositivoOrigem = ultRota.idDispositivoDestino
+                        newRota.idDispositivoDestino = ultRota.idDispositivoOrigem
+                        cmd.insertRota(rota=newRota, expunge=True, transient=True)       
+                        ultRota = cmd.selUltRotaCadastro(idCadastro=cadastroCartao.idCadastro)
+                
+                newOcorrencia.idCadastro = cadastroCartao.idCadastro
+                newOcorrencia.dtOcorrencia = db.func.current_date()
+                newOcorrencia.hrOcorrencia = db.func.current_time()
+                newOcorrencia.idDispositivo = locDisp
+                newOcorrencia.stOcorrencia = 'E'
+                cmd.insertOcorrencia(newOcorrencia)
+
+                newRota.idCadastro = cadastroCartao.idCadastro
+                newRota.dtRota = db.func.current_date()
+                newRota.hrRota = db.func.current_time()
+                if int(ultRota.idDispositivoDestino) == int(locDisp):
+                    newRota.idDispositivoOrigem = locDisp
+                    newRota.idDispositivoDestino = None
+                    cmd.insertRota(newRota)
+                else:
+                    newRota.idDispositivoOrigem = ultRota.idDispositivoDestino
+                    newRota.idDispositivoDestino = locDisp
+                    cmd.insertRota(newRota)
+                newOcupacao.idDispLocalizacao = cmd.selDispLocalizacao_disp(idDispositivo=ultOcorrencia.idDispositivo)[0].idDispLocalizacao
+                newOcupacao.nrPessoas = cmd.selCountPessoasDispositivo(idDispositivo=ultOcorrencia.idDispositivo)
+                cmd.insertOcupacao(ocupacao=newOcupacao, expunge=True, transient=True)
+
+
+                newOcupacao.dtOcupacao = db.func.current_date()
+                newOcupacao.hrOcupacao = db.func.current_time()
+                newOcupacao.idDispLocalizacao = cmd.selDispLocalizacao_disp(idDispositivo=locDisp)[0].idDispLocalizacao
+                newOcupacao.nrPessoas = cmd.selCountPessoasDispositivo(idDispositivo=locDisp)
+                cmd.insertOcupacao(newOcupacao)
+        else:
+            newOcorrencia.idDispositivo = locDisp
+            newOcorrencia.stOcorrencia = 'E'
+            cmd.insertOcorrencia(newOcorrencia)
+
+            newRota.idDispositivoOrigem = None
+            newRota.idDispositivoDestino = locDisp
+            cmd.insertRota(newRota)
+
+            newOcupacao.idDispLocalizacao = cmd.selDispLocalizacao_disp(idDispositivo=locDisp)[0].idDispLocalizacao
+            newOcupacao.nrPessoas = cmd.selCountPessoasDispositivo(idDispositivo=locDisp)
+            cmd.insertOcupacao(newOcupacao)
+    
+    
+        
+        
+        
+        
+        '''
         if ultOcorrencia is not None:
             if ultOcorrencia.idDispositivo == int(locDisp):
                 if ultOcorrencia.stOcorrencia == 'E':
@@ -599,6 +712,18 @@ def WiFIRFID ():
                                                 dtOcorrencia=db.func.current_date(),
                                                 hrOcorrencia=db.func.current_time(),
                                                 stOcorrencia='E'))
+        '''   
+
+
+#------------------------------------------------------------#
+
+                
+
+
+
+
+
+
             
         ##Atualiza a quantidade de pessoas nas salas
         rooms_updates = findrooms()
@@ -736,7 +861,7 @@ def userInfo():
     info_user = {}
     list_user= []
     all_user = cmd.selAllCadastros()
-
+    list_perm = []
     for i in all_user:
         dict_user = {}
         dict_user["id_user"] = i.idCadastro
@@ -748,7 +873,20 @@ def userInfo():
             nocartao = cmd.selCartao(cad_cat[-1].idCartao)
             dict_user["status"] = cad_cat[-1].stEstado
             dict_user["RFID"] = nocartao
-        
+        if len(cmd.selPermUsuDisp(i.idCadastro)) > 0:
+            for j in range(len(cmd.selPermUsuDisp(i.idCadastro))):
+
+                dict_perm = {}
+                perm_usu_disp = cmd.selPermUsuDisp(i.idCadastro)
+                dict_perm['id_perm_usu_disp'] = perm_usu_disp[j].idPermUsuDisp
+                dict_perm['id_user'] = perm_usu_disp[j].idCadastro
+                dict_perm['id_perm'] = perm_usu_disp[j].idPermissao
+                dict_perm['id_disp_loc'] = perm_usu_disp[j].idDispLocalizacao
+                dict_perm['id_perm_hora'] = perm_usu_disp[j].idPermHorario
+                dict_perm['status'] = perm_usu_disp[j].stStatus
+                list_perm.append(dict_perm)
+            dict_user["perm"] = list_perm
+            list_perm = []
         list_user.append(dict_user)
 
     info_user['usuarios']=list_user
@@ -828,7 +966,53 @@ def updateUser():
                # str_img = data['img']
               #  with open(os.getcwd().replace("\\","/")+"/static/imagens/{}.png".format(id_user),"wb") as png2:
               #      png2.write(base64.b64decode(str_img))
+        count = 0
+        for key in data:
+            if key == "perm":
+                list_perm = data['perm']
+                for i in list_perm:
+                    for p_key in i:
+                        #CASO DE ATUALIZAR STATUS DA PERMISSÃO
+                        if p_key == 'id_perm_usu_disp':
+                            id_perm_usu_disp = list_perm[count]['id_perm_usu_disp']
+                            st_perm_usu_disp = list_perm[count]['st_perm_usu_disp']
+                            cmd.updatestStatusPermUsuDisp(id_perm_usu_disp, st_perm_usu_disp)
+                        #CASO DE ADICIONAR NOVA PERMISSÃO
+                        elif p_key == 'id_disp_loc':
+                            id_disp_loc = list_perm[count]['id_disp_loc']
+                            if "hrini" in list_perm[count] and "hrfim" in list_perm[count]:
+                                hr_perm_ini = list_perm[count]["hrini"]
+                                hr_perm_fim = list_perm[count]["hrfim"]
+                                print(f'horário recebido de início : { list_perm[count]["hrini"]}')
+                                print(f'horário recebido de fim : { list_perm[count]["hrfim"]}')
+                                perm_perm =list_perm[count]["perm"]
+                                try:
+                                    perm_horario = PermHorario(hrInicial = hr_perm_ini, hrFinal = hr_perm_fim, stPermanente = perm_perm)
+                                    cmd.insertPermHorario(perm_horario, refresh = True)
+                                    usu_disp = PermUsuDisp(idCadastro = id_user, idPermissao = 1, idDispLocalizacao = id_disp_loc, idPermHorario = perm_horario.idPermHorario, stStatus = 'A')
+                                    
+                                except Exception as e:
+                                    print(f'register 1 - {e}')
+                                    return jsonify (success = False)
+                            else:
+                                print(f'Sem horário definido para a permissão número {i} do usuário.')
+                                try:
+                                    usu_disp = PermUsuDisp(idCadastro = id_user, idPermissao = 1, idDispLocalizacao = id_disp_loc, stStatus = 'A')
+                                    
+                                except Exception as e:
+                                    print(f'2 - {e}')
+                                    return jsonify (success = False)
+                            try:
+                                cmd.insertPermUsuDisp(usu_disp)
+                            except Exception as e:
+                                    print(f'3 - {e}')
+                                    return jsonify (success = False)
+                    count = count + 1
+                count = 0
 
+
+
+        
         cmd.updateCadastro(id_user, update_user)
 
         return jsonify(success = True)
@@ -1001,8 +1185,8 @@ def registerLoc():
 
             andar = int(str_andar)
             area = int(str_area)
-            insereDispLoc = LocalizacaoDisp(noEmpresa = str_emp,noLocalizacao = str_loc, vlAndar = andar, vlArea = area)
-             
+            insereDispLoc = LocalizacaoDisp(noEmpresa = str_emp,noLocalizacao = str_loc, vlAndar = andar, vlArea = area, vlQtdeLampadas = 20,vlConsumoLamp = 40, stStatus = 'A')
+
             cmd.insertLocalizacaoDisp(insereDispLoc, refresh = True)
            
             return jsonify(success = True)
@@ -1039,6 +1223,9 @@ def updateLoc():
         update_loc_disp.noLocalizacao = data['roomName']  
         update_loc_disp.vlAndar = data['floor']
         update_loc_disp.vlArea = data['area']
+
+        #STATUS NOVO
+        update_loc_disp.stStatus = data['status']
         cmd.updateLocalizacaoDisp(int(id_loc), update_loc_disp)
         #print(update_loc_disp)
         return jsonify(success = True)
@@ -1057,70 +1244,16 @@ def locInfo():
         dict_loc_disp["roomName"] = i.noLocalizacao
         dict_loc_disp["floor"] = i.vlAndar
         dict_loc_disp["area"] = i.vlArea
+
+        #NOVO COMANDO STATUS
+        dict_loc_disp["status"] = i.stStatus
         dict_loc_disp["maxOccupation"] = int(i.vlArea/2)
         list_loc_disp.append(dict_loc_disp)
 
     info_loc_disp["locinfo"] = list_loc_disp
     return jsonify (info_loc_disp)
         
-    
 
-
-
-
-@app.route ('/registerPerm', methods = ['GET','POST'])
-def registerPerm():
-    if request.method == 'POST':
-
-        try:
-            data = request.get_json ()
-        except (KeyError, TypeError, ValueError):
-            resp = jsonify (success = False)
-            return answer (app, 204, resp)
-
-        list_perm = data['permissoes']
-        
-        for i in range(len(list_perm)):
-            hr_perm_ini = 0
-            hr_perm_fim = 0
-            perm_perm = 0
-            loc_perm = list_perm[i]["loc"]
-
-            loc_perm_no = cmd.selLocalizacaoDisp_no(loc_perm)
-
-            dict_loc_perm = loc_perm_no[0].getDict()
-            id_loc_perm = dict_loc_perm['idLocalizacaoDisp']
-            print(f'id_loc_perm:   {id_loc_perm}')
-            disp_loc = cmd.selDispLocalizacao(id_loc_perm)
-            print(f'disp_loc:  {disp_loc}')
-            dict_disp_loc = disp_loc[0].getDict()
-            id_disp_loc = dict_disp_loc['idDispLocalizacao']
-            try:
-                hr_perm_ini = list_perm[i]["hrini"]
-                hr_perm_fim = list_perm[i]["hrfim"]
-                perm_perm =list_perm[i]["perm"]
-                try:
-                    perm_horario = PermHorario(hrInicial = hr_perm_ini, hrFinal = hr_perm_fim, stPermanente = perm_perm)
-                    cmd.insertPermHorario(perm_horario, refresh = True)
-                    usu_disp = PermUsuDisp(idCadastro = 1, idPermissao = 1, idDispLocalizacao = id_disp_loc, idPermHorario = perm_horario.idPermHorario, stStatus = 'A')
-                    
-                except Exception as e:
-                    print(f'1 - {e}')
-                    return jsonify (success = False)
-            except:
-                print(f'Sem horário definido para a permissão número {i} do usuário.')
-                try:
-                    usu_disp = PermUsuDisp(idCadastro = 1, idPermissao = 1, idDispLocalizacao = id_disp_loc, stStatus = 'A')
-                    
-                except Exception as e:
-                    print(f'2 - {e}')
-                    return jsonify (success = False)
-            try:
-                cmd.insertPermUsuDisp(usu_disp)
-            except Exception as e:
-                    print(f'3 - {e}')
-                    return jsonify (success = False)
-        return jsonify (success = True)
 
 
 #---------------------------------#
@@ -1204,3 +1337,4 @@ def fuc_roominfo(app_id_sala):
 #-----------RODANDO------------#
 if __name__ == '__main__':
     socketio.run(app, host = '0.0.0.0', port=7000)
+
