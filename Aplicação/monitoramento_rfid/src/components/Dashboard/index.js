@@ -99,24 +99,24 @@ class Dashboard extends Component {
     /* this.checkCategory = this.checkCategory.bind(this); */
   }
 
-/*   async getOffice() {
-    await firebase.getAllOffices((allOffices) => {
-      allOffices.forEach((office) => {
-        if (office.val().nomeCargo === this.state.cargo) {
-          let list = {
-            key: office.key,
-            nomeCargo: office.val().nomeCargo,
-            permissoes: office.val().permissoes,
-            status: office.val().status
+  /*   async getOffice() {
+      await firebase.getAllOffices((allOffices) => {
+        allOffices.forEach((office) => {
+          if (office.val().nomeCargo === this.state.cargo) {
+            let list = {
+              key: office.key,
+              nomeCargo: office.val().nomeCargo,
+              permissoes: office.val().permissoes,
+              status: office.val().status
+            }
+            /* alert(JSON.stringify(list));
+            if (this.state.isMounted === true) {
+              this.setState({ loggedOffice: list });
+            }
           }
-          /* alert(JSON.stringify(list));
-          if (this.state.isMounted === true) {
-            this.setState({ loggedOffice: list });
-          }
-        }
-      })
-    });
-  } */
+        })
+      });
+    } */
 
   /*   checkCategory(categoryName) {
       let perm;
@@ -354,6 +354,10 @@ class Dashboard extends Component {
   };
 
   getSelectedPerson = async (personId) => {
+    if (utils.checkSpecificPermission("dados", this.state.loggedOffice.permissoes.dashboard) === false) {
+      alert("Você não possui permissão para visualizar os dados dos usuários!");
+      return null;
+    }
     if (this.state.cargo !== 'Auxiliar') {
       const { selectedRoom } = this.state;
       selectedRoom.ocupantes.map((ocupante) => {
