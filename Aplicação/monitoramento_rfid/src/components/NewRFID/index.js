@@ -37,7 +37,7 @@ class NewRFID extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      nome: localStorage.nome,
+      loggedName: localStorage.nome,
       cargo: localStorage.cargo,
       name: '', //Armazenará o nome do usuário logado, que virá do Firebase Auth
       RFIDCode: '', //Armazenará o código 
@@ -91,7 +91,7 @@ class NewRFID extends Component {
 
     await firebase.getUserName((info) => {
       localStorage.nome = info.val().nome;
-      this.setState({ nome: localStorage.nome });
+      this.setState({ loggedName: localStorage.nome });
     });
 
     await firebase.getUserPerfil((info) => {
@@ -327,7 +327,7 @@ class NewRFID extends Component {
             {/* <progress value={this.state.progress} max="100" /> */}
             <div className='inputs'>
               <TextField label='Nome Completo' variant='outlined' autoFocus style={{ background: '#FFF', borderRadius: 8, marginBottom: 10, width: '100%' }}
-                value={this.state.nome} onChange={(e) => this.setState({ name: e.target.value })} required
+                value={this.state.name} onChange={(e) => this.setState({ name: e.target.value })} required
               />
 
               <TextField label='Codigo RFID' variant='outlined' style={{ background: '#FFF', borderRadius: 8, width: '20%' }}
@@ -352,9 +352,11 @@ class NewRFID extends Component {
                   onChange={(e) => this.setState({ localization: e.target.value })}
                 >
                   {this.state.localizations.map((localization) => {
-                    return (
-                      <MenuItem key={localization.roomName} value={localization.roomName}>{localization.roomName}</MenuItem>
-                    );
+                    if (localization.status === "A") {
+                      return (
+                        <MenuItem key={localization.roomName} value={localization.roomName}>{localization.roomName}</MenuItem>
+                      );
+                    }
                   })}
                 </Select>
               </FormControl>

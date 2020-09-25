@@ -412,10 +412,6 @@ class Dashboard extends Component {
           <div className="rooms-list">
             <div style={{ display: "flex", flexDirection: "row" }}>
               <h2 className="sector-title">Setores</h2>
-              <div style={{ width: "50%", display: "flex", flexDirection: "row", justifyContent: "flex-end" }}>
-                <AutorenewIcon fontSize="small" style={{ color: "#FFF", }}></AutorenewIcon>
-                <p style={{ fontSize: 15, color: "#FFF", fontWeight: "bold" }}>{this.state.updateCounter.toString().padStart(2, '0')}s</p>
-              </div>
             </div>
             {rooms.length > 0 ? (
               rooms.map((room) => {

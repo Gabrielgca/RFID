@@ -104,7 +104,7 @@ class Devices extends Component {
                     this.setState({ nome: localStorage.nome });
                 }); */
 
-        //this.getDevices();
+        this.getDevices();
     }
 
     handleNameChange = (e) => {
@@ -241,6 +241,7 @@ class Devices extends Component {
     getDevices = async () => {
         await axios.get(baseURL + 'dispInfo')
             .then(response => {
+                console.log(response.data.dispinfo)
                 this.setState({ devices: response.data.dispinfo });
             })
             .catch(error => {
@@ -377,6 +378,7 @@ class Devices extends Component {
                                 >
                                     {this.state.localization.map((loc) => {
                                         return (
+                                            //Alterar para enviar id_loc em vez de roomName
                                             <MenuItem value={loc.roomName}>{loc.id_loc} - {loc.roomName} </MenuItem>
                                         )
                                     })}

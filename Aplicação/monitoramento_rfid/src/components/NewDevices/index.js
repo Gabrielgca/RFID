@@ -38,9 +38,9 @@ class NewDevices extends Component {
             localization: [],
             cad: [],
 
-            selectLocazation: {
+            selectLocalization: {
                 localization: '',
-                status: ''
+                status: 'A'
             },
             loggedOffice: {
                 key: '',
@@ -89,15 +89,15 @@ class NewDevices extends Component {
 
 
     localizationDevices = async (event) => {
-        let newLocalization = this.state.selectLocazation;
+        let newLocalization = this.state.selectLocalization;
         newLocalization.localization = event.target.value;
-        this.setState({ selectLocazation: newLocalization })
+        this.setState({ selectLocalization: newLocalization })
     }
 
     statusDevice = async (event) => {
-        let newStatus = this.state.selectLocazation;
+        let newStatus = this.state.selectLocalization;
         newStatus.status = event.target.value;
-        this.setState({ selectLocazation: newStatus })
+        this.setState({ selectLocalization: newStatus })
     }
 
     getStatusDevices = async () => {
@@ -113,6 +113,7 @@ class NewDevices extends Component {
     getLocalization = async () => {
         await axios.get(baseURL + 'locInfo')
             .then(response => {
+                console.log(response.data.locinfo)
                 this.setState({ localization: response.data.locinfo })
             })
             .catch(error => {
@@ -122,7 +123,7 @@ class NewDevices extends Component {
 
     getStatus = async (user) => {
         await this.setState({
-            selectLocazation: {
+            selectLocalization: {
                 status: user.status,
                 localization: user.loc
             }
@@ -131,19 +132,19 @@ class NewDevices extends Component {
 
     registerDevices = async (e) => {
         e.preventDefault();
-        if (this.state.selectLocazation.status !== '' &&
+        if (this.state.selectLocalization.status !== '' &&
             this.state.nomeDispositivo !== '') {
 
             const params = {
                 desc: this.state.nomeDispositivo,
-                status: this.state.selectLocazation.status,
-                loc: this.state.selectLocazation.localization
+                status: this.state.selectLocalization.status,
+                loc: this.state.selectLocalization.localization
 
             }
 
             await axios.post(baseURL + 'registerDisp', params)
                 .then(response => {
-                    alert("Usuário salvo com sucesso")
+                    alert("Dispositivo salvo com sucesso")
                     console.log(response);
 
                 })
@@ -189,14 +190,16 @@ class NewDevices extends Component {
                         <FormControl variant="outlined" style={{ marginBottom: 20 }}>
                             <InputLabel>Localização</InputLabel>
                             <Select
-                                value={this.state.selectLocazation.localization}
+                                value={this.state.selectLocalization.localization}
                                 onChange={this.localizationDevices}
                                 label="Localização"
                             >
                                 {this.state.localization.map((loc) => {
-                                    return (
-                                        <MenuItem value={loc.id_loc}>{loc.id_loc} - {loc.loc}</MenuItem>
-                                    )
+                                    if (loc.status === "A") {
+                                        return (
+                                            <MenuItem value={loc.id_loc}>{loc.id_loc} - {loc.roomName}</MenuItem>
+                                        )
+                                    }
                                 })}
                             </Select>
                         </FormControl>
@@ -209,7 +212,7 @@ class NewDevices extends Component {
                                 margin='dense'
                                 label='Status'
                                 type='text'
-                                value={this.state.selectLocazation.status}
+                                value={this.state.selectLocalization.status}
                                 onChange={this.statusDevice}
                             >
                                 <MenuItem value='A'>Ativo</MenuItem>

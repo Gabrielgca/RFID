@@ -22,6 +22,7 @@ class Home extends Component {
     // onde cada alteração, será enviada do servidor para a aplicação em tempo real
     socket.emit("rooms");
     socket.on("rooms_update", response => {
+      console.log(response);
       this.setState({ rooms: response.salas });
     });
   }
