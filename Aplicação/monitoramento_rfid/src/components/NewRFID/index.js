@@ -37,6 +37,8 @@ class NewRFID extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      nome: localStorage.nome,
+      cargo: localStorage.cargo,
       name: '', //Armazenará o nome do usuário logado, que virá do Firebase Auth
       RFIDCode: '', //Armazenará o código 
       imagem: null, //Armazenará a imagem que o usuário selecionou
@@ -87,6 +89,17 @@ class NewRFID extends Component {
       return null;
     }
 
+    await firebase.getUserName((info) => {
+      localStorage.nome = info.val().nome;
+      this.setState({ nome: localStorage.nome });
+    });
+
+    await firebase.getUserPerfil((info) => {
+      localStorage.cargo = info.val();
+      this.setState({ cargo: localStorage.cargo });
+      //console.log("Valor recebido: " + info.val());
+    });
+
     let result = await utils.getOffice(localStorage.cargo);
     if (this.state.isMounted === true) {
       this.setState({ loggedOffice: result });
@@ -94,6 +107,7 @@ class NewRFID extends Component {
 
     if (utils.checkSpecificPermission("Cadastrar", this.state.loggedOffice.permissoes.usuario) !== true) {
       /* alert("Você não possui permissão para acessar esta página!"); */
+      console.log(utils.checkCategory(this.state.loggedOffice.permissoes.usuario))
       this.props.history.replace('/dashboard');
       return null;
     }

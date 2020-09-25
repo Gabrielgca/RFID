@@ -600,7 +600,7 @@ class Offices extends Component {
                         </IconButton>
                     </Paper>
 
-                    <p>{JSON.stringify(this.state.permissions)}</p>
+                    {/* <p>{JSON.stringify(this.state.permissions)}</p> */}
 
                     <FlatList
                         list={this.state.filteredOffices.length > 0 ? this.state.filteredOffices : this.state.offices}

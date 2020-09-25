@@ -143,15 +143,43 @@ class Users extends Component {
             this.setState({ pageLoading: false });
         }
 
-        /* if (this.state.cargo === "Administrador" || this.state.cargo === "Gestor") {
-            alert("Acesso autorizado");
-        }
-        else {
-            this.props.history.replace("/dashboard");
-            return null;
-        } */
+        this.getUsers();
+        /* await firebase.getAllUsers((allUsers) => {
+            allUsers.forEach((oneUser) => {
+                //alert("Key: " + oneUser.key);
+                let list = {
+                    key: oneUser.key,
+                    nome: oneUser.val().nome,
+                    cargo: oneUser.val().cargo,
+                    status: oneUser.val().status
+                }
+                this.setState({ users: [...this.state.users, list] });
+            })
+        }); */
+    }
 
-        firebase.getAllUsers((allUsers) => {
+    async completeUsers() {
+        let newUsers = this.state.users.slice();
+        await this.state.users.forEach((user) => {
+            firebase.getSpecificUserPerfil(user.key, (cargo) => {
+                //console.log(cargo.val());
+                let list = {
+                    key: user.key,
+                    nome: user.nome,
+                    cargo: user.cargo,
+                    keyCargo: cargo.val(),
+                    status: user.status
+                }
+                newUsers.splice(this.state.users.indexOf(user), 1);
+                newUsers.push(list);
+                this.setState({ users: newUsers });
+            })
+        })
+    }
+
+    getUsers = async () => {
+        this.setState({ users: [] });
+        await firebase.getAllUsers((allUsers) => {
             allUsers.forEach((oneUser) => {
                 //alert("Key: " + oneUser.key);
                 let list = {
@@ -163,22 +191,7 @@ class Users extends Component {
                 this.setState({ users: [...this.state.users, list] });
             })
         });
-    }
-
-    getUsers = () => {
-        this.setState({ users: [] });
-        firebase.getAllUsers((allUsers) => {
-            allUsers.forEach((oneUser) => {
-                //alert("Key: " + oneUser.key);
-                let list = {
-                    key: oneUser.key,
-                    nome: oneUser.val().nome,
-                    cargo: oneUser.val().cargo,
-                    status: oneUser.val().status,
-                }
-                this.setState({ users: [...this.state.users, list] });
-            })
-        });
+        this.completeUsers();
     }
 
     handleDeactivateUserOpen = (user) => {
@@ -289,7 +302,7 @@ class Users extends Component {
                         renderItem={(item) => (
                             <div className={item.status === 'Ativo' ? "card" : "card-disabled"} key={item.key}>
                                 <p><b>Nome: </b>{item.nome}</p>
-                                <p><b>Cargo: </b>{item.cargo}</p>
+                                <p><b>Cargo: </b>{item.keyCargo}</p>
                                 <p><b>Status: </b>{item.status}</p>
                                 <div className="buttonsArea">
                                     {/* <button className="addButton" onClick={() => { this.handleClickOpen(item) }}>Editar</button> */}
@@ -298,7 +311,7 @@ class Users extends Component {
                                     </Button>
 
                                     {item.status === 'Ativo' ? (
-                                        <Button endIcon={<BlockIcon />} onClick={() => { this.handleDeactivateUserOpen(item) }} style={{ backgroundColor: 'red', color: '#FFF' }}>
+                                        <Button disabled={!utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.conta)} endIcon={<BlockIcon />} onClick={() => { this.handleDeactivateUserOpen(item) }} style={{ backgroundColor: 'red', color: '#FFF' }}>
                                             Desativar
                                         </Button>
                                     ) : (

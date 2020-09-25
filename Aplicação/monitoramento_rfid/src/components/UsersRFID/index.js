@@ -330,6 +330,7 @@ class UsersRFID extends Component {
                         <DialogContent>
                             <DialogContentText id="alert-dialog-description">
                                 <TextField
+                                    disabled={!utils.checkSpecificPermission("Editar", this.state.loggedOffice.permissoes.usuario)}
                                     autoFocus
                                     margin='dense'
                                     label='Nome'
@@ -345,6 +346,7 @@ class UsersRFID extends Component {
                                 </FormControl>
 
                                 <TextField
+                                    disabled={!utils.checkSpecificPermission("Editar", this.state.loggedOffice.permissoes.usuario)}
                                     autoFocus
                                     margin='dense'
                                     label='Função'
@@ -356,6 +358,7 @@ class UsersRFID extends Component {
                                 />
                                 <InputLabel className="selectLabel">Status</InputLabel>
                                 <Select
+                                    disabled={!utils.checkSpecificPermission("Remover", this.state.loggedOffice.permissoes.usuario)}
                                     value={this.state.selectedUser.status}
                                     onChange={this.handleStatusChange}
                                 >
