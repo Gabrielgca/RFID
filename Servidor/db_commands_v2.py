@@ -1,4 +1,5 @@
 from sqlalchemy.sql.functions import Function
+from sqlalchemy.orm.session import make_transient
 
 #Repositório contendo os comandos SQLAlchemy do sistema RFID.
 class RfidCommands():
@@ -335,6 +336,15 @@ class RfidCommands():
         Cartao = s.query(ct).filter(ct.idCartao.in_(idCartao)).scalar()
         return Cartao.noCartao
 
+    #Comando inserido em: 25/09/2020 14:51
+    #Por: Gabriel de Castro Araújo
+    def selPermUsuDisp (self,idCadastro):
+        pud = self.pud
+        s = self.db.session
+        if type(idCadastro) != list:
+            idCadastro = [idCadastro]
+        return s.query(pud).filter(pud.idCadastro.in_(idCadastro)).all()
+
     def selCountEntradas(self,idDispositivo=None,idCadastro=None):
         oc = self.oc
         s = self.db.session
@@ -514,14 +524,27 @@ class RfidCommands():
         return s.query(dp,ld).join(dl,dp.idDispositivo == dl.idDispositivo)\
                              .join(ld,dl.idLocalizacaoDisp == ld.idLocalizacaoDisp).scalar()
 
-    #COMANDO NOVO!
+    #Comando alterado em: 24/09/2020 14:57
+	#Por: Saulo Silveira Corrêa
     def selUltRotaCadastro(self,idCadastro):
         rt = self.rt
         s = self.db.session
         desc = self.db.desc
         return s.query(rt)\
                 .filter(rt.idCadastro == idCadastro)\
-                .order_by(desc(rt.idRota))\
+                .order_by(desc(rt.idRota), desc(self.mysql_func.timestamp(rt.dtRota,rt.hrRota)))\
+                .limit(1).scalar()
+
+    #Comando inserido em: 24/09/2020 15:33
+    #Por: Saulo Silveira Corrêa
+    def selUltOcupacaoDisp(self,idDispositivo):
+        dl = self.dl
+        ocp = self.ocp
+        desc = self.db.desc
+        return s.query(ocp)\
+                .join(dl,ocp.idDispLocalizacao == dl.idDispLocalizacao)\
+                .filter(dl.idDispositivo == idDispositivo)\
+                .order_by(desc(ocp.idOcupacao), desc(self.mysql_func.timestamp(ocp.dtOcupacao,ocp.hrOcupacao)))\
                 .limit(1).scalar()
 
     ###########################
@@ -626,6 +649,44 @@ class RfidCommands():
         s.commit()
         if refresh:
             s.refresh(permUsuDisp)
+    
+    #Comando alterado em: 24/09/2020 15:45
+    #Por: Saulo Silveira Corrêa	
+    def insertOcorrencia(self, ocorrencia, refresh=False, expunge=False, transient=False):
+        s = self.db.session
+        s.add(ocorrencia)
+        s.commit()
+        if refresh:
+            s.refresh(ocorrencia)
+        if expunge:
+            s.expunge(ocorrencia)
+        if transient:
+            make_transient(ocorrencia)
+
+    #Comando alterado em: 24/09/2020 16:12
+    def insertRota(self, rota, refresh=False, expunge=False, transient=False):
+        s = self.db.session
+        s.add(rota)
+        s.commit()
+        if refresh:
+            s.refresh(rota)
+        if expunge:
+            s.expunge(rota)
+        if transient:
+            make_transient(rota)
+
+    #Comando inserido em: 22/09/2020 17:03
+    #Por: Saulo Silveira Corrêa
+    def insertOcupacao(self, ocupacao, refresh=False, expunge=False, transient=False):
+        s = self.db.session
+        s.add(ocupacao)
+        s.commit()
+        if refresh:
+            s.refresh(ocupacao)
+        if expunge:
+            s.expunge(ocupacao)
+        if transient:
+            make_transient(ocupacao)
 
     ###########################
     # FIM DOS COMANDOS INSERT #
@@ -712,22 +773,6 @@ class RfidCommands():
         cadastroCartaoUpdt.stEstado = newStatus
         s.commit()
 
-    def updateCadastroCartao(self ,idCadastroCartao, newCadastroCartao):
-
-        
-        s = self.db.session
-        cdct = self.cdct
-        CadastroCartaoUpdt = s.query(cdct)\
-                               .filter(cdct.idCadastroCartao == idCadastroCartao)\
-                               .scalar()
-        s.add(CadastroCartaoUpdt)
-        newCadastroCartaoDict = newCadastroCartao.getDict()
-        for key in CadastroCartaoUpdt.getDict():
-            print(key)
-            if newLocalizacaoDispDict[key] is not None:
-                setattr(CadastroCartaoUpdt, key, newCadastroCartao[key])
- 
-        s.commit()
     
     #COMANDO NOVO!
     def updateStSituacaoDispLoc(self, idDispLocalizacao, newStatus):
@@ -738,6 +783,18 @@ class RfidCommands():
                                .scalar()
         s.add(dispLocalizacaoUpdt)
         dispLocalizacaoUpdt.stSituacao = newStatus
+        s.commit()
+    
+    #Comando inserido em: 25/09/2020 11:39
+    #Por: Gabriel de Castro Araújo
+    def updatestStatusPermUsuDisp(self, idPermUsuDisp, newStatus):
+        s = self.db.session
+        pud = self.pud
+        PermUsuDispUpdt = s.query(pud)\
+                                .filter(pud.idPermUsuDisp == idPermUsuDisp)\
+                                .scalar()
+        s.add(PermUsuDispUpdt)
+        PermUsuDispUpdt.stStatus = newStatus
         s.commit()
 
     ###########################
