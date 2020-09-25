@@ -270,7 +270,7 @@ class Dashboard extends Component {
       })
   } */
 
-/*   getRooms() {
+  getRooms() {
     //var ENDPOINT = "http://192.168.2.196:7000"; //ENDPOINT
     var socket = io.connect(ENDPOINT, {
       reconnection: true,
@@ -284,7 +284,7 @@ class Dashboard extends Component {
     socket.on("rooms_update", response => {
       this.setState({ rooms: response.salas });
     });
-  } */
+  }
 
   getRoomDetails = async (roomId) => {
     const params = {
