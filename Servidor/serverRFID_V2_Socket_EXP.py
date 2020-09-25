@@ -191,7 +191,7 @@ class Ocorrencia(db.Model):
         return self.dictionary
 
 
-#MAPEAMENTO NOVO!
+#MAPEAMENTO ATUALIZADO POR RENATO REIS DIA 25/09/2020
 class LocalizacaoDisp(db.Model):
     __tablename__ = 'tb_localizacao_disp' 
 
@@ -200,6 +200,7 @@ class LocalizacaoDisp(db.Model):
     noLocalizacao = db.Column('no_localizacao', db.String(40), nullable=False, comment='''Nome da localização do dispositivo''')  
     vlAndar = db.Column('vl_andar', db.Integer, nullable=True,default=None, comment='''Indicação do andar da localização''')
     vlArea = db.Column('vl_area', db.Integer, nullable=False, comment='''Tamanho em metros quadrados de localização''')
+    stAtivo = db.Column('st_ativo', db.String(1), nullable=False, default='A', comment='''Status ativo ou inativo da localização.''')
 
     dispositivos = db.relationship('DispLocalizacao', back_populates='localizacaoDisp')
 
@@ -209,7 +210,8 @@ class LocalizacaoDisp(db.Model):
     no_empresa='{}',
 	no_localizacao='{}',
 	vl_andar='{}',
-	vl_area='{}')>'''.format(self.idLocalizacaoDisp, self.noEmpresa,self.noLocalizacao, self.vlAndar, self.vlArea)
+	vl_area='{}'),
+    st_ativo='{}')>'''.format(self.idLocalizacaoDisp, self.noEmpresa,self.noLocalizacao, self.vlAndar, self.vlArea, self.stAtivo)
 
     def getDict(self):
         self.dictionary = {}
@@ -218,6 +220,7 @@ class LocalizacaoDisp(db.Model):
         self.dictionary['noLocalizacao'] = self.noLocalizacao
         self.dictionary['vlAndar'] = self.vlAndar
         self.dictionary['vlArea'] = self.vlArea
+        self.dictionary['stAtivo'] = self.stAtivo
         return self.dictionary
 
 #MAPEAMENTO NOVO!
