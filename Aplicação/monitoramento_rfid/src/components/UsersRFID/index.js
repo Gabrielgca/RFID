@@ -287,36 +287,71 @@ class UsersRFID extends Component {
                             <AddIcon style={{ color: 'green' }} />
                         </IconButton>
                     </Paper>
-                    <FlatList
-                        list={this.state.filterUsers.length > 0 ? this.state.filterUsers : this.state.people}
-                        renderItem={(item) => (
-                            <div className={item.status === "A" ? "users-rfid-card" : "users-rfid-card-disabled"}>
-                                <p><b>Nome:</b> {item.nome}</p>
-                                <p><b>Idade:</b> {item.idade}</p>
-                                <p><b>Cargo:</b> {item.cargo}</p>
-                                {item.status === 'A' ? (<p><b>Status:</b> Ativo</p>) : (<p></p>)}
-                                {item.status === 'I' ? (<p><b>Status:</b> Inativo</p>) : (<p></p>)}
-                                <p><b>RFID:</b> {item.RFID}</p>
-                                <div className="btnArea">
-                                    <Button endIcon={<EditIcon />} onClick={() => { this.modalOpen(item) }} style={{ backgroundColor: 'green', color: '#FFF', marginRight: 10 }}>Editar</Button>
+
+                    <div className="devices-list">
+                        <p className="resultado-pesquisa">Exibindo <b>{this.state.filterUsers.length > 0 ? this.state.filterUsers.length : this.state.people.length}</b> registros</p>
+                        <br></br>
+
+                        <FlatList
+                            list={this.state.filterUsers.length > 0 ? this.state.filterUsers : this.state.people}
+                            renderItem={(item) => (
+                                <div className="devices-item">
+                                    <div className={item.status === 'Ativo' ? "offices-item-info" : "offices-item-info-disabled"} key={item.key}>
+                                        <p><b>Nome:</b> {item.nome}</p>
+                                        <p><b>Idade:</b> {item.idade}</p>
+                                        <p><b>Cargo:</b> {item.cargo}</p>
+                                        {item.status === 'A' ? (<p><b>Status:</b> Ativo</p>) : (<p></p>)}
+                                        {item.status === 'I' ? (<p><b>Status:</b> Inativo</p>) : (<p></p>)}
+                                        <p><b>RFID:</b> {item.RFID}</p>
+                                    </div>
+
+                                    <div className="devices-options">
+                                        <Button
+                                            endIcon={<EditIcon />}
+                                            onClick={() => { this.modalOpen(item) }}
+                                            style={{ backgroundColor: 'green', color: '#FFF', width: '80%', height: '35%', marginBottom: '1%' }}
+                                        >
+                                            Editar
+                                        </Button>
+
+                                        {item.status === 'A' ? (
+                                            <Button
+                                                endIcon={<EditIcon />}
+                                                //onClick={() => { this.handleDeactiveDevice(item) }}
+                                                style={{ backgroundColor: 'red', color: '#FFF', width: '80%', height: '35%' }}
+                                            >
+                                                Desativar
+                                            </Button>
+                                        ) : (
+                                                <Button
+                                                    endIcon={<EditIcon />}
+                                                    //onClick={() => { this.handleReative(item) }}
+                                                    style={{ backgroundColor: 'blue', color: '#FFF', width: '80%', height: '35%' }}
+                                                >
+                                                    Reativar
+                                                </Button>
+                                            )
+                                        }
+                                    </div>
                                 </div>
-                            </div>
+                            )}
+                            /* sorchBy={['status', 'cargo', 'nome']} */
+                            renderWhenEmpty={() => (
+                                <div className="loader">
+                                    <Loader
+                                        type="Oval"
+                                        //color="#ffa200"
+                                        color="#FFF"
+                                        height={100}
+                                        width={100}
+                                    //timeout={3000} //3 secs
 
+                                    />
+                                </div>
+                            )}
+                        />
+                    </div>
 
-                        )}
-                        /* sorchBy={['status', 'cargo', 'nome']} */
-                        renderWhenEmpty={() => (
-                            <div className="div-loader">
-                                <Loader
-                                    type="Oval"
-                                    //color="#ffa200"
-                                    color="#FFF"
-                                    height={100}
-                                    width={100}
-                                //timeout={3000} //3 secs
-                                />
-                            </div>)}
-                    />
                     {/* Modal */}
                     <Dialog
                         fullWidth={true}

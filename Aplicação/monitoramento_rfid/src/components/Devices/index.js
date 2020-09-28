@@ -195,16 +195,10 @@ class Devices extends Component {
         })
     }
 
-
-    reativeUser = () => {
-        alert('Dispositivo reativado');
-        this.handleCloseReactivateDevice();
-        this.getUsers();
-    }
-
     handleCloseReactivateDevice = () => {
         this.setState({ modalReactivateOpen: false });
-        this.setState({ selectedDevice: { key: '', nameDevice: '', status: '' } })
+        this.setState({ selectedDevice: { key: '', nameDevice: '', status: '' } });
+        this.getDevices();
     }
 
     handleClearFilter = () => {
@@ -212,25 +206,24 @@ class Devices extends Component {
         this.setState({ filter: '' });
     }
 
-    handleDeactiveDevice = (user) => {
-        this.setState({ selectedDevice: { key: user.key, name: user.nameDevice, status: user.status } })
-        this.setState({ modalDeactivateOpen: true })
+    handleDeactiveDeviceOpen = (device) => {
+        this.setState({ selectedDevice: { key: device.id_disp, status: device.status } });
+        this.setState({ modalDeactivateOpen: true });
     }
 
-    handleCloseDeactiveUser = () => {
-        this.setState({ modalOpen: false });
-        this.setState({ selectedDevice: { key: '', nameDevice: '', status: '' } })
+    handleReactivateDeviceOpen = (device) => {
+        this.setState({ selectedDevice: { key: device.id_disp, status: device.status } });
+        this.setState({ modalReactivateOpen: true });
+    }
+
+    handleCloseDeactivateDevice = () => {
+        this.setState({ modalDeactivateOpen: false });
+        this.setState({ selectedDevice: { key: '', nameDevice: '', status: '' } });
     }
 
     handleReative = (user) => {
         this.setState({ selectedDevice: { key: user.key, nameDevice: user.nameDevice, status: user.status } })
         this.setState({ modalReactivateOpen: true })
-    }
-
-    deactiveUser = async (key) => {
-        alert('dispositivo desativado')
-        this.handleCloseDeactiveUser();
-        this.getUsers();
     }
 
     handleCloseDeactivate = () => {
@@ -260,8 +253,34 @@ class Devices extends Component {
             })
     }
 
+    changeDeviceStatus = async (dispKey, newStatusDisp) => {
+        if (newStatusDisp === "A") {
+            newStatusDisp = "I"
+        } else {
+            newStatusDisp = "A"
+        }
 
+        let params = {
+            id_disp: dispKey,
+            status: newStatusDisp
+        }
 
+        console.log(params);
+
+        axios.post(baseURL + "statusDisp", params)
+            .then(response => {
+                console.log("SUCESSO");
+                console.log(response.data);
+            })
+            .catch(error => {
+                console.log("ERRO")
+                console.log(error);
+            });
+
+        this.handleCloseReactivateDevice();
+        this.handleCloseDeactivateDevice();
+        this.getDevices();
+    }
 
     render() {
         if (this.state.pageLoading === true) {
@@ -316,7 +335,7 @@ class Devices extends Component {
                             list={this.state.filteredDevices.length > 0 ? this.state.filteredDevices : this.state.devices}
                             renderItem={(item) => (
                                 <div className="devices-item">
-                                    <div className={item.status === 'Ativo' ? "offices-item-info" : "offices-item-info-disabled"} key={item.key}>
+                                    <div className={item.status === 'A' ? "offices-item-info" : "offices-item-info-disabled"} key={item.key}>
                                         <p><b>ID:</b> {item.id_disp}</p>
                                         <p><b>Descrição do Dispositivo:</b> {item.desc}</p>
                                         <p><b>Localização do Dispositivo:</b> {item.no_loc}</p>
@@ -334,10 +353,10 @@ class Devices extends Component {
                                             Editar
                                         </Button>
 
-                                        {item.status == 'A' ? (
+                                        {item.status === 'A' ? (
                                             <Button
                                                 endIcon={<EditIcon />}
-                                                onClick={() => { this.handleDeactiveDevice(item) }}
+                                                onClick={() => { this.handleDeactiveDeviceOpen(item) }}
                                                 style={{ backgroundColor: 'red', color: '#FFF', width: '80%', height: '35%' }}
                                             >
                                                 Desativar
@@ -345,7 +364,7 @@ class Devices extends Component {
                                         ) : (
                                                 <Button
                                                     endIcon={<EditIcon />}
-                                                    onClick={() => { this.handleReative(item) }}
+                                                    onClick={() => { this.handleReactivateDeviceOpen(item) }}
                                                     style={{ backgroundColor: 'blue', color: '#FFF', width: '80%', height: '35%' }}
                                                 >
                                                     Reativar
@@ -435,31 +454,31 @@ class Devices extends Component {
 
 
                     {/* Desativar usuário */}
-                    <Dialog open={this.state.modalDeactivateOpen} onClose={this.handleDeactiveDevice} arial-label-title="form-dialog-title">
-                        <DialogTitle id='form-dialog-title'>Desetivar Usuário</DialogTitle>
+                    <Dialog open={this.state.modalDeactivateOpen} onClose={this.handleCloseDeactivateDevice} arial-label-title="form-dialog-title">
+                        <DialogTitle id='form-dialog-title'>Desativar Usuário RFID</DialogTitle>
                         <DialogContent>
                             <DialogContentText>
-                                Tem certeza que deseja desativar o usuário <b>{this.state.selectedDevice.nameDevice} </b>?
+                                Tem certeza que deseja desativar o dispositivo <b>{this.state.selectedDevice.nameDevice} </b>?
                     </DialogContentText>
                         </DialogContent>
 
 
                         <DialogActions>
-                            <Button onClick={() => { this.deactiveUser(this.state.selectedDevice.nameDevice) }} style={{ backgroundColor: 'green', color: '#FFF' }}>Sim</Button>
-                            <Button onClick={this.handleCloseDeactivate} style={{ backgroundColor: 'red', color: '#FFF' }}>Cancelar</Button>
+                            <Button onClick={() => { this.changeDeviceStatus(this.state.selectedDevice.key, this.state.selectedDevice.status) }} style={{ backgroundColor: 'green', color: '#FFF' }}>Sim</Button>
+                            <Button onClick={this.handleCloseDeactivateDevice} style={{ backgroundColor: 'red', color: '#FFF' }}>Cancelar</Button>
                         </DialogActions>
                     </Dialog>
 
                     {/* Reativar usuario */}
-                    <Dialog open={this.state.modalReactivateOpen} onClose={this.handleReative} arial-label-title='form-ialog-title'>
+                    <Dialog open={this.state.modalReactivateOpen} onClose={this.handleCloseReactivateDevice} arial-label-title='form-ialog-title'>
                         <DialogTitle>
                             Reativar Usuário
                     </DialogTitle>
                         <DialogContent>
-                            <DialogContentText>Deseja reativar usuário <b>{this.state.selectedDevice.nameDevice}</b>?</DialogContentText>
+                            <DialogContentText>Tem certeza que deseja reativar o dispositivo <b>{this.state.selectedDevice.nameDevice}</b>?</DialogContentText>
                         </DialogContent>
                         <DialogActions>
-                            <Button onClick={() => { this.reativeUser(this.state.selectedDevice.key) }} style={{ backgroundColor: 'green', color: '#FFF' }}>Sim</Button>
+                            <Button onClick={() => { this.changeDeviceStatus(this.state.selectedDevice.key, this.state.selectedDevice.status) }} style={{ backgroundColor: 'green', color: '#FFF' }}>Sim</Button>
                             <Button onClick={this.handleCloseReactivateDevice} style={{ backgroundColor: 'red', color: '#FFF' }}>Cancelar</Button>
                         </DialogActions>
                     </Dialog>

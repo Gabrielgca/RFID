@@ -581,7 +581,7 @@ class Offices extends Component {
                             value={this.state.filter}
                             style={{ paddingLeft: 20, width: 500 }}
                             onChange={(e) => this.setState({ filter: e.target.value })}
-                            placeholder="Pesquisa um cargo..."
+                            placeholder="Pesquisar cargos..."
                         />
                         <IconButton type="button" onClick={this.searchOffice}>
                             <SearchIcon />
@@ -606,10 +606,8 @@ class Offices extends Component {
                             renderItem={(item) => (
                                 <div className="offices-item">
                                     <div className={item.status === 'Ativo' ? "offices-item-info" : "offices-item-info-disabled"} key={item.key}>
-                                        <FormGroup row style={{ justifyContent: "space-between" }}>
-                                            <p><b>Cargo: </b>{item.nomeCargo}</p>
-                                            {/* <p>{JSON.stringify(item)}</p> */}
-                                        </FormGroup>
+                                        <p><b>Cargo: </b>{item.nomeCargo}</p>
+                                        {/* <p>{JSON.stringify(item)}</p> */}
                                     </div>
 
                                     <div className="offices-options">
