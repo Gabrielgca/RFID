@@ -218,7 +218,7 @@ class LocalizacaoDisp(db.Model):
     vl_area='{}',
     vl_qtde_lampadas='{}',
     vl_consumo_lamp='{}',
-    st_status='{}')>'''.format(self.idLocalizacaoDisp, self.noEmpresa, self.noLocalizacao, self.vlAndar, self.vlArea, self.vlQtdeLampadas, self.vlConsumoLamp, self.stStatus)
+st_status='{}')>'''.format(self.idLocalizacaoDisp, self.noEmpresa, self.noLocalizacao, self.vlAndar, self.vlArea, self.vlQtdeLampadas, self.vlConsumoLamp, self.stStatus)
 
     def getDict(self):
         self.dictionary = {}
@@ -530,6 +530,7 @@ def WiFIRFID ():
         ultOcorrencia = cmd.selUltOcorrenciaCadastro(cadastroCartao.idCadastro)
 
         disp_loc = cmd.selDispLocalizacaoByDisp (locDisp)
+        
         population = cmd.selCountPessoasSala (locDisp)
         loc_disp = cmd.selLocalizacaoDispByDisp (locDisp)
 
@@ -540,8 +541,8 @@ def WiFIRFID ():
         if population >= loc_disp.vlArea / 2:
             # ACCESS DENIED: number of people in this location can't go any higher
             return jsonify (success = False)
-
         perm_usu_disp = cmd.selAllPermCadastroLocal (cadastroCartao.idCadastro, disp_loc.idDispLocalizacao)
+
 
         if len (perm_usu_disp) <= 0:
             # ACCESS DENIED
@@ -1084,34 +1085,17 @@ def updateDisp():
             resp = jsonify (success = False)
             return answer (app, 204, resp)
         update_disp = Dispositivo()
-        noLoc = 0
+        idLoc = 0
         for key in data:
             if key == "id_disp": id_disp = data['id_disp']      
             if key == "disp": update_disp.noDispositivo = data['disp']   
-            if key == "status": update_disp.stAtivo = data['status']  
-            if key == "loc": noLoc = data['loc']
+            if key == "loc": idLoc = data['loc']
                 
         try:
             cmd.updateDispositivo(int(id_disp), update_disp)
 
-            if update_disp.stAtivo == "I" and len(cmd.selDispLocalizacao_disp(id_disp)) != 0:
-                update_disp_loc = DispLocalizacao()
-                
-                old_disp_loc = cmd.selDispLocalizacao_disp(id_disp)
-
-                for i in range(len(old_disp_loc)):
-                    dict_old_disp_loc = old_disp_loc[i].getDict()
-                    old_id_disp_loc = dict_old_disp_loc['idDispLocalizacao']
-
-                    cmd.updateStSituacaoDispLoc(old_id_disp_loc, update_disp.stAtivo)
-            
-            if noLoc != 0:
+            if idLoc != 0:
                     old_disp_loc = cmd.selDispLocalizacao_disp(id_disp)
-
-                    new_loc_disp = cmd.selLocalizacaoDisp_no(noLoc)
-
-                    dict_new_loc_disp = new_loc_disp[0].getDict()
-                    new_id_loc_disp = dict_new_loc_disp['idLocalizacaoDisp']
 
                     #print(f'AQUIIIIIII     {cmd.selDispLocalizacao_disp_loc(id_disp, new_id_loc_disp)}')
                     
@@ -1123,22 +1107,17 @@ def updateDisp():
 
                             cmd.updateStSituacaoDispLoc(old_id_disp_loc, "I")
                     #VERIFICA SE JÁ EXISTE UMA CONEXÃO COM A LOCALIZAÇÃO ENVIADA
-                    if len(cmd.selDispLocalizacao_disp_loc(id_disp, new_id_loc_disp)) != 0:
-                        update_disp_loc = cmd.selDispLocalizacao_disp_loc(id_disp, new_id_loc_disp)
-                        dict_update_disp_loc = update_disp_loc[0].getDict()
+                    if len(cmd.selDispLocalizacao_disp_loc(id_disp, idLoc)) != 0:
+                        update_disp_loc = cmd.selDispLocalizacao_disp_loc(id_disp, idLoc)
+                        dict_update_disp_loc = update_disp_loc[-1].getDict()
 
                         update_id_disp_loc = dict_update_disp_loc['idDispLocalizacao']
 
                         cmd.updateStSituacaoDispLoc(update_id_disp_loc, "A")
                     #CASO NÃO HAJA UMA CONEXÃO, FARÁ UMA
                     else :
-                        new_loc_disp = cmd.selLocalizacaoDisp_no(noLoc)
-
-                        dict_new_loc_disp = new_loc_disp[0].getDict()
-                        new_id_loc_disp = dict_new_loc_disp['idLocalizacaoDisp']
-                        
-                        
-                        dispLoca = DispLocalizacao(idDispositivo = id_disp, idLocalizacaoDisp = new_id_loc_disp, stSituacao = "A")  
+           
+                        dispLoca = DispLocalizacao(idDispositivo = id_disp, idLocalizacaoDisp = idLoc, stSituacao = "A")  
                         cmd.insertDispLocalizacao(dispLoca)
 
             return jsonify(success = True)
@@ -1146,7 +1125,39 @@ def updateDisp():
             print (f'updatedisp 1 - {e}')
             return jsonify(success = False)
 
+@app.route ('/statusDisp', methods = ['GET','POST'])
+def statusDisp():
+    #ROTA APENAS PARA ATUALIZAR O STATUS DO DISPOSITIVO
 
+    if request.method == 'POST':
+        global old_id_disp_loc, id_disp
+        try:
+            data = request.get_json ()
+        except (KeyError, TypeError, ValueError):
+            resp = jsonify (success = False)
+            return answer (app, 204, resp)
+        update_disp = Dispositivo()
+        id_disp = 0
+        for key in data:
+            if key == "id_disp": id_disp = data['id_disp']      
+            if key == "status": update_disp.stAtivo = data['status']  
+        #try:
+        cmd.updateDispositivo(int(id_disp), update_disp)
+
+        if len(cmd.selDispLocalizacao_disp(int(id_disp), alldisploc = True)) != 0:
+            
+            old_disp_loc = cmd.selDispLocalizacao_disp(int(id_disp), alldisploc = True)
+
+            dict_old_disp_loc = old_disp_loc[-1].getDict()
+            old_id_disp_loc = dict_old_disp_loc['idDispLocalizacao']
+
+            cmd.updateStSituacaoDispLoc(old_id_disp_loc, update_disp.stAtivo)
+
+        return jsonify(success = True)
+        #except Exception as e:
+           # print(e)
+           # return jsonify(success = False)
+    
 
 @app.route ('/dispInfo', methods = ['GET','POST'])
 def dispInfo():
@@ -1237,10 +1248,12 @@ def updateLoc():
         update_loc_disp.vlArea = data['area']
 
         #STATUS NOVO
-        update_loc_disp.stStatus = data['status']
-        cmd.updateLocalizacaoDisp(int(id_loc), update_loc_disp)
-        #print(update_loc_disp)
-        return jsonify(success = True)
+        try:
+            update_loc_disp.stStatus = data['status']
+        finally:
+            cmd.updateLocalizacaoDisp(int(id_loc), update_loc_disp)
+            #print(update_loc_disp)
+            return jsonify(success = True)
 
 
 @app.route ('/locInfo', methods = ['GET','POST'])
@@ -1287,7 +1300,10 @@ def findrooms():
         full_dict_disp = i.getDict()
         dict_disp = {}
         dict_disp['idSala'] = full_dict_disp['idDispositivo']
-        dict_disp['nomeSala'] = full_dict_disp['noDispositivo']
+        #SELECIONA A SALA QUE O DISPOSITIVO ESTÁ RELACIONADO
+        loc_disp = cmd.selLocalizacaoDispByDisp(full_dict_disp['idDispositivo'])
+        no_loc_disp = loc_disp.noLocalizacao
+        dict_disp['nomeSala'] = no_loc_disp
         dict_disp["qtdOcupantes"] = cmd.selCountPessoasSala(i.idDispositivo)
         dispositivo.append(dict_disp)
   
