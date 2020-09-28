@@ -37,7 +37,7 @@ class Devices extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            filterDevice: [],
+            filteredDevices: [],
             filter: '',
             nome: localStorage.nomeDevice,
             modalDeactivateOpen: false,
@@ -177,7 +177,7 @@ class Devices extends Component {
     }
 
     searchDevice = () => {
-        this.state.filterDevice = [];
+        this.state.filteredDevices = [];
         this.state.devices.forEach((user) => {
 
             if (user.nameDevice.toUpperCase().includes(this.state.filter.toUpperCase()) || user.nameDevice.toUpperCase() == this.state.filter.toUpperCase()) {
@@ -188,9 +188,9 @@ class Devices extends Component {
                     status: user.status
                 }
 
-                let array = this.state.filterDevice;
+                let array = this.state.filteredDevices;
                 array.push(list)
-                this.setState({ filterDevice: array })
+                this.setState({ filteredDevices: array })
             }
         })
     }
@@ -208,7 +208,7 @@ class Devices extends Component {
     }
 
     handleClearFilter = () => {
-        this.setState({ filterDevice: [] });
+        this.setState({ filteredDevices: [] });
         this.setState({ filter: '' });
     }
 
@@ -281,71 +281,96 @@ class Devices extends Component {
         }
         else {
             return (
-                <div id="area">
+                <div className="container">
                     <header id="new">
                         {/* <Link to="/dashboard">Voltar</Link> */}
                         <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.push('/dashboard') }}>
                             Voltar
-                    </Button>
+                        </Button>
                     </header>
-                    <h1>Dispositivos Cadastrados</h1>
-                    <div className="pesquisa">
-                        <Paper style={{ marginTop: 50 }}>
-                            <InputBase
-                                value={this.state.filter}
-                                style={{ paddingLeft: 20, width: 500 }}
-                                onChange={(e) => this.setState({ filter: e.target.value })}
-                                placeholder="Faça uma pesquisa..."
-                            />
-                            <IconButton type="button" onClick={this.searchDevice}>
-                                <SearchIcon />
-                            </IconButton>
+                    <h1 style={{ color: '#FFF' }}>Controle de Dispositivos</h1>
+                    <Paper style={{ marginTop: 50, marginBottom: 10 }}>
+                        <InputBase
+                            value={this.state.filter}
+                            style={{ paddingLeft: 20, width: 500 }}
+                            onChange={(e) => this.setState({ filter: e.target.value })}
+                            placeholder="Pesquisar dispositivos..."
+                        />
+                        <IconButton type="button" onClick={this.searchDevice}>
+                            <SearchIcon />
+                        </IconButton>
 
-                            <IconButton type="button" onClick={this.handleClearFilter}>
-                                <ClearIcon />
-                            </IconButton>
+                        <IconButton type="button" onClick={this.handleClearFilter}>
+                            <ClearIcon />
+                        </IconButton>
 
-                            <IconButton type="button" onClick={() => { this.props.history.push("/devices/new") }}>
-                                <AddIcon style={{ color: 'green' }} />
-                            </IconButton>
-                        </Paper>
-                    </div>
-                    <FlatList
-                        list={this.state.filterDevice.length > 0 ? this.state.filterDevice : this.state.devices}
-                        renderItem={(item) => (
-                            <div className="room-list">
-                                <div className={item.status === "A" ? "card" : "card-disabled"}>
-                                    <p><b>ID:</b> {item.id_disp}</p>
-                                    <p><b>Descrição do Dispositivo:</b> {item.desc}</p>
-                                    <p><b>Localização do Dispositivo:</b> {item.no_loc}</p>
-                                    {item.status === 'A' ? (<p><b>Status:</b> Ativo</p>) : (<p></p>)}
-                                    {item.status === 'I' ? (<p><b>Status:</b> Inativo</p>) : (<p></p>)}
-                                    <div className="btnArea">
-                                        <Button endIcon={<EditIcon />} onClick={() => { this.modalOpen(item) }} style={{ backgroundColor: 'green', color: '#FFF', marginRight: 10 }}>Editar</Button>
+                        <IconButton type="button" onClick={() => { this.props.history.push("/devices/new") }}>
+                            <AddIcon style={{ color: 'green' }} />
+                        </IconButton>
+                    </Paper>
+
+                    <div className="devices-list">
+                        <p className="resultado-pesquisa">Exibindo <b>{this.state.filteredDevices.length > 0 ? this.state.filteredDevices.length : this.state.devices.length}</b> registros</p>
+                        <br></br>
+                        <FlatList
+                            list={this.state.filteredDevices.length > 0 ? this.state.filteredDevices : this.state.devices}
+                            renderItem={(item) => (
+                                <div className="devices-item">
+                                    <div className={item.status === 'Ativo' ? "offices-item-info" : "offices-item-info-disabled"} key={item.key}>
+                                        <p><b>ID:</b> {item.id_disp}</p>
+                                        <p><b>Descrição do Dispositivo:</b> {item.desc}</p>
+                                        <p><b>Localização do Dispositivo:</b> {item.no_loc}</p>
+                                        {item.status === 'A' ? (<p><b>Status:</b> Ativo</p>) : (<p></p>)}
+                                        {item.status === 'I' ? (<p><b>Status:</b> Inativo</p>) : (<p></p>)}
+                                        {/* <p>{JSON.stringify(item)}</p> */}
+                                    </div>
+
+                                    <div className="devices-options">
+                                        <Button
+                                            endIcon={<EditIcon />}
+                                            onClick={() => { this.modalOpen(item) }}
+                                            style={{ backgroundColor: 'green', color: '#FFF', width: '80%', height: '35%', marginBottom: '1%' }}
+                                        >
+                                            Editar
+                                        </Button>
+
                                         {item.status == 'A' ? (
-                                            <Button endIcon={<EditIcon />} onClick={() => { this.handleDeactiveDevice(item) }} style={{ backgroundColor: 'red', color: '#FFF' }}>Desativar</Button>
+                                            <Button
+                                                endIcon={<EditIcon />}
+                                                onClick={() => { this.handleDeactiveDevice(item) }}
+                                                style={{ backgroundColor: 'red', color: '#FFF', width: '80%', height: '35%' }}
+                                            >
+                                                Desativar
+                                            </Button>
                                         ) : (
-                                                <Button endIcon={<EditIcon />} onClick={() => { this.handleReative(item) }} style={{ backgroundColor: 'blue', color: '#FFF' }}>Reativar</Button>
+                                                <Button
+                                                    endIcon={<EditIcon />}
+                                                    onClick={() => { this.handleReative(item) }}
+                                                    style={{ backgroundColor: 'blue', color: '#FFF', width: '80%', height: '35%' }}
+                                                >
+                                                    Reativar
+                                                </Button>
                                             )
                                         }
                                     </div>
                                 </div>
-                            </div>
+                            )}
+                            renderWhenEmpty={() => (
+                                <div className="loader">
+                                    <Loader
+                                        type="Oval"
+                                        //color="#ffa200"
+                                        color="#FFF"
+                                        height={100}
+                                        width={100}
+                                    //timeout={3000} //3 secs
 
-                        )}
-                        renderWhenEmpty={() => (
-                            <div className="div-loader">
-                                <Loader
-                                    type="Oval"
-                                    //color="#ffa200"
-                                    color="#FFF"
-                                    height={100}
-                                    width={100}
-                                //timeout={3000} //3 secs
+                                    />
+                                </div>
+                            )}
+                        />
+                    </div>
 
-                                />
-                            </div>)}
-                    />
                     {/* Modal */}
                     <Dialog
                         fullWidth={true}
