@@ -90,6 +90,21 @@ class Firebase {
     await app.database().ref('cargos').child(officeKey).child('nomeCargo').once('value').then(callback);
   }
 
+  async getSpecificUserPerfil(userID, callback) {
+    if (!app.auth().currentUser) {
+      return null;
+    }
+    else {
+      var officeKey;
+      await app.database().ref('usuarios').child(userID).once('value', (snapshot) => {
+        //console.log(snapshot.val().cargo);
+        officeKey = snapshot.val().cargo;
+      });
+    }
+
+    await app.database().ref('cargos').child(officeKey).child('nomeCargo').once('value').then(callback);
+  }
+
   async getAllUsers(callback) {
     if (!app.auth().currentUser) {
       return null;
@@ -170,12 +185,12 @@ class Firebase {
     });
   }
 
-  async getOfficePermissions(callback) {
+  async getOfficePermissions(category, callback) {
     var officeKey;
     this.getUserName(async (info) => {
       //console.log(info.val().cargo);
       officeKey = info.val().cargo;
-      await app.database().ref('cargos').child(officeKey).child('permissoes').once('value').then(callback);
+      await app.database().ref('cargos').child(officeKey).child('permissoes').child(category).once('value').then(callback);
     });
     //await app.database().ref('cargos').child(officeKey).child('permissoes').once('value').then(callback);
   }
@@ -185,7 +200,7 @@ class Firebase {
     await app.database().ref('usuarios').once('value', async (snapshot) => {
       //console.log(JSON.stringify(snapshot));
       snapshot.forEach((childItem) => {
-        if (childItem.val().cargo === officeName) {
+        if (childItem.val().cargo === officeKey) {
           find = 1;
         }
       })
@@ -198,7 +213,7 @@ class Firebase {
       await app.database().ref('cargos').child(officeKey).update({
         status: 'Inativo'
       });
-      return "Usuário desabilitado com sucesso!";
+      return "Cargo desabilitado com sucesso!";
     }
   }
 
