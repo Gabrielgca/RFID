@@ -87,8 +87,8 @@ class Offices extends Component {
         this.handleClearFilter = this.handleClearFilter.bind(this);
         this.handleUpdate = this.handleUpdate.bind(this);
         this.handleUpdateOffice = this.handleUpdateOffice.bind(this);
-        this.handleDeactivateUserOpen = this.handleDeactivateUserOpen.bind(this);
-        this.handleReactivateUser = this.handleReactivateUser.bind(this);
+        this.handleDeactivateOfficeOpen = this.handleDeactivateOfficeOpen.bind(this);
+        this.handleReactivateOfficeOpen = this.handleReactivateOfficeOpen.bind(this);
         this.handlePermissionChange = this.handlePermissionChange.bind(this);
     }
 
@@ -175,7 +175,7 @@ class Offices extends Component {
 
     handleCloseDeactivate = () => {
         this.setState({ modalDeactivateOpen: false });
-        this.setState({ selectedOffice: { key: '', nomeCargo: '', status: 'Ativo' } });
+        this.setState({ selectedOffice: { key: '', nomeCargo: '', status: 'Ativo', permissoes: {} } });
     }
 
     handleClearFilter = () => {
@@ -312,18 +312,18 @@ class Offices extends Component {
         });
     }
 
-    handleDeactivateUserOpen = (office) => {
-        this.setState({ selectedOffice: { key: office.key, cargo: office.cargo, nome: office.nome, status: office.status, permissoes: {} } });
+    handleDeactivateOfficeOpen = (office) => {
+        this.setState({ selectedOffice: { key: office.key, cargo: office.cargo, nome: office.nomeCargo, status: office.status, permissoes: {} } });
         this.setState({ modalDeactivateOpen: true });
     }
 
     handleCloseReactivate = () => {
         this.setState({ modalReactivateOpen: false });
-        this.setState({ selectedOffice: { key: '', cargo: '', nome: '', status: '' } });
+        this.setState({ selectedOffice: { key: '', nomeCargo: '', status: 'Ativo', permissoes: {} } });
     }
 
-    handleReactivateUser = (office) => {
-        this.setState({ selectedOffice: { key: office.key, cargo: office.cargo, nome: office.nome, status: office.status, permissoes: {} } });
+    handleReactivateOfficeOpen = (office) => {
+        this.setState({ selectedOffice: { key: office.key, cargo: office.cargo, nome: office.nomeCargo, status: office.status, permissoes: office.permissoes } });
         this.setState({ modalReactivateOpen: true });
     }
 
@@ -431,23 +431,19 @@ class Offices extends Component {
         return newPermissions;
     }
 
-    deactivateUser = async (key) => {
-        if (key !== firebase.getCurrentUid()) {
-            //alert("Pode excluir\nKey: " + key + "\nLoggedKey: " + firebase.getCurrentUid());
-            await firebase.deactivateUser(key);
-            alert("Usuário deletado com sucesso!");
-            this.handleCloseDeactivate();
-            this.getUsers();
-        }
-        else {
-            alert("Desculpe, você não pode excluir o seu próprio usuário!");
-            this.handleCloseDeactivate();
-        }
+    deactivateOffice = async (key) => {
+        firebase.disableOffice(this.state.selectedOffice.nome, key)
+            .then((response) => {
+                alert(response);
+            });
+        this.getOffices();
+        this.handleCloseDeactivate();
     }
 
-    reactivateUser = async (key) => {
-        await firebase.reactivateUser(key);
-        alert("Usuário reativado com sucesso!");
+    reactivateOffice = async (key) => {
+        firebase.enableOffice(key); this.getOffices()
+        /* await firebase.reactivateUser(key); */
+        alert("Cargo reativado com sucesso!");
         this.handleCloseReactivate();
         this.getUsers();
     }
@@ -580,7 +576,7 @@ class Offices extends Component {
                         </Button>
                     </header>
                     <h1 style={{ color: '#FFF' }}>Controle de Cargos</h1>
-                    <Paper style={{ marginTop: 50 }}>
+                    <Paper style={{ marginTop: 50, marginBottom: 10 }}>
                         <InputBase
                             value={this.state.filter}
                             style={{ paddingLeft: 20, width: 500 }}
@@ -602,36 +598,67 @@ class Offices extends Component {
 
                     {/* <p>{JSON.stringify(this.state.permissions)}</p> */}
 
-                    <FlatList
-                        list={this.state.filteredOffices.length > 0 ? this.state.filteredOffices : this.state.offices}
-                        renderItem={(item) => (
-                            <div className={item.status === 'Ativo' ? "card" : "card-disabled"} key={item.key}>
-                                <FormGroup row style={{ justifyContent: "space-between" }}>
-                                    <p><b>Cargo: </b>{item.nomeCargo}</p>
-                                    {/* <p>{JSON.stringify(item)}</p> */}
-                                    <FormGroup row>
-                                        <Button endIcon={<DescriptionIcon />} onClick={() => { this.handleClickOpen(item) }} style={{ backgroundColor: 'green', zIndex: 3, color: '#FFF', marginRight: 10, width: 150 }}>
+                    <div className="offices-list">
+                        <p className="resultado-pesquisa">Exibindo <b>{this.state.filteredOffices.length > 0 ? this.state.filteredOffices.length : this.state.offices.length}</b> registros</p>
+                        <br></br>
+                        <FlatList
+                            list={this.state.filteredOffices.length > 0 ? this.state.filteredOffices : this.state.offices}
+                            renderItem={(item) => (
+                                <div className="offices-item">
+                                    <div className={item.status === 'Ativo' ? "offices-item-info" : "offices-item-info-disabled"} key={item.key}>
+                                        <FormGroup row style={{ justifyContent: "space-between" }}>
+                                            <p><b>Cargo: </b>{item.nomeCargo}</p>
+                                            {/* <p>{JSON.stringify(item)}</p> */}
+                                        </FormGroup>
+                                    </div>
+
+                                    <div className="offices-options">
+                                        <Button
+                                            endIcon={<DescriptionIcon />}
+                                            onClick={() => { this.handleClickOpen(item) }}
+                                            style={{ backgroundColor: 'green', color: '#FFF', width: '80%', height: '35%', marginBottom: '1%' }}
+                                        >
                                             Detalhes
-                                        </Button>
+                                            </Button>
 
                                         {item.status === 'Ativo' ? (
-                                            <Button endIcon={<BlockIcon />} onClick={() => { firebase.disableOffice(item.nomeCargo, item.key).then((response) => { alert(response) }); this.getOffices() }} style={{ backgroundColor: 'red', color: '#FFF', marginRight: 10, width: 150 }}>
+                                            <Button
+                                                endIcon={<BlockIcon />}
+                                                onClick={() => { this.handleDeactivateOfficeOpen(item) }}
+                                                style={{ backgroundColor: 'red', color: '#FFF', width: '80%', height: '35%', }}
+                                            >
                                                 Desativar
                                             </Button>
                                         ) : (
-                                                <Button endIcon={<CheckCircleOutlineIcon />} onClick={() => { firebase.enableOffice(item.key); this.getOffices() }} style={{ backgroundColor: 'blue', color: '#FFF', marginRight: 10, width: 150 }}>
+                                                <Button
+                                                    endIcon={<CheckCircleOutlineIcon />}
+                                                    onClick={() => { this.handleReactivateOfficeOpen(item) }}
+                                                    style={{ backgroundColor: 'blue', color: '#FFF', width: '80%', height: '35%', }}
+                                                >
                                                     Reativar
                                                 </Button>
                                             )}
-                                    </FormGroup>
-                                </FormGroup>
-                            </div>
-                        )}
-                        renderWhenEmpty={() => <div>Carregando...</div>}
-                        //sortBy={["item.cargo", { key: "lastName", descending: true }]}
-                        sortBy={["status", "nomeCargo"]}
-                    //groupBy={person => person.info.age > 18 ? 'Over 18' : 'Under 18'}
-                    />
+                                    </div>
+                                </div>
+                            )}
+                            renderWhenEmpty={() => (
+                                <div className="loader">
+                                    <Loader
+                                        type="Oval"
+                                        //color="#ffa200"
+                                        color="#FFF"
+                                        height={100}
+                                        width={100}
+                                    //timeout={3000} //3 secs
+
+                                    />
+                                </div>
+                            )}
+                            //sortBy={["item.cargo", { key: "lastName", descending: true }]}
+                            sortBy={["status", "nomeCargo"]}
+                        //groupBy={person => person.info.age > 18 ? 'Over 18' : 'Under 18'}
+                        />
+                    </div>
 
                     {/* Modal para edição dos dados da conta selecionada */}
                     <Dialog open={this.state.modalOpen} onClose={this.handleClose} aria-labelledby="form-dialog-title">
@@ -774,9 +801,9 @@ class Offices extends Component {
                         </DialogActions>
                     </Dialog>
 
-                    {/* Modal para confirmação de operação de desativação do usuário */}
+                    {/* Modal para confirmação de operação de desativação do cargo */}
                     <Dialog open={this.state.modalDeactivateOpen} onClose={this.handleCloseDeactivate} aria-labelledby="form-dialog-title">
-                        <DialogTitle id="form-dialog-title">Editar Usuário</DialogTitle>
+                        <DialogTitle id="form-dialog-title">Editar Cargo</DialogTitle>
                         <DialogContent>
                             <DialogContentText>
                                 Tem certeza de que deseja desativar o <b> {this.state.selectedOffice.cargo} {this.state.selectedOffice.nome} </b> ?
@@ -785,7 +812,7 @@ class Offices extends Component {
 
                         </DialogContent>
                         <DialogActions>
-                            <Button onClick={() => { this.deactivateUser(this.state.selectedOffice.key) }} style={{ backgroundColor: 'green', color: '#FFF' }}>
+                            <Button onClick={() => { this.deactivateOffice(this.state.selectedOffice.key) }} style={{ backgroundColor: 'green', color: '#FFF' }}>
                                 Sim
                             </Button>
                             <Button onClick={this.handleCloseDeactivate} style={{ backgroundColor: 'red', color: '#FFF' }}>
@@ -794,18 +821,18 @@ class Offices extends Component {
                         </DialogActions>
                     </Dialog>
 
-                    {/* Modal para confirmação de operação de reativação do usuário */}
-                    <Dialog open={this.state.modalReactivateOpen} onClose={this.handleCloseDeactivate} aria-labelledby="form-dialog-title">
-                        <DialogTitle id="form-dialog-title">Reativar Usuário</DialogTitle>
+                    {/* Modal para confirmação de operação de reativação do cargo */}
+                    <Dialog open={this.state.modalReactivateOpen} onClose={this.handleCloseReactivate} aria-labelledby="form-dialog-title">
+                        <DialogTitle id="form-dialog-title">Reativar Cargo</DialogTitle>
                         <DialogContent>
                             <DialogContentText>
-                                Tem certeza de que deseja reativar o <b> {this.state.selectedOffice.cargo} {this.state.selectedOffice.nome} </b> ?
+                                Tem certeza de que deseja reativar o cargo <b>{this.state.selectedOffice.nome}</b> ?
                             </DialogContentText>
 
 
                         </DialogContent>
                         <DialogActions>
-                            <Button onClick={() => { this.reactivateUser(this.state.selectedOffice.key) }} style={{ backgroundColor: 'green', color: '#FFF' }}>
+                            <Button onClick={() => { this.reactivateOffice(this.state.selectedOffice.key) }} style={{ backgroundColor: 'green', color: '#FFF' }}>
                                 Sim
                             </Button>
                             <Button onClick={this.handleCloseReactivate} style={{ backgroundColor: 'red', color: '#FFF' }}>

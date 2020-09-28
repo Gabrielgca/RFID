@@ -167,7 +167,7 @@ class Users extends Component {
                     key: user.key,
                     nome: user.nome,
                     cargo: user.cargo,
-                    keyCargo: cargo.val(),
+                    nomeCargo: cargo.val(),
                     status: user.status
                 }
                 newUsers.splice(this.state.users.indexOf(user), 1);
@@ -277,7 +277,7 @@ class Users extends Component {
                         </Button>
                     </header>
                     <h1 style={{ color: '#FFF' }}>Usuários de Conta</h1>
-                    <Paper style={{ marginTop: 50 }}>
+                    <Paper style={{ marginTop: 50, marginBottom: 10 }}>
                         <InputBase
                             value={this.state.filter}
                             style={{ paddingLeft: 20, width: 500 }}
@@ -297,38 +297,70 @@ class Users extends Component {
                         </IconButton>
                     </Paper>
 
-                    <FlatList
-                        list={this.state.filteredUsers.length > 0 ? this.state.filteredUsers : this.state.users}
-                        renderItem={(item) => (
-                            <div className={item.status === 'Ativo' ? "card" : "card-disabled"} key={item.key}>
-                                <p><b>Nome: </b>{item.nome}</p>
-                                <p><b>Cargo: </b>{item.keyCargo}</p>
-                                <p><b>Status: </b>{item.status}</p>
-                                <div className="buttonsArea">
-                                    {/* <button className="addButton" onClick={() => { this.handleClickOpen(item) }}>Editar</button> */}
-                                    <Button endIcon={<EditIcon />} onClick={() => { this.handleClickOpen(item) }} style={{ backgroundColor: 'green', color: '#FFF', marginRight: 10 }}>
-                                        Editar
+                    <div className="users-list">
+                        <p className="resultado-pesquisa">Exibindo <b>{this.state.filteredUsers.length > 0 ? this.state.filteredUsers.length : this.state.users.length}</b> registros</p>
+                        <br></br>
+                        <FlatList
+                            list={this.state.filteredUsers.length > 0 ? this.state.filteredUsers : this.state.users}
+                            renderItem={(item) => (
+                                <div className="user-details" key={item.key}>
+                                    <div className={item.status === 'Ativo' ? "user-account-info" : "user-account-info-disabled"}>
+                                        <p><b>Nome: </b> {item.nome}</p>
+                                        <p><b>Cargo: </b>{item.nomeCargo}</p>
+                                        <p><b>Status: </b>{item.status}</p>
+                                    </div>
+
+                                    <div className="user-options">
+                                        {/* <button className="addButton" onClick={() => { this.handleClickOpen(item) }}>Editar</button> */}
+                                        <Button
+                                            endIcon={<EditIcon />}
+                                            onClick={() => { this.handleClickOpen(item) }}
+                                            style={{ backgroundColor: 'green', color: '#FFF', width: '80%', height: '35%', marginBottom: '1%' }}
+                                        >
+                                            Editar
                                     </Button>
 
-                                    {item.status === 'Ativo' ? (
-                                        <Button disabled={!utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.conta)} endIcon={<BlockIcon />} onClick={() => { this.handleDeactivateUserOpen(item) }} style={{ backgroundColor: 'red', color: '#FFF' }}>
-                                            Desativar
-                                        </Button>
-                                    ) : (
-                                            <Button endIcon={<CheckCircleOutlineIcon />} onClick={() => { this.handleReactivateUser(item) }} style={{ backgroundColor: 'blue', color: '#FFF' }}>
-                                                Reativar
+                                        {item.status === 'Ativo' ? (
+                                            <Button
+                                                disabled={!utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.conta)}
+                                                endIcon={<BlockIcon />}
+                                                onClick={() => { this.handleDeactivateUserOpen(item) }}
+                                                style={{ backgroundColor: 'red', color: '#FFF', width: '80%', height: '35%', }}
+                                            >
+                                                Desativar
                                             </Button>
-                                        )
-                                    }
-                                    {/* <button className="deleteButton" onClick={() => { this.handleDeactivateUserOpen(item) }}>Excluir</button> */}
+                                        ) : (
+                                                <Button
+                                                    endIcon={<CheckCircleOutlineIcon />}
+                                                    onClick={() => { this.handleReactivateUser(item) }}
+                                                    style={{ backgroundColor: 'blue', color: '#FFF', width: '80%', height: '35%', }}
+                                                >
+                                                    Reativar
+                                                </Button>
+                                            )
+                                        }
+                                        {/* <button className="deleteButton" onClick={() => { this.handleDeactivateUserOpen(item) }}>Excluir</button> */}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                        renderWhenEmpty={() => <div>Carregando...</div>}
-                        //sortBy={["item.cargo", { key: "lastName", descending: true }]}
-                        sortBy={["status", "cargo", "nome"]}
-                    //groupBy={person => person.info.age > 18 ? 'Over 18' : 'Under 18'}
-                    />
+                            )}
+                            renderWhenEmpty={() => (
+                                <div className="loader">
+                                    <Loader
+                                        type="Oval"
+                                        //color="#ffa200"
+                                        color="#FFF"
+                                        height={100}
+                                        width={100}
+                                    //timeout={3000} //3 secs
+
+                                    />
+                                </div>
+                            )}
+                            //sortBy={["item.cargo", { key: "lastName", descending: true }]}
+                            sortBy={["status", "cargo", "nome"]}
+                        //groupBy={person => person.info.age > 18 ? 'Over 18' : 'Under 18'}
+                        />
+                    </div>
 
                     {/* Modal para edição dos dados da conta selecionada */}
                     <Dialog open={this.state.modalOpen} onClose={this.handleClose} aria-labelledby="form-dialog-title">
@@ -393,7 +425,7 @@ class Users extends Component {
                         <DialogTitle id="form-dialog-title">Editar Usuário</DialogTitle>
                         <DialogContent>
                             <DialogContentText>
-                                Tem certeza de que deseja desativar o <b> {this.state.selectedUser.cargo} {this.state.selectedUser.nome} </b> ?
+                                Tem certeza de que deseja desativar o usuário <b> {this.state.selectedUser.nome} </b> ?
                             </DialogContentText>
 
 
