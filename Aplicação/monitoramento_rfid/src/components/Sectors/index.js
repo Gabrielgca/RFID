@@ -30,6 +30,8 @@ import { FormGroup, FormControlLabel } from '@material-ui/core';
 import axios from 'axios';
 import baseURL from '../../service';
 
+import "./sectors.css";
+
 
 class Sectors extends Component {
 
@@ -240,7 +242,7 @@ class Sectors extends Component {
                         </Button>
                     </header>
                     <h1 style={{ color: '#FFF' }}>Controle de Setores</h1>
-                    <Paper style={{ marginTop: 50 }}>
+                    <Paper style={{ marginTop: 50, marginBottom: 10 }}>
                         <InputBase
                             value={this.state.filter}
                             style={{ paddingLeft: 20, width: 500 }}
@@ -260,43 +262,68 @@ class Sectors extends Component {
                         </IconButton>
                     </Paper>
 
-                    <FlatList
-                        list={this.state.filteredSectors.length > 0 ? this.state.filteredSectors : this.state.sectors}
-                        renderItem={(item) => (
-                            <div className={item.status === 'Ativo' ? "card" : "card"} key={item.id_loc}>
-                                <FormGroup row style={{ justifyContent: "space-between" }}>
-                                    <FormGroup>
+                    <div className="sectors-list">
+                        <p className="resultado-pesquisa">Exibindo <b>{this.state.filteredSectors.length > 0 ? this.state.filteredSectors.length : this.state.sectors.length}</b> registros</p>
+                        <br></br>
+                        <FlatList
+                            list={this.state.filteredSectors.length > 0 ? this.state.filteredSectors : this.state.sectors}
+                            renderItem={(item) => (
+                                <div className="sectors-item">
+                                    <div className={item.status === 'Ativo' ? "sectors-item-info" : "sectors-item-info-disabled"} key={item.id_loc}>
                                         <p><b>Nome da Empresa: </b>{item.companyName}</p>
                                         <p><b>Sala: </b>{item.roomName}</p>
                                         <p><b>Área: </b>{item.area}</p>
                                         <p><b>Andar: </b>{item.floor}</p>
                                         <p><b>Ocupação máxima: </b>{item.maxOccupation}</p>
-                                    </FormGroup>
-                                    <FormGroup row style={{ alignItems: 'center' }}>
-                                        <Button endIcon={<DescriptionIcon />} onClick={() => { this.handleConfirmModalOpen(item) }} style={{ backgroundColor: 'green', zIndex: 3, color: '#FFF', marginRight: 10, width: 150, height: '50%' }}>
+                                    </div>
+
+                                    <div className="sectors-options">
+                                        <Button
+                                            endIcon={<DescriptionIcon />}
+                                            onClick={() => { this.handleConfirmModalOpen(item) }}
+                                            style={{ backgroundColor: 'green', color: '#FFF', width: '80%', height: '35%', marginBottom: '1%' }}
+                                        >
                                             Detalhes
                                         </Button>
 
                                         {item.status === 'Inativo' ? (
-                                            <Button endIcon={<CheckCircleOutlineIcon />} style={{ backgroundColor: 'blue', color: '#FFF', marginRight: 10, width: 150, height: '50%' }}>
+                                            <Button
+                                                endIcon={<CheckCircleOutlineIcon />}
+                                                style={{ backgroundColor: 'red', color: '#FFF', width: '80%', height: '35%' }}
+                                            >
                                                 Reativar
                                             </Button>
                                         ) : (
-                                                <Button endIcon={<BlockIcon />} disabled style={{ opacity: 0.5, backgroundColor: 'red', color: '#FFF', marginRight: 10, width: 150, height: '50%' }}>
+                                                <Button
+                                                    endIcon={<BlockIcon />}
+                                                    disabled={true}
+                                                    style={{ backgroundColor: 'red', color: '#FFF', width: '80%', height: '35%' }}
+                                                >
                                                     Desativar
                                                 </Button>
                                             )}
-                                    </FormGroup>
-                                </FormGroup>
-                            </div>
-                        )}
-                        renderWhenEmpty={() => <div>Carregando...</div>}
-                        //sortBy={["item.cargo", { key: "lastName", descending: true }]}
-                        sortBy={["companyName"]}
-                    //groupBy={person => person.info.age > 18 ? 'Over 18' : 'Under 18'}
-                    />
+                                    </div>
+                                </div>
+                            )}
+                            renderWhenEmpty={() => (
+                                <div className="loader">
+                                    <Loader
+                                        type="Oval"
+                                        //color="#ffa200"
+                                        color="#FFF"
+                                        height={100}
+                                        width={100}
+                                    //timeout={3000} //3 secs
 
+                                    />
+                                </div>
+                            )}
+                            //sortBy={["item.cargo", { key: "lastName", descending: true }]}
+                            sortBy={["companyName"]}
+                        //groupBy={person => person.info.age > 18 ? 'Over 18' : 'Under 18'}
+                        />
 
+                    </div>
 
                     {/* Modal para edição dos dados da conta selecionada */}
                     <Dialog maxWidth={700} open={this.state.modalConfirmShow} onClose={this.handleCloseConfirmModal} aria-labelledby="form-dialog-title">
