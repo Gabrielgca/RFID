@@ -231,7 +231,6 @@ class LocalizacaoDisp(db.Model):
         self.dictionary['vlConsumoLamp'] = self.vlConsumoLamp
         self.dictionary['stStatus'] = self.stStatus
         return self.dictionary
-        
 #MAPEAMENTO NOVO!
 class DispLocalizacao(db.Model):
     __tablename__ = 'tb_disp_localizacao' 
@@ -531,8 +530,18 @@ def WiFIRFID ():
         ultOcorrencia = cmd.selUltOcorrenciaCadastro(cadastroCartao.idCadastro)
 
         disp_loc = cmd.selDispLocalizacaoByDisp (locDisp)
+        population = cmd.selCountPessoasSala (locDisp)
+        loc_disp = cmd.selLocalizacaoDispByDisp (locDisp)
+
+        print (f'LOCATION ID: {loc_disp.idLocalizacaoDisp}')
+        print (f'CURRENT POPULATION: {population}')
+        print (f'MAX POPULATION: {loc_disp.vlArea / 2}')
+
+        if population >= loc_disp.vlArea / 2:
+            # ACCESS DENIED: number of people in this location can't go any higher
+            return jsonify (success = False)
+
         perm_usu_disp = cmd.selAllPermCadastroLocal (cadastroCartao.idCadastro, disp_loc.idDispLocalizacao)
-        print (f'PERM_USU_DISP: {perm_usu_disp}')
 
         if len (perm_usu_disp) <= 0:
             # ACCESS DENIED

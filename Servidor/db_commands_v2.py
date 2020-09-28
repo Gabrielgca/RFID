@@ -21,7 +21,7 @@ class RfidCommands():
             return Function("CONVERTE_MES",self.date_format(col,"%m"))
 
     def __init__(self,database=None):
-        from serverRFID_V2_Socket import Cadastro, Cartao, Dispositivo, Rota \
+        from serverRFID_V2_Socket_EXP import Cadastro, Cartao, Dispositivo, Rota \
                                                , Ocorrencia, CadastroCartao, LocalizacaoDisp \
                                                , DispLocalizacao, PermHorario, PermissaoDisp, PermUsuDisp
                                                
