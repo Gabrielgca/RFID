@@ -212,16 +212,18 @@ class LocalizacaoDisp(db.Model):
     def __repr__(self):
         return '''<Localizacao_disp
     (id_localizacao_disp='{}',
+    no_empresa='{}',
     no_localizacao='{}',
     vl_andar='{}',
     vl_area='{}',
     vl_qtde_lampadas='{}',
     vl_consumo_lamp='{}',
-    st_status='{}')>'''.format(self.idLocalizacaoDisp, self.noLocalizacao, self.vlAndar, self.vlArea, self.vlQtdeLampadas, self.vlConsumoLamp, self.stStatus)
+    st_status='{}')>'''.format(self.idLocalizacaoDisp, self.noEmpresa, self.noLocalizacao, self.vlAndar, self.vlArea, self.vlQtdeLampadas, self.vlConsumoLamp, self.stStatus)
 
     def getDict(self):
         self.dictionary = {}
         self.dictionary['idLocalizacaoDisp'] = self.idLocalizacaoDisp
+        self.dictionary['noEmpresa'] = self.noEmpresa
         self.dictionary['noLocalizacao'] = self.noLocalizacao
         self.dictionary['vlAndar'] = self.vlAndar
         self.dictionary['vlArea'] = self.vlArea
@@ -229,6 +231,7 @@ class LocalizacaoDisp(db.Model):
         self.dictionary['vlConsumoLamp'] = self.vlConsumoLamp
         self.dictionary['stStatus'] = self.stStatus
         return self.dictionary
+        
 #MAPEAMENTO NOVO!
 class DispLocalizacao(db.Model):
     __tablename__ = 'tb_disp_localizacao' 
