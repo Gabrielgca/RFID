@@ -21,7 +21,7 @@ class RfidCommands():
             return Function("CONVERTE_MES",self.date_format(col,"%m"))
 
     def __init__(self,database=None):
-        from serverRFID_V2_Socket_EXP import Cadastro, Cartao, Dispositivo, Rota \
+        from serverRFID_V2_Socket import Cadastro, Cartao, Dispositivo, Rota \
                                                , Ocorrencia, CadastroCartao, LocalizacaoDisp \
                                                , DispLocalizacao, PermHorario, PermissaoDisp, PermUsuDisp
                                                
@@ -188,6 +188,15 @@ class RfidCommands():
             idLocalizacao = [idLocalizacao]
         return s.query(dl).filter(dl.idLocalizacaoDisp.in_(idLocalizacao), dl.stSituacao.in_("A")).all()
 
+    #Comando inserido em: 29/09/2020 13:44
+    #Por: Gabriel de Castro Araújo
+    def selDispLocalizacao_byid(self, idDispLocalizacao):
+        dl = self.dl
+        s = self.db.session
+        if type(idDispLocalizacao) != list:
+            idDispLocalizacao = [idDispLocalizacao]
+        return s.query(dl).filter(dl.idLocalizacaoDisp.in_(idDispLocalizacao), dl.stSituacao.in_("A")).scalar()
+
     def selAllPermissions (self, idCadastro):
         pud = self.pud
         s = self.db.session
@@ -222,12 +231,15 @@ class RfidCommands():
     
     
     #-----------COMANDO GABRIEL-----------#
-    def selDispLocalizacao_disp(self, idDispositivo):
+    def selDispLocalizacao_disp(self, idDispositivo, alldisploc = False):
         dl = self.dl
         s = self.db.session
         if type(idDispositivo) != list:
             idDispositivo = [idDispositivo]
-        return s.query(dl).filter(dl.idDispositivo.in_(idDispositivo), dl.stSituacao.in_("A")).all()
+        if alldisploc == True:
+            return s.query(dl).filter(dl.idDispositivo.in_(idDispositivo)).all()
+        else:
+            return s.query(dl).filter(dl.idDispositivo.in_(idDispositivo), dl.stSituacao.in_("A")).all()
 
     #-----------COMANDO GABRIEL-----------#
     def selDispLocalizacao_disp_loc(self, idDispositivo, idLocalizacao):
@@ -756,11 +768,11 @@ class RfidCommands():
         s.add(localizacaoDispUpdt)
         newLocalizacaoDispDict = newLocalizacaoDisp.getDict()
         for key in localizacaoDispUpdt.getDict():
-            print(key)
             if newLocalizacaoDispDict[key] is not None:
                 setattr(localizacaoDispUpdt, key, newLocalizacaoDispDict[key])
  
         s.commit()
+
 
     #COMANDO NOVO!
     def updateStEstadoCadastroCartao(self, idCadastroCartao, newStatus):
@@ -795,6 +807,29 @@ class RfidCommands():
                                 .scalar()
         s.add(PermUsuDispUpdt)
         PermUsuDispUpdt.stStatus = newStatus
+        s.commit()
+
+    #Comando inserido em: 29/09/2020 15:01
+    #Por: Gabriel de Castro Araújo
+    def updatePermHorarioPermUsuDisp(self, idPermUsuDisp , newPermHorario):
+        s = self.db.session
+        pud = self.pud
+        PermUsuDispUpdt = s.query(pud)\
+                               .filter(pud.idPermUsuDisp == idPermUsuDisp)\
+                               .scalar()
+        s.add(PermUsuDispUpdt)
+        PermUsuDispUpdt.idPermHorario = newPermHorario
+        s.commit()
+    #Comando inserido em: 28/09/2020 10:25
+    #Por: Gabriel de Castro Araújo
+    def updateStatusDisp(self, idDispositivo, newStatus):
+        s = self.db.session
+        dp = self.dp
+        DispUpdt = s.query(dp)\
+                                .filter(dp.idDispositivo == idDispositivo)\
+                                .scalar()
+        s.add(DispUpdt)
+        DispUpdt.stAtivo = newStatus
         s.commit()
 
     ###########################

@@ -540,6 +540,7 @@ def WiFIRFID ():
 
         if population >= loc_disp.vlArea / 2:
             # ACCESS DENIED: number of people in this location can't go any higher
+            print('NÚMERO MAXIMO NA SALA FOI EXCEDIDO.')
             return jsonify (success = False)
         perm_usu_disp = cmd.selAllPermCadastroLocal (cadastroCartao.idCadastro, disp_loc.idDispLocalizacao)
 
@@ -816,14 +817,15 @@ def register():
             perm_perm = "N"
             loc_perm = list_perm[i]["loc"]
             print(f'loc_perm :{loc_perm}')
+            #MUDEI PARA QUE RECEBA O ID, E NÃO O NOME
             loc_perm_no = cmd.selLocalizacaoDisp_no(loc_perm)
 
             dict_loc_perm = loc_perm_no[0].getDict()
             id_loc_perm = dict_loc_perm['idLocalizacaoDisp']
-            print(f'id_loc_perm:   {id_loc_perm}')
+            
             disp_loc = cmd.selDispLocalizacao(id_loc_perm)
-            print(f'disp_loc:  {disp_loc}')
-            dict_disp_loc = disp_loc[0].getDict()
+            
+            dict_disp_loc = disp_loc[-1].getDict()
             id_disp_loc = dict_disp_loc['idDispLocalizacao']
             
             if len(list_perm[i]["hrini"]) != 0 or len(list_perm[i]["hrfim"]) != 0:
@@ -894,16 +896,38 @@ def userInfo():
                 dict_perm['id_perm_usu_disp'] = perm_usu_disp[j].idPermUsuDisp
                 dict_perm['id_user'] = perm_usu_disp[j].idCadastro
                 dict_perm['id_perm'] = perm_usu_disp[j].idPermissao
+
                 dict_perm['id_disp_loc'] = perm_usu_disp[j].idDispLocalizacao
+
+                disp_loc = cmd.selDispLocalizacao_byid(dict_perm['id_disp_loc'])
+
+                loc_disp = cmd.selLocalizacaoDisp(disp_loc.idLocalizacaoDisp)
+
+                dict_perm['company'] = loc_disp[0].noEmpresa
+                dict_perm['no_localizacao'] = loc_disp[0].noLocalizacao
+
                 dict_perm['id_perm_hora'] = perm_usu_disp[j].idPermHorario
+
+                if dict_perm['id_perm_hora'] != None:
+                    
+                    perm_hor = cmd.selPermHorario(dict_perm['id_perm_hora'] )
+
+                    dict_perm['hr_inicio'] = perm_hor[0].hrInicial.strftime("%H:%M:%S")
+                    dict_perm['hr_final'] = perm_hor[0].hrFinal.strftime("%H:%M:%S")
+                    dict_perm['permanente'] = perm_hor[0].stPermanente
+
+                    if perm_hor[0].dtInicio != None or perm_hor[0].dtFim != None:
+                        dict_perm['dt_inicio'] = perm_hor[0].dtInicio.strftime("%m/%d/%Y")
+                        dict_perm['dt_fim'] = perm_hor[0].dtFim.strftime("%m/%d/%Y")
+
                 dict_perm['status'] = perm_usu_disp[j].stStatus
                 list_perm.append(dict_perm)
             dict_user["perm"] = list_perm
             list_perm = []
         list_user.append(dict_user)
 
+    
     info_user['usuarios']=list_user
-
     return jsonify(info_user)
 
 @app.route ('/updateUser', methods = ['GET','POST'])
@@ -985,14 +1009,42 @@ def updateUser():
                 list_perm = data['perm']
                 for i in list_perm:
                     for p_key in i:
-                        #CASO DE ATUALIZAR STATUS DA PERMISSÃO
+                        #CASO DE ATUALIZAR PERMISSÃO
                         if p_key == 'id_perm_usu_disp':
                             id_perm_usu_disp = list_perm[count]['id_perm_usu_disp']
-                            st_perm_usu_disp = list_perm[count]['st_perm_usu_disp']
-                            cmd.updatestStatusPermUsuDisp(id_perm_usu_disp, st_perm_usu_disp)
+                            #CASO DE ATUALIZAR STATUS DA PERMISSÃO
+                            if "st_perm_usu_disp" in list_perm[count]:
+                                st_perm_usu_disp = list_perm[count]['st_perm_usu_disp']
+                                cmd.updatestStatusPermUsuDisp(id_perm_usu_disp, st_perm_usu_disp)
+                            #CASO DE ATUALIZAR HORA DA PERMISSÃO
+                            if "hrini" in list_perm[count] and "hrfim" in list_perm[count] :
+                                if list_perm[count]['hrini'] != None and list_perm[count]['hrfim'] != None:
+                                    hr_inicio = list_perm[count]['hrini']
+                                    hr_fim = list_perm[count]['hrfim']
+                                    permissao = list_perm[count]['perm']
+
+
+                                    try:
+                                        perm_horario = PermHorario(hrInicial = hr_inicio, hrFinal = hr_fim, stPermanente = permissao)
+                                        cmd.insertPermHorario(perm_horario, refresh = True)
+                                        
+                                        cmd.updatePermHorarioPermUsuDisp(id_perm_usu_disp,perm_horario.idPermHorario)
+                                    except Exception as e:
+                                        print(f'update permissao  - {e}')
+                                        return jsonify (success = False)
+                                else:
+                                    print('Tirando horário de permissão.')
+                                            
+                                    cmd.updatePermHorarioPermUsuDisp(id_perm_usu_disp, None)
                         #CASO DE ADICIONAR NOVA PERMISSÃO
-                        elif p_key == 'id_disp_loc':
-                            id_disp_loc = list_perm[count]['id_disp_loc']
+                        elif p_key == 'id_loc_disp':
+                            
+                            id_loc_perm = list_perm[count]["id_loc_disp"]
+                            
+                            disp_loc = cmd.selDispLocalizacao(id_loc_perm)
+                            dict_disp_loc = disp_loc[-1].getDict()
+                            id_disp_loc = dict_disp_loc['idDispLocalizacao']
+                            
                             if "hrini" in list_perm[count] and "hrfim" in list_perm[count]:
                                 hr_perm_ini = list_perm[count]["hrini"]
                                 hr_perm_fim = list_perm[count]["hrfim"]
@@ -1051,7 +1103,7 @@ def registerDisp():
             print (e)
             return jsonify(success = False)
         try:
-            id_disp_loc = data['loc']
+            id_loc_disp = data['loc']
            # disp_loc = cmd.selLocalizacaoDisp_no(noLoc)
 
            # dict_disp_loc = disp_loc[0].getDict()
@@ -1066,8 +1118,8 @@ def registerDisp():
         
         try:
             cmd.insertDispositivo(new_disp, refresh=True)
-            if id_disp_loc != 0:
-                dispLoca = DispLocalizacao(idDispositivo = new_disp.idDispositivo, idLocalizacaoDisp = id_disp_loc, stSituacao = st_disp)
+            if id_loc_disp != 0:
+                dispLoca = DispLocalizacao(idDispositivo = new_disp.idDispositivo, idLocalizacaoDisp = id_loc_disp, stSituacao = st_disp)
                 
                 cmd.insertDispLocalizacao(dispLoca)
             return jsonify(success = True)
