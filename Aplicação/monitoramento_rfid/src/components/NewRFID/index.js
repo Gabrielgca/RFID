@@ -5,6 +5,7 @@ import utils from '../../utils';
 import axios from 'axios';
 import './index.css';
 
+
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -70,7 +71,8 @@ class NewRFID extends Component {
           dashboard: []
         }
       },
-      pageLoading: true
+      pageLoading: true,
+      value: ''//mascara para hora, podendo ser usado para outras coisas
     };
 
     this.register = this.register.bind(this);
@@ -261,6 +263,7 @@ class NewRFID extends Component {
   }
 
   render() {
+
     if (this.state.pageLoading === true) {
       return (
         <div className="page-loader">
@@ -334,7 +337,7 @@ class NewRFID extends Component {
                 value={this.state.cardCodeRFID} disabled
               />
 
-              <TextField label='Idade' variant='outlined' style={{ background: '#FFF', borderRadius: 8, width: '20%', marginLeft: '2%' }}
+              <TextField type='number' label='Idade' variant='outlined' size='small' style={{ background: '#FFF', borderRadius: 8, width: '20%', marginLeft: '2%', height:40 }}
                 value={this.state.age} onChange={(e) => this.setState({ age: e.target.value })} required
               />
 
@@ -342,7 +345,7 @@ class NewRFID extends Component {
                 value={this.state.office} onChange={(e) => this.setState({ office: e.target.value })} required
               />
 
-              <FormControl style={{ background: '#FFF', borderRadius: 8, width: '20%', height: 42 }}>
+              <FormControl style={{ background: '#FFF', borderRadius: 8, width: '20%'}}>
                 <InputLabel id='labelTitle'>Permissão</InputLabel>
                 <Select
                   variant='outlined'
@@ -361,15 +364,12 @@ class NewRFID extends Component {
                 </Select>
               </FormControl>
 
-              <TextField name='hrini' label='Hora de inicio' variant='outlined' style={{ background: '#FFF', borderRadius: 8, width: '20%', marginLeft: '2%', marginBottom: 10 }}
+              <TextField InputLabelProps={{ shrink: true}} type='time' label='Hora de inicio' variant='outlined' style={{ background: '#FFF', borderRadius: 8, width: '20%', marginLeft: '2%', marginBottom: 10 }}
                 value={this.state.hrini} onChange={(e) => this.setState({ hrini: e.target.value })}
               />
-              <TextField label='Hora de fim' variant='outlined' style={{ background: '#FFF', borderRadius: 8, width: '20%', marginLeft: '2%', marginBottom: 10 }}
+              <TextField InputLabelProps={{ shrink: true}} type='time' label='Hora de fim' variant='outlined' style={{ background: '#FFF', borderRadius: 8, width: '20%', marginLeft: '2%', marginBottom: 10 }}
                 value={this.state.hrfim} onChange={(e) => this.setState({ hrfim: e.target.value })}
               />
-
-
-
               <Button onClick={this.handleAddPermission} variant='contained' style={{ marginLeft: '2%', background: 'green', height: 42 }} ><AddIcon /></Button>
               <FormControlLabel control={<CheckBox checked={this.state.perm} onChange={(e) => { this.handleCheck(e) }} />} label='Manter horário direto' />
               <div className='flatScroll'>
