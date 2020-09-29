@@ -6,7 +6,7 @@ USE `db_rfid_v2`;
 
 DELIMITER // 
 
-CREATE OR REPLACE PROCEDURE insert_ocupacao(IN id_disp INT,IN dt_ocorrencia DATE,IN hr_ocorrencia TIME)
+CREATE OR REPLACE PROCEDURE insert_ocupacao(IN id_disp INT,IN id_rta INT,IN dt_ocorrencia DATE,IN hr_ocorrencia TIME)
 BEGIN
     DECLARE done INT DEFAULT FALSE;
     DECLARE IDC INT;
@@ -23,12 +23,14 @@ BEGIN
             LEAVE insere;
         END IF;
 
-        IF EXISTS (SELECT * FROM tb_rota 
-                  WHERE id_cadastro = IDC) THEN
+        IF EXISTS (SELECT * FROM tb_rota
+                  WHERE id_cadastro = IDC
+				  AND id_rota <= id_rta) THEN
             SELECT id_rota
             INTO @ult_rota_cadastro
             FROM tb_rota
             WHERE id_cadastro = IDC
+			AND id_rota <= id_rta
             ORDER BY id_rota DESC,TIMESTAMP(dt_rota,hr_rota) DESC
             LIMIT 1;
             
@@ -58,13 +60,22 @@ DELIMITER //
 CREATE OR REPLACE PROCEDURE insert_rotas_ocupacoes ()
 BEGIN
     DECLARE done INT DEFAULT FALSE;
-    DECLARE IDO,IDD,IDC INT;
-    DECLARE DTO DATE;
-    DECLARE HRO TIME;
+    DECLARE IDO,IDR,IDD,IDC INT;
+    DECLARE DTO,DTR DATE;
+    DECLARE HRO,HRR TIME;
     DECLARE STO CHAR(1);
     DECLARE ocorrencias CURSOR FOR SELECT * FROM tb_ocorrencia;
+	DECLARE rotas CURSOR FOR SELECT * FROM tb_rota;
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
+	CREATE TEMPORARY TABLE tb_rota_temp(
+		id_dispositivo_origem INT,
+		id_dispositivo_destino INT,
+		id_cadastro INT,
+		dt_rota DATE,
+		hr_rota TIME
+	);
+	
     OPEN ocorrencias;
 
     insere: LOOP
@@ -77,8 +88,8 @@ BEGIN
                   FROM tb_ocorrencia
                   WHERE id_cadastro = IDC
                   AND id_ocorrencia < IDO) THEN
-            SELECT id_dispositivo,st_ocorrencia
-            INTO @curr_disp,@curr_status
+            SELECT id_dispositivo,st_ocorrencia,dt_ocorrencia,hr_ocorrencia
+            INTO @curr_disp,@curr_status,@curr_dt_ocorrencia,@curr_hr_ocorrencia
             FROM tb_ocorrencia
             WHERE id_cadastro = IDC
             AND id_ocorrencia < IDO
@@ -90,80 +101,63 @@ BEGIN
 
         IF @curr_disp IS NULL THEN
             IF IDD = 1 AND STO = 'E' THEN
-                INSERT INTO tb_rota(id_dispositivo_origem,id_dispositivo_destino,id_cadastro,dt_rota,hr_rota)
+                INSERT INTO tb_rota_temp(id_dispositivo_origem,id_dispositivo_destino,id_cadastro,dt_rota,hr_rota)
                 VALUES(NULL,IDD,IDC,DTO,HRO);
-
-                CALL insert_ocupacao(IDD,DTO,HRO);
             ELSE
                 IF IDD = 1 AND STO = 'S' THEN
-                    INSERT INTO tb_rota(id_dispositivo_origem,id_dispositivo_destino,id_cadastro,dt_rota,hr_rota)
+                    INSERT INTO tb_rota_temp(id_dispositivo_origem,id_dispositivo_destino,id_cadastro,dt_rota,hr_rota)
                     VALUES(IDD,NULL,IDC,DTO,HRO);
-
-                    CALL insert_ocupacao(IDD,DTO,HRO);
                 ELSE
                     IF STO = 'E' THEN
-                        INSERT INTO tb_rota(id_dispositivo_origem,id_dispositivo_destino,id_cadastro,dt_rota,hr_rota)
+                        INSERT INTO tb_rota_temp(id_dispositivo_origem,id_dispositivo_destino,id_cadastro,dt_rota,hr_rota)
                         VALUES(1,IDD,IDC,DTO,HRO);
-
-                        CALL insert_ocupacao(1,DTO,HRO);
-                        CALL insert_ocupacao(IDD,DTO,HRO);
                     ELSE 
                         IF STO = 'S' THEN
-                            INSERT INTO tb_rota(id_dispositivo_origem,id_dispositivo_destino,id_cadastro,dt_rota,hr_rota)
+                            INSERT INTO tb_rota_temp(id_dispositivo_origem,id_dispositivo_destino,id_cadastro,dt_rota,hr_rota)
                             VALUES(IDD,1,IDC,DTO,HRO);
-
-                            CALL insert_ocupacao(IDD,DTO,HRO);
-                            CALL insert_ocupacao(1,DTO,HRO);
                         END IF;
                     END IF;
                 END IF;
             END IF;
         ELSE
-            IF IDD = @curr_disp THEN
-                IF @curr_status = 'E' THEN
-                    SELECT id_dispositivo_origem,id_dispositivo_destino
-                    INTO @ult_id_disp_origem,@ult_id_disp_destino
-                    FROM tb_rota
-                    WHERE id_cadastro = IDC
-                    ORDER BY id_rota DESC,TIMESTAMP(dt_rota,hr_rota) DESC
-                    LIMIT 1;
-                    
-                    IF @ult_id_disp_origem IS NOT NULL THEN                
-                        INSERT INTO tb_rota(id_dispositivo_origem,id_dispositivo_destino,id_cadastro,dt_rota,hr_rota)
-                        VALUES(@ult_id_disp_destino,@ult_id_disp_origem,IDC,DTO,HRO);
-
-                        CALL insert_ocupacao(IDD,DTO,HRO);
-                        CALL insert_ocupacao(@ult_id_disp_origem,DTO,HRO);
-                    END IF;
-                ELSE    
-                    SELECT id_dispositivo_destino
-                    INTO @ult_id_disp_destino
-                    FROM tb_rota
-                    WHERE id_cadastro = IDC
-                    ORDER BY id_rota DESC,TIMESTAMP(dt_rota,hr_rota) DESC
-                    LIMIT 1;
-
-                    INSERT INTO tb_rota(id_dispositivo_origem,id_dispositivo_destino,id_cadastro,dt_rota,hr_rota)
-                    VALUES(@ult_id_disp_destino,IDD,IDC,DTO,HRO);
-
-                    CALL insert_ocupacao(IDD,DTO,HRO);
-                END IF;
-            ELSE
-                SELECT id_dispositivo_origem,id_dispositivo_destino
-                INTO @ult_id_disp_origem,@ult_id_disp_destino
-                FROM tb_rota
-                WHERE id_cadastro = IDC
-                ORDER BY id_rota DESC,TIMESTAMP(dt_rota,hr_rota) DESC
-                LIMIT 1;
-
-                INSERT INTO tb_rota (id_dispositivo_origem,id_dispositivo_destino,id_cadastro,dt_rota,hr_rota)
-                VALUES(@ult_id_disp_destino,IDD,IDC,DTO,HRO);
-
-                CALL insert_ocupacao(@ult_id_disp_destino,DTO,HRO);
-                CALL insert_ocupacao(IDD,DTO,HRO);
-            END IF;
+			IF STO = 'E' THEN				
+				IF @curr_disp = 1 AND IDD = 1 THEN
+					INSERT INTO tb_rota_temp(id_dispositivo_origem,id_dispositivo_destino,id_cadastro,dt_rota,hr_rota)
+					VALUES(1,NULL,IDC,@curr_dt_ocorrencia,@curr_hr_ocorrencia);
+					
+					INSERT INTO tb_rota_temp(id_dispositivo_origem,id_dispositivo_destino,id_cadastro,dt_rota,hr_rota)
+					VALUES(NULL,1,IDC,DTO,HRO);
+				ELSE
+					INSERT INTO tb_rota_temp(id_dispositivo_origem,id_dispositivo_destino,id_cadastro,dt_rota,hr_rota)
+					VALUES(@curr_disp,IDD,IDC,@curr_dt_ocorrencia,@curr_hr_ocorrencia);
+				END IF;
+			END IF;
         END IF;
     END LOOP;
+	INSERT INTO tb_rota(id_dispositivo_origem,id_dispositivo_destino,id_cadastro,dt_rota,hr_rota)
+		SELECT id_dispositivo_origem,id_dispositivo_destino,id_cadastro,dt_rota,hr_rota
+		FROM tb_rota_temp
+		ORDER BY TIMESTAMP(dt_rota,hr_rota) ASC;
+		
+	IF EXISTS (SELECT *
+			   FROM tb_rota) THEN
+		OPEN rotas;
+		SET done = FALSE;
+		
+		insere2: LOOP
+			FETCH rotas INTO IDR,IDO,IDD,IDC,DTR,HRR;
+			IF done THEN
+				LEAVE insere2;
+			END IF;
+			
+			IF (IDO IS NULL AND IDD = 1) OR (IDO = 1 AND IDD IS NULL) THEN
+				CALL insert_ocupacao(1,IDR,DTR,HRR);
+			ELSE
+				CALL insert_ocupacao(IDO,IDR,DTR,HRR);
+				CALL insert_ocupacao(IDD,IDR,DTR,HRR);
+			END IF;
+		END LOOP;
+	END IF;
 END;//
 
 DELIMITER ;
