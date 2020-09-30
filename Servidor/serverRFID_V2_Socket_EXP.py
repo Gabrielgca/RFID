@@ -899,7 +899,7 @@ def userInfo():
 
                 dict_perm['id_disp_loc'] = perm_usu_disp[j].idDispLocalizacao
 
-                disp_loc = cmd.selDispLocalizacao_byid(dict_perm['id_disp_loc'])
+                disp_loc = cmd.selDispLocalizacao_byid(dict_perm['id_disp_loc'], alldisploc = True)
 
                 loc_disp = cmd.selLocalizacaoDisp(disp_loc.idLocalizacaoDisp)
 
@@ -941,6 +941,7 @@ def updateUser():
             return answer (app, 204, resp)
         update_user = Cadastro()
 
+        print(f'DADO RECEBIDO DE UPDATE_USER: {data}')
         id_user = data['id_user']
         update_user.noUsuario = data['nome']
         update_user.vlIdade = data['idade']
@@ -999,33 +1000,39 @@ def updateUser():
             print('Não foi encontrado um id_cadastro na tabela tb_cadastro_cartao.')
             return jsonify(success = False)
             
-            #if key == "img": 
-               # str_img = data['img']
-              #  with open(os.getcwd().replace("\\","/")+"/static/imagens/{}.png".format(id_user),"wb") as png2:
-              #      png2.write(base64.b64decode(str_img))
+            #if "img" in data:
+                #str_img = data['img']
+                #with open(os.getcwd().replace("\\","/")+"/static/imagens/{}.png".format(id_user),"wb") as png2:
+                #    png2.write(base64.b64decode(str_img))
+
         count = 0
         for key in data:
             if key == "perm":
                 list_perm = data['perm']
+                print('Encontrei permissões a serem editadas.')
                 for i in list_perm:
                     for p_key in i:
                         #CASO DE ATUALIZAR PERMISSÃO
                         if p_key == 'id_perm_usu_disp':
+                            print('ENTREI AQUI 1 .')
                             id_perm_usu_disp = list_perm[count]['id_perm_usu_disp']
                             #CASO DE ATUALIZAR STATUS DA PERMISSÃO
                             if "st_perm_usu_disp" in list_perm[count]:
+                                print('ENTREI AQUI 2 .')
                                 st_perm_usu_disp = list_perm[count]['st_perm_usu_disp']
                                 cmd.updatestStatusPermUsuDisp(id_perm_usu_disp, st_perm_usu_disp)
                             #CASO DE ATUALIZAR HORA DA PERMISSÃO
-                            if "hrini" in list_perm[count] and "hrfim" in list_perm[count] :
-                                if list_perm[count]['hrini'] != None and list_perm[count]['hrfim'] != None:
-                                    hr_inicio = list_perm[count]['hrini']
-                                    hr_fim = list_perm[count]['hrfim']
-                                    permissao = list_perm[count]['perm']
+                            if "hr_inicio" in list_perm[count] and "hr_final" in list_perm[count] :
+                                print('ENTREI AQUI 3 .')
+                                if list_perm[count]['hr_inicio'] != None and list_perm[count]['hr_final'] != None:
+                                    print('ENTREI AQUI 4 .')
+                                    hr_inicio = list_perm[count]['hr_inicio']
+                                    hr_final = list_perm[count]['hr_final']
+                                    permissao = list_perm[count]['permanente']
 
 
                                     try:
-                                        perm_horario = PermHorario(hrInicial = hr_inicio, hrFinal = hr_fim, stPermanente = permissao)
+                                        perm_horario = PermHorario(hrInicial = hr_inicio, hrFinal = hr_final, stPermanente = permissao)
                                         cmd.insertPermHorario(perm_horario, refresh = True)
                                         
                                         cmd.updatePermHorarioPermUsuDisp(id_perm_usu_disp,perm_horario.idPermHorario)
@@ -1039,18 +1046,20 @@ def updateUser():
                         #CASO DE ADICIONAR NOVA PERMISSÃO
                         elif p_key == 'id_loc_disp':
                             
+                            print('ENTREI AQUI 5 .')
                             id_loc_perm = list_perm[count]["id_loc_disp"]
                             
                             disp_loc = cmd.selDispLocalizacao(id_loc_perm)
                             dict_disp_loc = disp_loc[-1].getDict()
                             id_disp_loc = dict_disp_loc['idDispLocalizacao']
                             
-                            if "hrini" in list_perm[count] and "hrfim" in list_perm[count]:
-                                hr_perm_ini = list_perm[count]["hrini"]
-                                hr_perm_fim = list_perm[count]["hrfim"]
-                                print(f'horário recebido de início : { list_perm[count]["hrini"]}')
-                                print(f'horário recebido de fim : { list_perm[count]["hrfim"]}')
-                                perm_perm =list_perm[count]["perm"]
+                            if "hr_inicio" in list_perm[count] and "hr_final" in list_perm[count]:
+                                print('ENTREI AQUI 6 .')
+                                hr_perm_ini = list_perm[count]["hr_inicio"]
+                                hr_perm_fim = list_perm[count]["hr_final"]
+                                print(f'horário recebido de início : { list_perm[count]["hr_inicio"]}')
+                                print(f'horário recebido de fim : { list_perm[count]["hr_final"]}')
+                                perm_perm =list_perm[count]["permanente"]
                                 try:
                                     perm_horario = PermHorario(hrInicial = hr_perm_ini, hrFinal = hr_perm_fim, stPermanente = perm_perm)
                                     cmd.insertPermHorario(perm_horario, refresh = True)
@@ -1224,12 +1233,12 @@ def dispInfo():
         dict_disp["status"] = i.stAtivo
         if len(cmd.selDispLocalizacao_disp(i.idDispositivo)) != 0:
             disp_loc = cmd.selDispLocalizacao_disp(i.idDispositivo)
-            id_loc_disp = disp_loc[0].idLocalizacaoDisp
-
-            dict_disp["id_loc"] = id_loc_disp
+            id_loc_disp = disp_loc[-1].idLocalizacaoDisp
+            dict_disp["id_disp_loc"] = disp_loc[-1].idDispLocalizacao
+            dict_disp["id_loc_disp"] = id_loc_disp
 
             loc_disp = cmd.selLocalizacaoDisp(id_loc_disp)
-            dict_disp["no_loc"] = loc_disp[0].noLocalizacao
+            dict_disp["no_loc"] = loc_disp[-1].noLocalizacao
 
             
         list_disp.append(dict_disp)
@@ -1255,18 +1264,21 @@ def registerLoc():
         str_loc = data['roomName']
         str_andar = data['floor']
         str_area = data['area']
+        #str_img = data['img']
         
         try:
 
             andar = int(str_andar)
             area = int(str_area)
-            insereDispLoc = LocalizacaoDisp(noEmpresa = str_emp,noLocalizacao = str_loc, vlAndar = andar, vlArea = area, vlQtdeLampadas = 20,vlConsumoLamp = 40, stStatus = 'A')
+            insereLocDisp = LocalizacaoDisp(noEmpresa = str_emp,noLocalizacao = str_loc, vlAndar = andar, vlArea = area, vlQtdeLampadas = 20,vlConsumoLamp = 40, stStatus = 'A')
 
-            cmd.insertLocalizacaoDisp(insereDispLoc, refresh = True)
+            cmd.insertLocalizacaoDisp(insereLocDisp, refresh = True)
            
+            #with open(os.getcwd().replace("\\","/")+"/static/imagens/{}_{}.png".format(str_emp, insereLocDisp.idLocalizacao),"wb") as png2:
+                #png2.write(base64.b64decode(str_img))
+            
             return jsonify(success = True)
-            #VERIFICAR COM A APLICAÇÃO SE PODERÃO ARMAZENAR ISSO
-            #return jsonify(idLoc = insereDispLoc.idLocalizacaoDisp)
+            
 
         except Exception as e:
             print(e)
@@ -1287,17 +1299,15 @@ def updateLoc():
 
         update_loc_disp = LocalizacaoDisp(idLocalizacaoDisp = id_loc)
 
-        ''' for key in data:
-            if key == "emp": update_loc_disp.noEmpresa = data['emp']   
-            if key == "loc": update_loc_disp.noLocalizacao = data['loc']  
-            if key == "andar": update_loc_disp.vlAndar = data['andar']
-            if key == "area": update_loc_disp.vlArea = data['area']
-                
-        '''
         update_loc_disp.noEmpresa = data['companyName']   
         update_loc_disp.noLocalizacao = data['roomName']  
         update_loc_disp.vlAndar = data['floor']
         update_loc_disp.vlArea = data['area']
+
+        if "img" in data:
+            str_img = data['img']
+            #with open(os.getcwd().replace("\\","/")+"/static/imagens/{}_{}.png".format(data['companyName'], id_loc),"wb") as png2:
+            #png2.write(base64.b64decode(str_img))
 
         #STATUS NOVO
         try:
@@ -1353,8 +1363,8 @@ def findrooms():
         dict_disp = {}
         dict_disp['idSala'] = full_dict_disp['idDispositivo']
         #SELECIONA A SALA QUE O DISPOSITIVO ESTÁ RELACIONADO
-        loc_disp = cmd.selLocalizacaoDispByDisp(full_dict_disp['idDispositivo'])
-        no_loc_disp = loc_disp.noLocalizacao
+        loc_disp = cmd.selLocalizacaoDispByDisp(full_dict_disp['idDispositivo'], all_disp = True)
+        no_loc_disp = loc_disp[-1].noLocalizacao
         dict_disp['nomeSala'] = no_loc_disp
         dict_disp["qtdOcupantes"] = cmd.selCountPessoasSala(i.idDispositivo)
         dispositivo.append(dict_disp)
@@ -1375,6 +1385,15 @@ def fuc_roominfo(app_id_sala):
 
     print(id_sala)
   
+    
+    #Considerando que o id_sala será o id_dispositivo
+
+    loc_disp = cmd.selLocalizacaoDispByDisp(id_sala, all_disp = True)
+    no_empresa = loc_disp[-1].noEmpresa
+    id_loc_disp = loc_disp[-1].idLocalizacao
+
+    
+    
     room = findrooms()
 
     if validateRoom(room,id_sala):
@@ -1405,8 +1424,8 @@ def fuc_roominfo(app_id_sala):
                 dict_ocupante = dict (nomeOcupante = info_users[i], idOcupante = users_inside[i], imgPerfil = '')
                 lista_ocupantes.append(dict_ocupante)
         #VERIFICAR SE O ARQUIVO DE IMAGEM DE SALA EXISTE
-        if os.path.exists(os.getcwd().replace("\\","/")+"/static/imagens/SalaIBTI.png"):
-            img_sala = url_for("static",filename = "imagens/SalaIBTI.png",_external = True)
+        if os.path.exists(os.getcwd().replace("\\","/")+"/static/imagens/{}_{}.png".format(no_empresa, id_loc_disp)):
+            img_sala = url_for("static",filename = "imagens/{}_{}.png".format(no_empresa, id_loc_disp),_external = True)
             sala = dict( idSala = id_sala, nomeSala = room['salas'][int(id_sala)-1]['nomeSala'], imgMapaSala = img_sala ,ocupantes = lista_ocupantes)
             room['salaSelecionada'] = sala
 

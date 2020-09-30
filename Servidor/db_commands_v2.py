@@ -21,7 +21,7 @@ class RfidCommands():
             return Function("CONVERTE_MES",self.date_format(col,"%m"))
 
     def __init__(self,database=None):
-        from serverRFID_V2_Socket_EXP import Cadastro, Cartao, Dispositivo, Rota \
+        from serverRFID_V2_Socket import Cadastro, Cartao, Dispositivo, Rota \
                                                , Ocorrencia, CadastroCartao, LocalizacaoDisp \
                                                , DispLocalizacao, PermHorario, PermissaoDisp, PermUsuDisp
                                                
@@ -135,13 +135,17 @@ class RfidCommands():
 
     #Comando inserido em: 21/09/2020 14:36
     #Por: Saulo Silveira Corrêa
-    def selLocalizacaoDispByDisp(self,idDispositivo):
+    def selLocalizacaoDispByDisp(self,idDispositivo, all_disp = False):
         ld = self.ld
         dl = self.dl
         s = self.db.session
-        return s.query(ld).join(dl,ld.idLocalizacaoDisp == dl.idLocalizacaoDisp)\
-                          .filter(dl.idDispositivo == idDispositivo,
-                                  dl.stSituacao == 'A').scalar()
+        if all_disp == True:
+            return s.query(ld).join(dl,ld.idLocalizacaoDisp == dl.idLocalizacaoDisp)\
+                            .filter(dl.idDispositivo == idDispositivo, dl.stSituacao == 'A').all()
+        else:
+            return s.query(ld).join(dl,ld.idLocalizacaoDisp == dl.idLocalizacaoDisp)\
+                            .filter(dl.idDispositivo == idDispositivo, dl.stSituacao == 'A').scalar()
+
 
     #Comando inserido em: 21/09/2020 10:37
     #Por: Saulo Silveira Corrêa
@@ -190,12 +194,15 @@ class RfidCommands():
 
     #Comando inserido em: 29/09/2020 13:44
     #Por: Gabriel de Castro Araújo
-    def selDispLocalizacao_byid(self, idDispLocalizacao):
+    def selDispLocalizacao_byid(self, idDispLocalizacao, alldisploc = False):
         dl = self.dl
         s = self.db.session
         if type(idDispLocalizacao) != list:
             idDispLocalizacao = [idDispLocalizacao]
-        return s.query(dl).filter(dl.idLocalizacaoDisp.in_(idDispLocalizacao), dl.stSituacao.in_("A")).scalar()
+        if alldisploc == True:
+            return s.query(dl).filter(dl.idDispLocalizacao.in_(idDispLocalizacao)).scalar()
+        else:
+            return s.query(dl).filter(dl.idDispLocalizacao.in_(idDispLocalizacao), dl.stSituacao.in_("A")).scalar()
 
     def selAllPermissions (self, idCadastro):
         pud = self.pud
