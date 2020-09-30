@@ -151,7 +151,7 @@ void loop ()
   
 
   
-  recebido =  sendData(get, 2000, DEBUG);//3000
+  recebido =  sendData(get, 2000, DEBUG, true);//3000
    Serial.println(recebido);
 
   passe = permitido(recebido);
