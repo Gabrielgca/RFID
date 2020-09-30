@@ -17,6 +17,8 @@
 #define RST_PIN 9
 #define DEBUG true
 #define BUZZER 3
+#define led_green 4
+#define led_red 5
 
 String ssid = "Inst Brasilia de Tec e Inov 2G";
 String pass = "#ibti@2019";
@@ -24,9 +26,11 @@ String strID = "";
 String servidor = "192.168.2.196";
 String port = "7000";
 String uri = "/WiFiRFID?RFID=";
+String recebido = "";
+int passe = 0;
 
 //ID do dispositivo no Banco de dados
-String loc = "3";
+String loc = "1";
 
 //Número de tentativas de reconexão
 unsigned int N = 7;
@@ -35,6 +39,7 @@ String sendData(String command, const int timeout, boolean debug, boolean wait_r
 void aproximaCartao(int freq = 1500, int bip = 2);
 bool tryagain (String comando, unsigned int N = 7);
 bool resposta (String resp, String esperado);
+int permitido (String perm);
 
 String tagID = ""; //Variável que armazenará o ID da Tag
 bool access = false; //Variável que verifica a permissão 
@@ -142,11 +147,25 @@ void loop ()
   }
   
   //envia primeiro o tamanho dos dados, e depois os dados
-  sendData(cipSend, 1000, DEBUG);//3000
+  sendData(cipSend, 2000, DEBUG);//3000
   
 
   
-  sendData(get, 1000, DEBUG, true);//3000
+  recebido =  sendData(get, 2000, DEBUG);//3000
+   Serial.println(recebido);
+
+  passe = permitido(recebido);
+
+    Serial.println("Resultado");
+    Serial.println(passe);
+
+    if(passe==0)
+    {
+      accessDenied();
+    }else
+    {
+      accessGranted();
+    }
 
   tagID="";
   
@@ -156,7 +175,7 @@ void loop ()
   closeCommand+=2;
   closeCommand+="\r\n";
   //envia os comandos de encerramento
-  sendData(closeCommand, 1000,DEBUG);//foi alterado aqui para forma padrão que seria o DEBUG, aqui estava false 2000
+  sendData(closeCommand, 2000,DEBUG);//foi alterado aqui para forma padrão que seria o DEBUG, aqui estava false 2000
   
 }
 
@@ -244,5 +263,61 @@ void aproximaCartao(int freq = 1500, int bip = 2){
     return true;
     }
    }
+
  
+  int permitido (String perm){
+  
+  char * pch;
+  const char * suc;
+  int ascii;
+
+  suc = perm.c_str();
+  pch = strstr(suc,"true");
+  //Serial.print("Comparando String com true: "); Serial.println(pch);
+  ascii = pch;
+  if (ascii == 0){
+    return 0;
+    }
+  else{
+    return 1;
+    }
+   }
+
+ void accessGranted ()
+{
+
+ int count = 2; //definindo a quantidade de bips
+  for (int j = 0; j < count; j++)
+  {
+    //Ligando o buzzer com uma frequência de 1500 hz e ligando o led verde.
+    tone (BUZZER, 1500);
+    digitalWrite (led_green, HIGH);   
+    delay (100);   
+    
+    //Desligando o buzzer e led verde.      
+    noTone (BUZZER);
+    digitalWrite (led_green, LOW);
+    delay (100);
+  }
+  access = false;  //Seta a variável access como false novamente
+}
+
+void accessDenied ()
+{
+  
+  int count = 1;  //definindo a quantidade de bips
+  for (int j = 0; j < count; j++)
+  {   
+    //Ligando o buzzer com uma frequência de 500 hz e ligando o led vermelho.
+    tone (BUZZER, 500);
+    digitalWrite (led_red, HIGH);   
+    delay (500); 
+    
+    //Desligando o buzzer e o led vermelho.
+    noTone (BUZZER);
+    digitalWrite (led_red, LOW);
+    delay (500);
+  }
+}
+    
     
