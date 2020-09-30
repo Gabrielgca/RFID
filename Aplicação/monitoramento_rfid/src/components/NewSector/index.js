@@ -54,26 +54,35 @@ class NewSectors extends Component {
         await this.setState({ maxOccupation: Math.trunc(this.state.area / 2) });
     }
 
-    handleAddSector = () => {
+    handleAddSector = async () => {
         /* alert(this.state.companyName);
         alert(this.state.roomName);
         alert(this.state.area);
         alert(this.state.floor);
         alert(this.state.maxOccupation); */
+        if ((this.state.companyName !== '')
+            && (this.state.roomName !== '')
+            && (this.state.floor !== '')) {
+        }
+        else {
+            alert('Os campos precisam ser preenchidos!')
+            return null
+        }
         let params = {
             companyName: this.state.companyName,
             roomName: this.state.roomName,
             floor: this.state.floor,
             area: this.state.area
         }
-
-        axios.post(baseURL + "registerLoc", params)
+        await axios.post(baseURL + "registerLoc", params)
             .then(response => {
                 console.log(response.data);
             })
             .catch(error => {
                 console.log(error);
-            });
+            })
+
+
 
         this.handleCloseConfirmModal();
     }
@@ -152,45 +161,45 @@ class NewSectors extends Component {
                             label="Nome da Empresa"
                             type="text"
                             fullWidth
+                            required
                         />
 
                         <TextField
                             //value={this.state.selectedOffice.nomeCargo}
                             onChange={(e) => { this.setState({ roomName: e.target.value }) }}
                             style={{ width: 500 }}
-                            autoFocus
                             margin="dense"
                             label="Nome/Nº Sala"
                             type="text"
                             fullWidth
+                            required
                         />
 
                         <TextField
                             //value={this.state.selectedOffice.nomeCargo}
                             onChange={(e) => { this.handleAreaUpdate(e) }}
                             style={{ width: 500 }}
-                            autoFocus
                             margin="dense"
                             label="Área"
                             type="number"
                             fullWidth
+                            required
                         />
 
                         <TextField
                             //value={this.state.selectedOffice.nomeCargo}
                             onChange={(e) => { this.setState({ floor: e.target.value }) }}
                             style={{ width: 500 }}
-                            autoFocus
                             margin="dense"
                             label="Andar"
                             type="number"
                             fullWidth
+                            required
                         />
 
                         <TextField
                             value={this.state.maxOccupation}
                             style={{ width: 500 }}
-                            autoFocus
                             margin="dense"
                             label="Limite Máximo de Pessoas"
                             type="number"
