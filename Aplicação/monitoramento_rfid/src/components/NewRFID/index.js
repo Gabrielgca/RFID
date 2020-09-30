@@ -57,7 +57,7 @@ class NewRFID extends Component {
       localizations: [],
       hrini: '',
       hrfim: '',
-      perm: '',
+      perm: true,
       loggedOffice: {
         key: '',
         nomeCargo: '',
@@ -259,7 +259,9 @@ class NewRFID extends Component {
   }
 
   handleCheck = async (event) => {
-    this.setState({ perm: event.target.checked })
+    this.setState({ 
+      perm: event.target.checked 
+    })
   }
 
   render() {
@@ -337,7 +339,7 @@ class NewRFID extends Component {
                 value={this.state.cardCodeRFID} disabled
               />
 
-              <TextField type='number' label='Idade' variant='outlined' size='small' style={{ background: '#FFF', borderRadius: 8, width: '20%', marginLeft: '2%', height:40 }}
+              <TextField type='number' label='Idade' variant='outlined' size='small' style={{ background: '#FFF', borderRadius: 8, width: '20%', marginLeft: '2%', height: 40 }}
                 value={this.state.age} onChange={(e) => this.setState({ age: e.target.value })} required
               />
 
@@ -345,7 +347,7 @@ class NewRFID extends Component {
                 value={this.state.office} onChange={(e) => this.setState({ office: e.target.value })} required
               />
 
-              <FormControl style={{ background: '#FFF', borderRadius: 8, width: '20%'}}>
+              <FormControl style={{ background: '#FFF', borderRadius: 8, width: '20%' }}>
                 <InputLabel id='labelTitle'>Permissão</InputLabel>
                 <Select
                   variant='outlined'
@@ -364,13 +366,13 @@ class NewRFID extends Component {
                 </Select>
               </FormControl>
 
-              <TextField InputLabelProps={{ shrink: true}} type='time' label='Hora de inicio' variant='outlined' style={{ background: '#FFF', borderRadius: 8, width: '20%', marginLeft: '2%', marginBottom: 10 }}
+              <TextField InputLabelProps={{ shrink: true }} type='time' label='Hora de inicio' variant='outlined' style={{ background: '#FFF', borderRadius: 8, width: '20%', marginLeft: '2%', marginBottom: 10 }}
                 value={this.state.hrini} onChange={(e) => this.setState({ hrini: e.target.value })}
               />
-              <TextField InputLabelProps={{ shrink: true}} type='time' label='Hora de fim' variant='outlined' style={{ background: '#FFF', borderRadius: 8, width: '20%', marginLeft: '2%', marginBottom: 10 }}
+              <TextField InputLabelProps={{ shrink: true }} type='time' label='Hora de fim' variant='outlined' style={{ background: '#FFF', borderRadius: 8, width: '20%', marginLeft: '2%', marginBottom: 10 }}
                 value={this.state.hrfim} onChange={(e) => this.setState({ hrfim: e.target.value })}
               />
-              <Button onClick={this.handleAddPermission} variant='contained' style={{ marginLeft: '2%', background: 'green', height: 42 }} ><AddIcon /></Button>
+              <Button onClick={this.handleAddPermission} variant='contained' style={{ marginLeft: '2%', background: 'green', height: 54 }} ><AddIcon /></Button>
               <FormControlLabel control={<CheckBox checked={this.state.perm} onChange={(e) => { this.handleCheck(e) }} />} label='Manter horário direto' />
               <div className='flatScroll'>
                 <FlatList
@@ -382,7 +384,8 @@ class NewRFID extends Component {
                         <p><b>Localização:</b> {item.loc}</p>
                         <p><b>Hora de inicio:</b> {item.hrini}</p>
                         <p><b>Hora fim:</b> {item.hrfim}</p>
-                        <p><b>Permissão:</b>{item.perm}</p>
+                        {item.perm == true ? (<p><b>Diario:</b>Sim</p>) : (<p></p>)}
+                        {item.perm == false ? (<p><b>Diario:</b>Não</p>) : (<p></p>)}
                       </div>
                       <div>
                         <Button onClick={() => (this.removeEntrada(this.state.permissions.indexOf(item)))} variant='contained' style={{ background: 'red', marginLeft: '90%', marginTop: '-10%' }} ><RemoveIcon /></Button>
