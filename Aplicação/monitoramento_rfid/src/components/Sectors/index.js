@@ -119,6 +119,7 @@ class Sectors extends Component {
         this.getAllSectors();
     }
 
+
     handleConfirmModalOpen = (sector) => {
         this.setState({ modalConfirmShow: true });
         let array = {
@@ -216,6 +217,8 @@ class Sectors extends Component {
         } */
     }
 
+
+
     render() {
         if (this.state.pageLoading === true) {
             return (
@@ -269,7 +272,7 @@ class Sectors extends Component {
                             list={this.state.filteredSectors.length > 0 ? this.state.filteredSectors : this.state.sectors}
                             renderItem={(item) => (
                                 <div className="sectors-item">
-                                    <div className={item.status === 'Ativo' ? "sectors-item-info" : "sectors-item-info-disabled"} key={item.id_loc}>
+                                    <div className={item.status === 'A' ? "sectors-item-info" : "sectors-item-info-disabled"} key={item.id_loc}>
                                         <p><b>Nome da Empresa: </b>{item.companyName}</p>
                                         <p><b>Sala: </b>{item.roomName}</p>
                                         <p><b>Área: </b>{item.area}</p>
@@ -286,7 +289,7 @@ class Sectors extends Component {
                                             Detalhes
                                         </Button>
 
-                                        {item.status === 'Inativo' ? (
+                                        {item.status === 'I' ? (
                                             <Button
                                                 endIcon={<CheckCircleOutlineIcon />}
                                                 style={{ backgroundColor: 'red', color: '#FFF', width: '80%', height: '35%' }}
@@ -296,7 +299,6 @@ class Sectors extends Component {
                                         ) : (
                                                 <Button
                                                     endIcon={<BlockIcon />}
-                                                    disabled={true}
                                                     style={{ backgroundColor: 'red', color: '#FFF', width: '80%', height: '35%' }}
                                                 >
                                                     Desativar
@@ -324,7 +326,7 @@ class Sectors extends Component {
                         />
 
                     </div>
-
+                    
                     {/* Modal para edição dos dados da conta selecionada */}
                     <Dialog maxWidth={700} open={this.state.modalConfirmShow} onClose={this.handleCloseConfirmModal} aria-labelledby="form-dialog-title">
                         <DialogTitle id="form-dialog-title">Editar Setor</DialogTitle>
