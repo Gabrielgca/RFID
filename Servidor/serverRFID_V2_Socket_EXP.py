@@ -67,9 +67,10 @@ class Cadastro(db.Model):
         return '''<Cadastro
 (id_cadastro='{}',
 no_usuario='{}',
+ed_arquivo_imagem='{}',
 vl_idade = '{}',
-no_area_trabalho = '{}',
-    ed_arquivo_imagem='{}')>'''.format(self.idCadastro, self.noUsuario, self.edArquivoImagem, self.vlIdade, self.noAreaTrabalho)
+no_area_trabalho = '{}'
+    )>'''.format(self.idCadastro, self.noUsuario, self.edArquivoImagem, self.vlIdade, self.noAreaTrabalho)
     
     def getDict(self):
         self.dictionary = {}
@@ -199,9 +200,9 @@ class LocalizacaoDisp(db.Model):
     __tablename__ = 'tb_localizacao_disp' 
 
     idLocalizacaoDisp = db.Column('id_localizacao_disp', db.Integer, primary_key=True, unique=True, nullable=False, comment='''Identificação da localização do dispositivo''')
-    noEmpresa = db.Column('no_empresa', db.String(40), primary_key=True, unique=True, comment='''Nome da empresa em que se encontra a localização.''')
+    noEmpresa = db.Column('no_empresa', db.String(40), nullable = False, comment='''Nome da empresa em que se encontra a localização.''')
     noLocalizacao = db.Column('no_localizacao', db.String(40), nullable=False, comment='''Nome da localização do dispositivo''')
-    vlAndar = db.Column('vl_andar', db.Integer, nullable=True,default=None, comment='''Indicação do andar da localização''')
+    vlAndar = db.Column('vl_andar', db.Integer, nullable=True, default=None, comment='''Indicação do andar da localização''')
     vlArea = db.Column('vl_area', db.Integer, nullable=False, comment='''Quantidade de pessoas na localização''')
     vlQtdeLampadas = db.Column('vl_qtde_lampadas', db.Integer, nullable=False, comment='''Quantidade de lâmpadas instaladas na localização.''')
     vlConsumoLamp = db.Column('vl_consumo_lamp', db.Integer, nullable=False, comment='''Consumo total por lâmpada instalada, em watts.''')
@@ -772,7 +773,7 @@ def register():
         str_user = data['nomeUsuario']
         str_age = data['idade']
         str_trab = data['trab']
-        #str_img = data['imgPerfil']
+        str_img = data['imgPerfil']
         
         list_perm = data['permissoes']
 
@@ -792,56 +793,67 @@ def register():
                 id_cartao = cmd.selnoCartao(str_card).idCartao
                 cadastroCartao = CadastroCartao(idCadastro = usuario.idCadastro, idCartao = id_cartao, stEstado = 'A')
                 cmd.insertCadastroCartao_byid(cadastroCartao, refresh=True)
-                #cmd.updateCadastroImg(cadastro = cadastroCartao.idCadastro,
-            #                     imgUrl = url_for("static",filename = "imagens/"+str(cadastroCartao.idCadastro)+".png",_external = True))
+                cmd.updateCadastroImg(idCadastro = cadastroCartao.idCadastro,
+                                 imgUrl = url_for("static",filename = "imagens/"+str(cadastroCartao.idCadastro)+".png",_external = True))
             else:
                 #CARTAO NÃO TINHA SIDO CADASTRADO
                 cmd.insertCadastroCartao(cadastroCartao = cadastroCartao,
                                         cadastro = usuario,
                                         cartao = cartao,
                                         refresh = True)
-            #cmd.updateCadastroImg(cadastro = cadastroCartao.idCadastro,
-            #                     imgUrl = url_for("static",filename = "imagens/"+str(cadastroCartao.idCadastro)+".png",_external = True))
+            cmd.updateCadastroImg(idCadastro = cadastroCartao.idCadastro,
+                                 imgUrl = url_for("static",filename = "imagens/"+str(cadastroCartao.idCadastro)+".png",_external = True))
         except Exception as e:
             print(e)
             return jsonify(success = False)
 
         #VERIFICAR CAMINHO NA RASP
-        #with open(os.getcwd().replace("\\","/")+"/static/imagens/{}.png".format(cadastroCartao.idCadastro),"wb") as png2:
-           # png2.write(base64.b64decode(str_img))
+        with open(os.getcwd().replace("\\","/")+"/static/imagens/{}.png".format(str(cadastroCartao.idCadastro)),"wb") as png2:
+            png2.write(base64.b64decode(str_img))
 
         for i in range(len(list_perm)):
 
             hr_perm_ini = 0
             hr_perm_fim = 0
             perm_perm = "N"
-            loc_perm = list_perm[i]["loc"]
-            print(f'loc_perm :{loc_perm}')
+            id_disp_loc = list_perm[i]["id_disp_loc"]
+            #print(f'loc_perm :{loc_perm}')
             #MUDEI PARA QUE RECEBA O ID, E NÃO O NOME
-            loc_perm_no = cmd.selLocalizacaoDisp_no(loc_perm)
-
-            dict_loc_perm = loc_perm_no[0].getDict()
-            id_loc_perm = dict_loc_perm['idLocalizacaoDisp']
-            
-            disp_loc = cmd.selDispLocalizacao(id_loc_perm)
-            
-            dict_disp_loc = disp_loc[-1].getDict()
-            id_disp_loc = dict_disp_loc['idDispLocalizacao']
-            
-            if len(list_perm[i]["hrini"]) != 0 or len(list_perm[i]["hrfim"]) != 0:
+            if list_perm[i]["hrini"] != None or list_perm[i]["hrini"] != None:
                 hr_perm_ini = list_perm[i]["hrini"]
                 hr_perm_fim = list_perm[i]["hrfim"]
                 print(f'horário recebido de início : { list_perm[i]["hrini"]}')
                 print(f'horário recebido de fim : { list_perm[i]["hrfim"]}')
-                perm_perm =list_perm[i]["perm"]
-                try:
-                    perm_horario = PermHorario(hrInicial = hr_perm_ini, hrFinal = hr_perm_fim, stPermanente = perm_perm)
-                    cmd.insertPermHorario(perm_horario, refresh = True)
-                    usu_disp = PermUsuDisp(idCadastro = cadastroCartao.idCadastro, idPermissao = 1, idDispLocalizacao = id_disp_loc, idPermHorario = perm_horario.idPermHorario, stStatus = 'A')
+                perm_perm =list_perm[i]["permanente"]
+
+
+
+                if "dtini" not in list_perm[i] and "dtfim" not in list_perm[i]:
+                    list_perm[i]["dtini"] == None
+                    list_perm[i]["dtfim"] == None
+
+                
+                if list_perm[i]["dtini"] == None or list_perm[i]["dtfim"] == None:
+                    #CASO NÃO EXISTA DATA ESPECÍFICA
+                    try:
+                        perm_horario = PermHorario(hrInicial = hr_perm_ini, hrFinal = hr_perm_fim, stPermanente = perm_perm)
+                        cmd.insertPermHorario(perm_horario, refresh = True)
+                        usu_disp = PermUsuDisp(idCadastro = cadastroCartao.idCadastro, idPermissao = 1, idDispLocalizacao = id_disp_loc, idPermHorario = perm_horario.idPermHorario, stStatus = 'A')
+                        
+                    except Exception as e:
+                        print(f'register 1 - {e}')
+                        return jsonify (success = False)
+                else:
+                    #CASO EXISTA DATA ESPECÍFICA 
+                    try:
+                        perm_horario = PermHorario(hrInicial = hr_perm_ini, hrFinal = hr_perm_fim, dtInicio = list_perm[i]["dtini"], dtFim = list_perm[i]["dtfim"],stPermanente = perm_perm)
+                        cmd.insertPermHorario(perm_horario, refresh = True)
+                        usu_disp = PermUsuDisp(idCadastro = cadastroCartao.idCadastro, idPermissao = 1, idDispLocalizacao = id_disp_loc, idPermHorario = perm_horario.idPermHorario, stStatus = 'A')
                     
-                except Exception as e:
-                    print(f'register 1 - {e}')
-                    return jsonify (success = False)
+                    except Exception as e:
+                        print(f'register 1 - {e}')
+                        return jsonify (success = False)
+
             else:
                 print(f'Sem horário definido para a permissão número {i} do usuário.')
                 try:
@@ -880,14 +892,23 @@ def userInfo():
     for i in all_user:
         dict_user = {}
         dict_user["id_user"] = i.idCadastro
-        dict_user["nome"] = i.noUsuario
-        dict_user["idade"] = i.vlIdade
-        dict_user["cargo"] = i.noAreaTrabalho
+        dict_user["name"] = i.noUsuario
+        dict_user["age"] = i.vlIdade
+        dict_user["office"] = i.noAreaTrabalho
+
+        #VERIFICAR SE O ARQUIVO DE IMAGEM DE PERFIL EXISTE
+        if os.path.exists(os.getcwd().replace("\\","/")+"/static/imagens/"+ str(i.idCadastro) +".png"):
+            dict_user['imgPerfil'] = i.edArquivoImagem
+
         if len(cmd.selCadastroCartao(i.idCadastro)) > 0:
             cad_cat = cmd.selCadastroCartao(i.idCadastro)
             nocartao = cmd.selCartao(cad_cat[-1].idCartao)
             dict_user["status"] = cad_cat[-1].stEstado
             dict_user["RFID"] = nocartao
+
+
+
+
         if len(cmd.selPermUsuDisp(i.idCadastro)) > 0:
             for j in range(len(cmd.selPermUsuDisp(i.idCadastro))):
 
@@ -941,11 +962,10 @@ def updateUser():
             return answer (app, 204, resp)
         update_user = Cadastro()
 
-        print(f'DADO RECEBIDO DE UPDATE_USER: {data}')
         id_user = data['id_user']
-        update_user.noUsuario = data['nome']
-        update_user.vlIdade = data['idade']
-        update_user.noAreaTrabalho = data['cargo']
+        update_user.noUsuario = data['name']
+        update_user.vlIdade = data['age']
+        update_user.noAreaTrabalho = data['office']
   
         
         #DESATIVANDO RFID ANTERIOR
@@ -1000,37 +1020,42 @@ def updateUser():
             print('Não foi encontrado um id_cadastro na tabela tb_cadastro_cartao.')
             return jsonify(success = False)
             
-            #if "img" in data:
-                #str_img = data['img']
-                #with open(os.getcwd().replace("\\","/")+"/static/imagens/{}.png".format(id_user),"wb") as png2:
-                #    png2.write(base64.b64decode(str_img))
+        if data['imgPerfil'] != None:
+            str_img = data['imgPerfil']
+            with open(os.getcwd().replace("\\","/")+"/static/imagens/{}.png".format(id_user),"wb") as png2:
+                png2.write(base64.b64decode(str_img))
 
         count = 0
-        for key in data:
-            if key == "perm":
-                list_perm = data['perm']
-                print('Encontrei permissões a serem editadas.')
-                for i in list_perm:
-                    for p_key in i:
-                        #CASO DE ATUALIZAR PERMISSÃO
-                        if p_key == 'id_perm_usu_disp':
-                            print('ENTREI AQUI 1 .')
-                            id_perm_usu_disp = list_perm[count]['id_perm_usu_disp']
-                            #CASO DE ATUALIZAR STATUS DA PERMISSÃO
-                            if "st_perm_usu_disp" in list_perm[count]:
-                                print('ENTREI AQUI 2 .')
-                                st_perm_usu_disp = list_perm[count]['st_perm_usu_disp']
-                                cmd.updatestStatusPermUsuDisp(id_perm_usu_disp, st_perm_usu_disp)
-                            #CASO DE ATUALIZAR HORA DA PERMISSÃO
-                            if "hr_inicio" in list_perm[count] and "hr_final" in list_perm[count] :
-                                print('ENTREI AQUI 3 .')
-                                if list_perm[count]['hr_inicio'] != None and list_perm[count]['hr_final'] != None:
-                                    print('ENTREI AQUI 4 .')
-                                    hr_inicio = list_perm[count]['hr_inicio']
-                                    hr_final = list_perm[count]['hr_final']
-                                    permissao = list_perm[count]['permanente']
+        if "perm" in data:
+            list_perm = data['perm']
+            
+            for i in list_perm:
 
+                if "dtini" not in list_perm[i] and "dtfim" not in list_perm[i]:
+                    list_perm[i]["dtini"] == None
+                    list_perm[i]["dtfim"] == None
+                
+                for p_key in i:
+                    #CASO DE ATUALIZAR PERMISSÃO
+                    if p_key == 'id_perm_usu_disp':
+                        
+                        id_perm_usu_disp = list_perm[count]['id_perm_usu_disp']
+                        #CASO DE ATUALIZAR STATUS DA PERMISSÃO
+                        if "st_perm_usu_disp" in list_perm[count]:
+                            
+                            st_perm_usu_disp = list_perm[count]['st_perm_usu_disp']
+                            cmd.updatestStatusPermUsuDisp(id_perm_usu_disp, st_perm_usu_disp)
+                        #CASO DE ATUALIZAR HORA OU DATA DA PERMISSÃO
+                        if "hr_inicio" in list_perm[count] and "hr_final" in list_perm[count] :
+                            
+                            if list_perm[count]['hr_inicio'] != None and list_perm[count]['hr_final'] != None:
+                                
+                                hr_inicio = list_perm[count]['hr_inicio']
+                                hr_final = list_perm[count]['hr_final']
+                                permissao = list_perm[count]['permanente']
 
+                                if list_perm[i]["dtini"] == None or list_perm[i]["dtfim"] == None:
+                                    #CASO NÃO EXISTA DATA ESPECÍFICA
                                     try:
                                         perm_horario = PermHorario(hrInicial = hr_inicio, hrFinal = hr_final, stPermanente = permissao)
                                         cmd.insertPermHorario(perm_horario, refresh = True)
@@ -1040,49 +1065,59 @@ def updateUser():
                                         print(f'update permissao  - {e}')
                                         return jsonify (success = False)
                                 else:
-                                    print('Tirando horário de permissão.')
-                                            
-                                    cmd.updatePermHorarioPermUsuDisp(id_perm_usu_disp, None)
-                        #CASO DE ADICIONAR NOVA PERMISSÃO
-                        elif p_key == 'id_loc_disp':
-                            
-                            print('ENTREI AQUI 5 .')
-                            id_loc_perm = list_perm[count]["id_loc_disp"]
-                            
-                            disp_loc = cmd.selDispLocalizacao(id_loc_perm)
-                            dict_disp_loc = disp_loc[-1].getDict()
-                            id_disp_loc = dict_disp_loc['idDispLocalizacao']
-                            
-                            if "hr_inicio" in list_perm[count] and "hr_final" in list_perm[count]:
-                                print('ENTREI AQUI 6 .')
-                                hr_perm_ini = list_perm[count]["hr_inicio"]
-                                hr_perm_fim = list_perm[count]["hr_final"]
-                                print(f'horário recebido de início : { list_perm[count]["hr_inicio"]}')
-                                print(f'horário recebido de fim : { list_perm[count]["hr_final"]}')
-                                perm_perm =list_perm[count]["permanente"]
-                                try:
-                                    perm_horario = PermHorario(hrInicial = hr_perm_ini, hrFinal = hr_perm_fim, stPermanente = perm_perm)
-                                    cmd.insertPermHorario(perm_horario, refresh = True)
-                                    usu_disp = PermUsuDisp(idCadastro = id_user, idPermissao = 1, idDispLocalizacao = id_disp_loc, idPermHorario = perm_horario.idPermHorario, stStatus = 'A')
+                                    #CASO EXISTA DATA ESPECÍFICA 
+                                    try:
+                                        perm_horario = PermHorario(hrInicial = hr_perm_ini, hrFinal = hr_perm_fim, dtInicio = list_perm[i]["dtini"], dtFim = list_perm[i]["dtfim"],stPermanente = perm_perm)
+                                        cmd.insertPermHorario(perm_horario, refresh = True)
+                                        cmd.updatePermHorarioPermUsuDisp(id_perm_usu_disp,perm_horario.idPermHorario)
                                     
-                                except Exception as e:
-                                    print(f'register 1 - {e}')
-                                    return jsonify (success = False)
+                                    except Exception as e:
+                                        print(f'register 1 - {e}')
+                                        return jsonify (success = False)
                             else:
-                                print(f'Sem horário definido para a permissão número {i} do usuário.')
-                                try:
-                                    usu_disp = PermUsuDisp(idCadastro = id_user, idPermissao = 1, idDispLocalizacao = id_disp_loc, stStatus = 'A')
-                                    
-                                except Exception as e:
-                                    print(f'2 - {e}')
-                                    return jsonify (success = False)
+                                print('Tirando horário de permissão.')
+                                        
+                                cmd.updatePermHorarioPermUsuDisp(id_perm_usu_disp, None)
+                    #CASO DE ADICIONAR NOVA PERMISSÃO
+                    elif p_key == 'id_disp_loc':
+                        
+                        print('ENTREI AQUI 5 .')
+                        id_disp_loc = list_perm[count]["id_disp_loc"]
+                        
+                        '''disp_loc = cmd.selDispLocalizacao(id_loc_perm)
+                        dict_disp_loc = disp_loc[-1].getDict()
+                        id_disp_loc = dict_disp_loc['idDispLocalizacao']
+                        '''
+                        if "hr_inicio" in list_perm[count] and "hr_final" in list_perm[count]:
+                            print('ENTREI AQUI 6 .')
+                            hr_perm_ini = list_perm[count]["hr_inicio"]
+                            hr_perm_fim = list_perm[count]["hr_final"]
+                            print(f'horário recebido de início : { list_perm[count]["hr_inicio"]}')
+                            print(f'horário recebido de fim : { list_perm[count]["hr_final"]}')
+                            perm_perm =list_perm[count]["permanente"]
                             try:
-                                cmd.insertPermUsuDisp(usu_disp)
+                                perm_horario = PermHorario(hrInicial = hr_perm_ini, hrFinal = hr_perm_fim, stPermanente = perm_perm)
+                                cmd.insertPermHorario(perm_horario, refresh = True)
+                                usu_disp = PermUsuDisp(idCadastro = id_user, idPermissao = 1, idDispLocalizacao = id_disp_loc, idPermHorario = perm_horario.idPermHorario, stStatus = 'A')
+                                
                             except Exception as e:
-                                    print(f'3 - {e}')
-                                    return jsonify (success = False)
-                    count = count + 1
-                count = 0
+                                print(f'register 1 - {e}')
+                                return jsonify (success = False)
+                        else:
+                            print(f'Sem horário definido para a permissão número {i} do usuário.')
+                            try:
+                                usu_disp = PermUsuDisp(idCadastro = id_user, idPermissao = 1, idDispLocalizacao = id_disp_loc, stStatus = 'A')
+                                
+                            except Exception as e:
+                                print(f'2 - {e}')
+                                return jsonify (success = False)
+                        try:
+                            cmd.insertPermUsuDisp(usu_disp)
+                        except Exception as e:
+                                print(f'3 - {e}')
+                                return jsonify (success = False)
+                count = count + 1
+            count = 0
 
 
 
@@ -1264,7 +1299,6 @@ def registerLoc():
         str_loc = data['roomName']
         str_andar = data['floor']
         str_area = data['area']
-        #str_img = data['img']
         
         try:
 
@@ -1274,8 +1308,10 @@ def registerLoc():
 
             cmd.insertLocalizacaoDisp(insereLocDisp, refresh = True)
            
-            #with open(os.getcwd().replace("\\","/")+"/static/imagens/{}_{}.png".format(str_emp, insereLocDisp.idLocalizacao),"wb") as png2:
-                #png2.write(base64.b64decode(str_img))
+            if data['img'] != None:
+                str_img = data['img']
+                with open(os.getcwd().replace("\\","/")+"/static/setores/{}_{}.png".format(str_emp.replace(" ", "_"), insereLocDisp.idLocalizacaoDisp),"wb") as png2:
+                    png2.write(base64.b64decode(str_img))
             
             return jsonify(success = True)
             
@@ -1304,10 +1340,10 @@ def updateLoc():
         update_loc_disp.vlAndar = data['floor']
         update_loc_disp.vlArea = data['area']
 
-        if "img" in data:
+        if data['img'] != None:
             str_img = data['img']
-            #with open(os.getcwd().replace("\\","/")+"/static/imagens/{}_{}.png".format(data['companyName'], id_loc),"wb") as png2:
-            #png2.write(base64.b64decode(str_img))
+            with open(os.getcwd().replace("\\","/")+"/static/setores/{}_{}.png".format(data['companyName'].replace(" ","_"), id_loc),"wb") as png2:
+                png2.write(base64.b64decode(str_img))
 
         #STATUS NOVO
         try:
@@ -1424,8 +1460,8 @@ def fuc_roominfo(app_id_sala):
                 dict_ocupante = dict (nomeOcupante = info_users[i], idOcupante = users_inside[i], imgPerfil = '')
                 lista_ocupantes.append(dict_ocupante)
         #VERIFICAR SE O ARQUIVO DE IMAGEM DE SALA EXISTE
-        if os.path.exists(os.getcwd().replace("\\","/")+"/static/imagens/{}_{}.png".format(no_empresa, id_loc_disp)):
-            img_sala = url_for("static",filename = "imagens/{}_{}.png".format(no_empresa, id_loc_disp),_external = True)
+        if os.path.exists(os.getcwd().replace("\\","/")+"/static/setores/{}_{}.png".format(no_empresa.replace(" ","_"), id_loc_disp)):
+            img_sala = url_for("static",filename = "imagens/{}_{}.png".format(no_empresa.replace(" ","_"), id_loc_disp),_external = True)
             sala = dict( idSala = id_sala, nomeSala = room['salas'][int(id_sala)-1]['nomeSala'], imgMapaSala = img_sala ,ocupantes = lista_ocupantes)
             room['salaSelecionada'] = sala
 
