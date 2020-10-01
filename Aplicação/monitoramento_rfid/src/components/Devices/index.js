@@ -119,7 +119,7 @@ class Devices extends Component {
             selectedDevice: {
                 key: user.id_disp,
                 nameDevice: user.desc,
-                localization: user.id_loc,
+                localization: user.id_disp,
                 status: user.status,
             }
         })
@@ -339,8 +339,8 @@ class Devices extends Component {
                                         <p><b>ID:</b> {item.id_disp}</p>
                                         <p><b>Descrição do Dispositivo:</b> {item.desc}</p>
                                         <p><b>Localização do Dispositivo:</b> {item.no_loc}</p>
-                                        {item.status === 'A' ? (<p><b>Status:</b> Ativo</p>) : (<p></p>)}
-                                        {item.status === 'I' ? (<p><b>Status:</b> Inativo</p>) : (<p></p>)}
+                                        {/* {item.status === 'A' ? (<p><b>Status:</b> Ativo</p>) : (<p></p>)}
+                                        {item.status === 'I' ? (<p><b>Status:</b> Inativo</p>) : (<p></p>)} */}
                                         {/* <p>{JSON.stringify(item)}</p> */}
                                     </div>
 
@@ -423,7 +423,7 @@ class Devices extends Component {
                                     {this.state.localization.map((loc) => {
                                         return (
                                             //Alterar para enviar id_loc em vez de roomName
-                                            <MenuItem value={loc.roomName}>{loc.id_loc} - {loc.roomName} </MenuItem>
+                                            <MenuItem value={loc.id_loc}>{loc.id_loc} - {loc.roomName} </MenuItem>
                                         )
                                     })}
 
@@ -432,14 +432,14 @@ class Devices extends Component {
                             </DialogContentText>
 
 
-                            <InputLabel className="selectLabel">Status</InputLabel>
-                            <Select
-                                value={this.state.selectedDevice.status}
-                                onChange={this.statusDevice}
-                            >
-                                <MenuItem value="A">Ativo</MenuItem>
-                                <MenuItem value="I">Inativo</MenuItem>
-                            </Select>
+                            {/* <InputLabel className="selectLabel">Status</InputLabel>
+                                <Select
+                                    value={this.state.selectedDevice.status}
+                                    onChange={this.statusDevice}
+                                >
+                                    <MenuItem value="A">Ativo</MenuItem>
+                                    <MenuItem value="I">Inativo</MenuItem>
+                                </Select> */}
 
 
 
