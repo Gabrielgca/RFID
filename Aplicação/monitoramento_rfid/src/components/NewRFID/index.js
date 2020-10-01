@@ -215,7 +215,6 @@ class NewRFID extends Component {
   }
 
   handleFile = async (e) => {
-
     fileUpload(e).then(result => {
       //this.fileResult = result;
       this.setState({ fileResult: result.base64 });
@@ -320,11 +319,11 @@ class NewRFID extends Component {
 
 
             <div className='input-wrapper'>
-              <label>
+              <label for='input-file'>
                 Selecionar um arquivo
               </label>
               <input type="file" id="input-file" placeholder="Imagem de Perfil"
-                onChange={this.handleFile} required />
+                onChange={this.handleFile} />
               <span id='file-name'></span>
             </div>
 
