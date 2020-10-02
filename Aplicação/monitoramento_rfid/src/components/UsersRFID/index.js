@@ -36,6 +36,8 @@ import RemoveIcon from '@material-ui/icons/Remove';
 
 import { FormControlLabel, Checkbox } from '@material-ui/core';
 
+const fileUpload = require('fuctbase64');
+
 
 class UsersRFID extends Component {
     constructor(props) {
@@ -50,6 +52,7 @@ class UsersRFID extends Component {
             setores: [],
 
             selectedSector: -1,
+            fileResult: '',
             roomName: "",
             hr_inicio: "",
             hr_final: "",
@@ -122,6 +125,7 @@ class UsersRFID extends Component {
                 id_user: user.id_user,
                 name: user.name,
                 status: user.status,
+                imgPerfil: user.imgPerfil,
                 RFID: user.RFID,
                 age: user.age,
                 office: user.office,
@@ -135,7 +139,7 @@ class UsersRFID extends Component {
     modalClose = async () => { //Fecha o modal de edição
         this.setState({ modalOpen: false });
         this.getUsersRFID();
-        this.setState({ selectedUser: { id_user: '', name: '', age: '', office: '', status: '', RFID: '', perm: [] } });
+        this.setState({ selectedUser: { id_user: '', name: '', age: '', office: '', status: '', imgPerfil: '', RFID: '', perm: [] } });
         this.setState({ permissoesAdicionadas: [] });
         //window.location.reload();
         this.setState({ hr_inicio: "" });
@@ -143,6 +147,7 @@ class UsersRFID extends Component {
         this.setState({ selectedSector: -1 });
         this.setState({ roomName: "" });
         this.setState({ permanente: true });
+        this.setState({ fileResult: '' });
     };
 
     handleDeactivateUserOpen = (user) => { //Abre o modal de confirmação de desativação do usuário
@@ -153,6 +158,7 @@ class UsersRFID extends Component {
                 id_user: user.id_user,
                 name: user.name,
                 status: user.status,
+                imgPerfil: user.imgPerfil,
                 age: user.age,
                 office: user.office,
                 RFID: user.RFID,
@@ -165,7 +171,8 @@ class UsersRFID extends Component {
 
     handleDeactivateUserClose = () => { //Fecha o modal de confirmação de desativação
         this.setState({ modalDeactivateOpen: false });
-        this.setState({ selectedUser: { id_user: '', name: '', age: '', office: '', status: '', RFID: '', perm: [] } });
+        this.setState({ selectedUser: { id_user: '', name: '', age: '', office: '', status: '', imgPerfil: '', RFID: '', perm: [] } });
+        this.setState({ fileResult: '' });
         this.getUsersRFID();
     };
 
@@ -204,7 +211,8 @@ class UsersRFID extends Component {
 
     handleReactivateUserClose = () => { //Fecha o modal de confirmação de reativação
         this.setState({ modalReactivateOpen: false });
-        this.setState({ selectedUser: { id_user: '', name: '', age: '', office: '', status: '', RFID: '', perm: [] } });
+        this.setState({ selectedUser: { id_user: '', name: '', age: '', office: '', status: '', imgPerfil: '', RFID: '', perm: [] } });
+        this.setState({ fileResult: '' });
         this.getUsersRFID();
     };
 
@@ -232,7 +240,7 @@ class UsersRFID extends Component {
                 console.log("Responses");
                 console.log(response.data.dispinfo);
                 this.setState({ setores: response.data.dispinfo });
-                this.setState({ selectedSector: response.data.dispinfo[0].id_loc_disp });
+                this.setState({ selectedSector: response.data.dispinfo[0].id_disp_loc });
                 this.setState({ roomName: response.data.dispinfo[0].no_loc });
             })
             .catch(error => {
@@ -251,6 +259,14 @@ class UsersRFID extends Component {
 
 
     //FUNÇÕES QUE ALTERAM OS VALORES DOS DADOS DO USUÁRIO SELECIONADO
+    handleFile = async (e) => {
+        fileUpload(e).then(result => {
+            //this.fileResult = result;
+            this.setState({ fileResult: result.base64 });
+            //alert("Result: " + JSON.stringify(result));
+        });
+    }
+
     handleNameChange = async (event) => { //Altera o nome do usuário atualmente sendo editado
         let newName = this.state.selectedUser;
         newName.name = event.target.value;
@@ -300,6 +316,7 @@ class UsersRFID extends Component {
     getUsersRFID = async () => { //Função que obtém todos os usuários do Servidor
         await axios.get(baseURL + 'userInfo')
             .then(response => {
+                console.log(response.data.usuarios);
                 this.setState({ users: response.data.usuarios })
             })
             .catch(error => {
@@ -330,6 +347,7 @@ class UsersRFID extends Component {
                 id_user: this.state.selectedUser.id_user,
                 RFID: this.state.selectedUser.RFID,
                 name: this.state.selectedUser.name,
+                imgPerfil: this.state.fileResult !== '' ? this.state.fileResult : null,
                 age: this.state.selectedUser.age,
                 office: this.state.selectedUser.office,
                 status: this.state.selectedUser.status,
@@ -410,7 +428,7 @@ class UsersRFID extends Component {
         if ((this.state.hr_inicio !== '' && this.state.hr_final !== '' && this.state.selectedSector !== '') || (this.state.hr_inicio === '' && this.state.hr_final === '' && this.state.selectedSector !== '')) {
             let newPermissions = this.state.permissoesAdicionadas;
             newPermissions.push({
-                id_loc_disp: this.state.selectedSector,
+                id_disp_loc: this.state.selectedSector,
                 roomName: this.state.roomName,
                 hr_inicio: this.state.hr_inicio === "" ? null : this.state.hr_inicio,
                 hr_final: this.state.hr_final === "" ? null : this.state.hr_final,
@@ -541,13 +559,19 @@ class UsersRFID extends Component {
                             list={this.state.filterUsers.length > 0 ? this.state.filterUsers : this.state.users}
                             renderItem={(item) => (
                                 <div className="users-rfid-item">
-                                    <div className={item.status === 'A' ? "users-rfid-item-info" : "users-rfid-item-info-disabled"} key={item.id_user}>
-                                        <p><b>Nome:</b> {item.name}</p>
-                                        <p><b>Idade:</b> {item.age}</p>
-                                        <p><b>Cargo:</b> {item.office}</p>
-                                        {item.status === 'A' ? (<p><b>Status:</b> Ativo</p>) : (<p></p>)}
-                                        {item.status === 'I' ? (<p><b>Status:</b> Inativo</p>) : (<p></p>)}
-                                        <p><b>RFID:</b> {item.RFID}</p>
+                                    <div style={{ display: "flex", flexDirection: "row", justifyContent: "flex-start" }} className={item.status === 'A' ? "users-rfid-item-info" : "users-rfid-item-info-disabled"} key={item.id_user}>
+                                        <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+                                            <img className="person-avatar" src={item.imgPerfil} ></img>
+                                        </div>
+                                        <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                                            <p><b>ID:</b> {item.id_user}</p>
+                                            <p><b>Nome:</b> {item.name}</p>
+                                            <p><b>Idade:</b> {item.age}</p>
+                                            <p><b>Cargo:</b> {item.office}</p>
+                                            {item.status === 'A' ? (<p><b>Status:</b> Ativo</p>) : (<p></p>)}
+                                            {item.status === 'I' ? (<p><b>Status:</b> Inativo</p>) : (<p></p>)}
+                                            <p><b>RFID:</b> {item.RFID}</p>
+                                        </div>
                                         {/* {item.perm.forEach((p) => {
                                             return (
                                                 <p>{JSON.stringify(p)}</p>
@@ -618,6 +642,25 @@ class UsersRFID extends Component {
                         <DialogTitle id="alert-dialog-title">{"Detalhes do usuário"}</DialogTitle>
                         <DialogContent>
                             <DialogContentText id="alert-dialog-description">
+                                {this.state.fileResult !== '' ?
+                                    <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+                                        <img style={{ marginBottom: 10 }} className="img-perfil" src={"data:image/png;base64, " + this.state.fileResult} />
+                                    </div>
+                                    :
+                                    <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+                                        <img style={{ marginBottom: 10 }} className="img-perfil" src={this.state.selectedUser.imgPerfil} />
+                                    </div>
+                                }
+
+                                <div className='input-wrapper'>
+                                    <label for='input-file'>
+                                        Selecionar um arquivo
+                                    </label>
+                                    <input type="file" id="input-file" placeholder="Imagem de Perfil"
+                                        onChange={this.handleFile} />
+                                    <span id='file-name'></span>
+                                </div>
+
                                 <TextField
                                     disabled={!utils.checkSpecificPermission("Editar", this.state.loggedOffice.permissoes.usuario)}
                                     autoFocus
@@ -789,7 +832,7 @@ class UsersRFID extends Component {
                                         {this.state.setores.map((setor) => {
                                             if (setor.status === "A") {
                                                 return (
-                                                    <MenuItem key={setor.id_loc_disp} value={setor.id_loc_disp}>{setor.id_loc_disp} - {setor.no_loc}</MenuItem>
+                                                    <MenuItem key={setor.id_disp_loc} value={setor.id_disp_loc}>{setor.id_disp_loc} - {setor.no_loc}</MenuItem>
                                                 );
                                             }
                                         })}

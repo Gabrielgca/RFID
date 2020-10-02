@@ -54,6 +54,7 @@ class NewRFID extends Component {
       office: '',//Armazenará o cargo
       permissions: [],
       localization: '',
+      roomName: '',
       localizations: [],
       hrini: '',
       hrfim: '',
@@ -157,6 +158,15 @@ class NewRFID extends Component {
       })
   } */
 
+  handleSelectedLocalizationChange = (e) => { //Função que altera o setor da nova permissão a ser cadastrada
+    this.setState({ localization: e.target.value });
+    this.state.localizations.map((localization) => {
+      if (localization.id_disp_loc === e.target.value) {
+        this.setState({ roomName: localization.no_loc });
+      }
+    });
+  };
+
   handleLoadingOn = async () => {
     this.setState({ loading: true });
   }
@@ -179,7 +189,7 @@ class NewRFID extends Component {
     e.preventDefault();
     if (this.state.name !== '' &&
       this.state.cardCodeRFID !== '' &&
-      //this.state.fileResult !== '' &&
+      this.state.fileResult !== '' &&
       this.state.age !== '' &&
       this.state.office !== '' &&
       this.state.permissions.length > 0) {
@@ -189,10 +199,10 @@ class NewRFID extends Component {
         nomeUsuario: this.state.name,
         idade: this.state.age,
         trab: this.state.office,
-        //imgPerfil: this.state.fileResult,
+        imgPerfil: this.state.fileResult,
         permissoes: this.state.permissions
       }
-      alert(JSON.stringify(params))
+      alert(JSON.stringify(params));
 
       //Se todos os dados necessários existirem, envia os dados para o servidor salvar no banco
       await axios.post(baseURL + "register", params)
@@ -206,7 +216,6 @@ class NewRFID extends Component {
         })
       //Após enviar os dados pro banco, reencaminhar para a Dashboard
       this.props.history.push('/usersRFID');
-
     } else {
       //Caso algum campo não tenha sido preenchido, mostra mensagem de erro
       this.setState({ alert: 'Preencha todos os campos!' });
@@ -226,12 +235,13 @@ class NewRFID extends Component {
     if ((this.state.hrini !== '' && this.state.hrfim !== '' && this.state.localization !== '') || (this.state.hrini === '' && this.state.hrfim === '' && this.state.localization !== '')) {
       let newPermissions = this.state.permissions;
       newPermissions.push({
-        loc: this.state.localization,
-        hrini: this.state.hrini,
-        hrfim: this.state.hrfim,
-        perm: this.state.perm
-      })
-      this.setState({ permissions: newPermissions })
+        id_disp_loc: this.state.localization,
+        roomName: this.state.roomName,
+        hrini: this.state.hrini === "" ? null : this.state.hrini,
+        hrfim: this.state.hrfim === "" ? null : this.state.hrfim,
+        permanente: this.state.perm === true ? "S" : "N"
+      });
+      this.setState({ permissions: newPermissions });
     }
     else {
       alert('Os campos de hora e fim precisam ser preenchidos')
@@ -240,11 +250,13 @@ class NewRFID extends Component {
   }
 
   getLocalizations = async () => {
-    axios.get(baseURL + "locInfo")
+    axios.get(baseURL + "dispInfo")
       .then(response => {
         console.log("Responses");
-        console.log(response.data.locinfo);
-        this.setState({ localizations: response.data.locinfo });
+        console.log(response.data.dispinfo);
+        this.setState({ localizations: response.data.dispinfo });
+        this.setState({ localization: response.data.dispinfo[0].id_disp_loc });
+        this.setState({ roomName: response.data.dispinfo[0].no_loc });
       })
       .catch(error => {
         console.log(error);
@@ -258,8 +270,8 @@ class NewRFID extends Component {
   }
 
   handleCheck = async (event) => {
-    this.setState({ 
-      perm: event.target.checked 
+    this.setState({
+      perm: event.target.checked
     })
   }
 
@@ -353,12 +365,13 @@ class NewRFID extends Component {
                   labelId='labelTitle'
                   label='Permissão'
                   value={this.state.localization}
-                  onChange={(e) => this.setState({ localization: e.target.value })}
+                  //onChange={(e) => this.setState({ localization: e.target.value })}
+                  onChange={(e) => { this.handleSelectedLocalizationChange(e) }}
                 >
                   {this.state.localizations.map((localization) => {
                     if (localization.status === "A") {
                       return (
-                        <MenuItem key={localization.roomName} value={localization.roomName}>{localization.roomName}</MenuItem>
+                        <MenuItem key={localization.id_disp_loc} value={localization.id_disp_loc}>{localization.id_disp_loc} - {localization.no_loc}</MenuItem>
                       );
                     }
                   })}
@@ -380,7 +393,7 @@ class NewRFID extends Component {
                   renderItem={(item) => (
                     <div>
                       <div className='usersList'>
-                        <p><b>Localização:</b> {item.loc}</p>
+                        <p><b>Localização:</b> {item.roomName}</p>
                         <p><b>Hora de inicio:</b> {item.hrini}</p>
                         <p><b>Hora fim:</b> {item.hrfim}</p>
                         {item.perm == true ? (<p><b>Diario:</b>Sim</p>) : (<p></p>)}
