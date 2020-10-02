@@ -292,8 +292,12 @@ class Users extends Component {
                             <ClearIcon />
                         </IconButton>
 
-                        <IconButton type="button" onClick={() => { this.props.history.push("/users/new") }}>
-                            <AddIcon style={{ color: 'green' }} />
+                        <IconButton
+                            disabled={!utils.checkSpecificPermission('Cadastrar', this.state.loggedOffice.permissoes.conta)}
+                            type="button"
+                            onClick={() => { this.props.history.push("/users/new") }}
+                        >
+                            <AddIcon style={{ color: 'green', opacity: utils.checkSpecificPermission('Cadastrar', this.state.loggedOffice.permissoes.conta) === true ? 1 : 0.25 }} />
                         </IconButton>
                     </Paper>
 

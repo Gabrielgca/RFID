@@ -546,8 +546,12 @@ class UsersRFID extends Component {
                         <IconButton type="button" onClick={this.handleClearFilter}>
                             <ClearIcon />
                         </IconButton>
-                        <IconButton type="button" onClick={() => { this.props.history.push("/usersRFID/new") }}>
-                            <AddIcon style={{ color: 'green' }} />
+                        <IconButton
+                            disabled={!utils.checkSpecificPermission('Cadastrar', this.state.loggedOffice.permissoes.usuario)}
+                            type="button"
+                            onClick={() => { this.props.history.push("/usersRFID/new") }}
+                        >
+                            <AddIcon style={{ color: 'green', opacity: utils.checkSpecificPermission('Cadastrar', this.state.loggedOffice.permissoes.usuario) === true ? 1 : 0.25 }} />
                         </IconButton>
                     </Paper>
 

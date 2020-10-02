@@ -594,8 +594,12 @@ class Offices extends Component {
                             <ClearIcon />
                         </IconButton>
 
-                        <IconButton type="button" onClick={() => { this.props.history.push("/offices/new") }}>
-                            <AddIcon style={{ color: 'green' }} />
+                        <IconButton
+                            disabled={!utils.checkSpecificPermission('Cadastrar', this.state.loggedOffice.permissoes.cargo)}
+                            type="button"
+                            onClick={() => { this.props.history.push("/offices/new") }}
+                        >
+                            <AddIcon style={{ color: 'green', opacity: utils.checkSpecificPermission('Cadastrar', this.state.loggedOffice.permissoes.cargo) === true ? 1 : 0.25 }} />
                         </IconButton>
                     </Paper>
 

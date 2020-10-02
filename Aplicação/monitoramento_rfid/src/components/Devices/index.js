@@ -323,8 +323,12 @@ class Devices extends Component {
                             <ClearIcon />
                         </IconButton>
 
-                        <IconButton type="button" onClick={() => { this.props.history.push("/devices/new") }}>
-                            <AddIcon style={{ color: 'green' }} />
+                        <IconButton
+                            disabled={!utils.checkSpecificPermission('Cadastrar', this.state.loggedOffice.permissoes.dispositivo)}
+                            type="button"
+                            onClick={() => { this.props.history.push("/devices/new") }}
+                        >
+                            <AddIcon style={{ color: 'green', opacity: utils.checkSpecificPermission('Cadastrar', this.state.loggedOffice.permissoes.dispositivo) === true ? 1 : 0.25 }} />
                         </IconButton>
                     </Paper>
 
