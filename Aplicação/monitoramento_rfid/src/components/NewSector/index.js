@@ -18,7 +18,10 @@ import Loader from 'react-loader-spinner';
 import axios from 'axios';
 import baseURL from '../../service';
 
+
 import './NewSectors.css';
+
+const fileUpload = require('fuctbase64');
 
 class NewSectors extends Component {
     constructor(props) {
@@ -28,6 +31,8 @@ class NewSectors extends Component {
             cargo: localStorage.cargo,
             companyName: '',
             roomName: '',
+            fileResult:'',
+            imgStatus: false,
             area: 0,
             floor: 0,
             maxOccupation: 0,
@@ -54,6 +59,15 @@ class NewSectors extends Component {
         await this.setState({ maxOccupation: Math.trunc(this.state.area / 2) });
     }
 
+    handleFile = async (e) => {
+        fileUpload(e).then(result => {
+            //this.fileResult = result;
+            this.setState({ fileResult: result.base64 });
+            this.setState({ imgStatus: true})
+            //alert("Result: " + JSON.stringify(result));
+        });
+    }
+
     handleAddSector = async () => {
         /* alert(this.state.companyName);
         alert(this.state.roomName);
@@ -62,7 +76,8 @@ class NewSectors extends Component {
         alert(this.state.maxOccupation); */
         if ((this.state.companyName !== '')
             && (this.state.roomName !== '')
-            && (this.state.floor !== '')) {
+            && (this.state.floor !== '')
+            && (this.state.fileResult !== '')) {
         }
         else {
             alert('Os campos precisam ser preenchidos!')
@@ -72,7 +87,8 @@ class NewSectors extends Component {
             companyName: this.state.companyName,
             roomName: this.state.roomName,
             floor: this.state.floor,
-            area: this.state.area
+            area: this.state.area,
+            img: this.state.fileResult
         }
         await axios.post(baseURL + "registerLoc", params)
             .then(response => {
@@ -81,6 +97,8 @@ class NewSectors extends Component {
             .catch(error => {
                 console.log(error);
             })
+
+            console.log(params)
 
 
 
@@ -97,6 +115,7 @@ class NewSectors extends Component {
 
     async componentDidMount() {
         this.setState({ isMounted: true });
+        
 
         if (!firebase.getCurrent()) {
             this.props.history.replace('/');
@@ -106,6 +125,7 @@ class NewSectors extends Component {
         let result = await utils.getOffice(localStorage.cargo);
         if (this.state.isMounted === true) {
             this.setState({ loggedOffice: result });
+            
         }
 
         if (utils.checkSpecificPermission("Cadastrar", this.state.loggedOffice.permissoes.setor) !== true) {
@@ -151,7 +171,42 @@ class NewSectors extends Component {
                         </Button>
                     </header>
                     <h1 style={{ color: '#FFF', marginTop: 10, marginBottom: 25 }}>Cadastrar Novo Setor</h1>
-                    <FormControl style={{ backgroundColor: '#FFF', padding: 20, borderRadius: 5 }}>
+                    <FormControl  style={{ backgroundColor: '#FFF', padding: 20, borderRadius: 5 }}>
+                        <div className="check-area">
+                            <div className="empty-check">
+                                {this.state.fileResult !== '' ?
+                                    <div className="div-img-perfil">
+                                        <img className="img-to-send" src={"data:image/png;base64, " + this.state.fileResult} />
+                                    </div>
+                                    :
+                                    <div></div>
+                                }
+
+                                {this.state.imgStatus === true ? (
+                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130.2 130.2">
+                                        <circle className="path circle" fill="none" stroke="#318a04" strokeWidth="6" strokeMiterlimit="10" cx="65.1" cy="65.1" r="62.1" />
+                                        <polyline className="path check" fill="none" stroke="#318a04" strokeWidth="6" strokeLinecap="round" strokeMiterlimit="10" points="100.2,40.2 51.5,88.8 29.8,67.5 " />
+                                    </svg>
+                                ) : (
+                                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130.2 130.2">
+                                            <circle className="path circle" fill="none" stroke="#FFA200" strokeWidth="6" strokeMiterlimit="10" cx="65.1" cy="65.1" r="62.1" />
+                                            <line className="path line" fill="none" stroke="#FFA200" strokeWidth="6" strokeLinecap="round" strokeMiterlimit="10" x1="34.4" y1="37.9" x2="95.8" y2="92.3" />
+                                            <line className="path line" fill="none" stroke="#FFA200" strokeWidth="6" strokeLinecap="round" strokeMiterlimit="10" x1="95.8" y1="38" x2="34.4" y2="92.2" />
+                                        </svg>
+                                    )}
+                            </div>
+                            {/* <h4>Status: {this.state.imgStatus === true ? "Cartão disponível" : "Cartão já utilizado!"}</h4> */}
+                        </div>
+
+
+                        <div className='input-wrapper'>
+                            <label for='input-file'>
+                                Selecionar uma imagem
+              </label>
+                            <input type="file" id="input-file" placeholder="Imagem de Perfil"
+                                onChange={this.handleFile} />
+                            <span id='file-name'></span>
+                        </div>
                         <TextField
                             //value={this.state.selectedOffice.nomeCargo}
                             onChange={(e) => { this.setState({ companyName: e.target.value }) }}

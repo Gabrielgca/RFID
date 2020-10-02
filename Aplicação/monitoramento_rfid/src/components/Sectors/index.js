@@ -24,6 +24,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Avatar from '@material-ui/core/Avatar';
 
 import FlatList from 'flatlist-react';
 import { FormGroup, FormControlLabel } from '@material-ui/core';
@@ -32,6 +33,7 @@ import baseURL from '../../service';
 
 import "./sectors.css";
 
+const fileUpload = require('fuctbase64');
 
 class Sectors extends Component {
 
@@ -42,6 +44,7 @@ class Sectors extends Component {
             cargo: localStorage.cargo,
             filter: '',
             sectors: [],
+            fileResult: '',
             filteredSectors: [],
             selectedSector: {
                 id_loc: 0,
@@ -49,7 +52,8 @@ class Sectors extends Component {
                 roomName: '',
                 area: 0,
                 floor: 0,
-                maxOccupation: 0
+                maxOccupation: 0,
+                img: '',
             },
             modalConfirmShow: false,
             loggedOffice: {
@@ -84,7 +88,8 @@ class Sectors extends Component {
                     roomName: sector.roomName,
                     area: sector.area,
                     floor: sector.floor,
-                    maxOccupation: sector.maxOccupation
+                    maxOccupation: sector.maxOccupation,
+                    img: sector.img
                 }
                 //alert(JSON.stringify(list));
                 let array = this.state.filteredSectors;
@@ -128,7 +133,8 @@ class Sectors extends Component {
             roomName: sector.roomName,
             area: sector.area,
             floor: sector.floor,
-            maxOccupation: sector.maxOccupation
+            maxOccupation: sector.maxOccupation,
+            img: sector.img
         }
 
         this.setState({ selectedSector: array });
@@ -138,6 +144,7 @@ class Sectors extends Component {
         this.getAllSectors();
         this.setState({ modalConfirmShow: false });
         this.setState({ selectedSector: { id_loc: 0, companyName: '', roomName: '', area: 0, floor: 0, maxOccupation: 0 } });
+        this.setState({ fileResult: '' })
     }
 
     handleAreaUpdate = async (e) => {
@@ -166,7 +173,8 @@ class Sectors extends Component {
                 companyName: this.state.selectedSector.companyName,
                 roomName: this.state.selectedSector.roomName,
                 area: this.state.selectedSector.area,
-                floor: this.state.selectedSector.floor
+                floor: this.state.selectedSector.floor,
+                img: this.state.fileResult !== '' ? this.state.fileResult : null
                 //maxOccupation: this.state.selectedSector.maxOccupation
             }
             await axios.post(baseURL + "updateLoc", params)
@@ -177,6 +185,7 @@ class Sectors extends Component {
                 .catch(error => {
                     console.log(error)
                 });
+                console.log(params)
         }
         else {
             alert("Dados inválidos. Revise o formulário");
@@ -215,6 +224,18 @@ class Sectors extends Component {
         else {
             alert("Acesso autorizado");
         } */
+    }
+
+    handleFile = async (e) => {
+        fileUpload(e).then(result => {
+            //this.fileResult = result;
+            this.setState({ fileResult: result.base64 });
+            //alert("Result: " + JSON.stringify(result));
+        })
+    }
+
+    handleSelectFile = async (event) => {
+        this.setState({ fileResult: event.target.value })
     }
 
 
@@ -326,11 +347,27 @@ class Sectors extends Component {
                         />
 
                     </div>
-                    
+
                     {/* Modal para edição dos dados da conta selecionada */}
                     <Dialog maxWidth={700} open={this.state.modalConfirmShow} onClose={this.handleCloseConfirmModal} aria-labelledby="form-dialog-title">
                         <DialogTitle id="form-dialog-title">Editar Setor</DialogTitle>
-                        <DialogContent style={{ width: 700 }}>
+                        <DialogContent style={{ width: 500 }}>
+                            <div id='img-select'>
+                                <div className='imgSelect'>
+                                    {this.state.fileResult !== '' ?
+                                        <img src={'data:image/png;base64, ' + this.state.fileResult} />
+                                        : <img src={this.state.selectedSector.img} />
+                                    }
+                                </div>
+                                <div></div>
+                                <div className='input-wrapper'>
+                                    <label for='input-file'>
+                                        Alterar imagem
+                                 </label>
+                                    <input type="file" id="input-file" placeholder="Imagem de Perfil" onChange={this.handleFile} />
+                                    <span id='file-name'></span>
+                                </div>
+                            </div>
                             <TextField
                                 value={this.state.selectedSector.companyName}
                                 onChange={(e) => { let array = this.state.selectedSector; array.companyName = e.target.value; this.setState({ selectedSector: array }) }}
