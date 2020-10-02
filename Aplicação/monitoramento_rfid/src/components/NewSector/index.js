@@ -171,7 +171,7 @@ class NewSectors extends Component {
                         </Button>
                     </header>
                     <h1 style={{ color: '#FFF', marginTop: 10, marginBottom: 25 }}>Cadastrar Novo Setor</h1>
-                    <FormControl  style={{ backgroundColor: '#FFF', padding: 20, borderRadius: 5 }}>
+                    <FormControl  style={{ backgroundColor: '#FFF', padding: 20, borderRadius: 5, width:'50%' }}>
                         <div className="check-area">
                             <div className="empty-check">
                                 {this.state.fileResult !== '' ?
