@@ -683,7 +683,6 @@ class UsersRFID extends Component {
 
                                 <TextField
                                     disabled={!utils.checkSpecificPermission("Editar", this.state.loggedOffice.permissoes.usuario)}
-                                    autoFocus
                                     margin='dense'
                                     label='Função'
                                     type='text'
@@ -713,7 +712,6 @@ class UsersRFID extends Component {
                                                     <TextField
                                                         //disabled={!utils.checkSpecificPermission("Editar", this.state.loggedOffice.permissoes.usuario)}
                                                         disabled={true}
-                                                        autoFocus
                                                         margin='dense'
                                                         label='Empresa'
                                                         type='text'
@@ -725,7 +723,6 @@ class UsersRFID extends Component {
                                                     <TextField
                                                         //disabled={!utils.checkSpecificPermission("Editar", this.state.loggedOffice.permissoes.usuario)}
                                                         disabled={true}
-                                                        autoFocus
                                                         margin='dense'
                                                         label='Sala'
                                                         type='text'
@@ -737,7 +734,6 @@ class UsersRFID extends Component {
                                                     <TextField
                                                         //disabled={!utils.checkSpecificPermission("Editar", this.state.loggedOffice.permissoes.usuario)}
                                                         disabled={permission.status === "A" && utils.checkSpecificPermission("Editar", this.state.loggedOffice.permissoes.usuario) === true ? false : true}
-                                                        autoFocus
                                                         margin='dense'
                                                         label='Hora Início'
                                                         type='text'
@@ -749,7 +745,6 @@ class UsersRFID extends Component {
                                                     <TextField
                                                         //disabled={!utils.checkSpecificPermission("Editar", this.state.loggedOffice.permissoes.usuario)}
                                                         disabled={permission.status === "A" && utils.checkSpecificPermission("Editar", this.state.loggedOffice.permissoes.usuario) === true ? false : true}
-                                                        autoFocus
                                                         margin='dense'
                                                         label='Hora Fim'
                                                         type='text'
@@ -770,7 +765,6 @@ class UsersRFID extends Component {
                                                     <TextField
                                                         //disabled={!utils.checkSpecificPermission("Editar", this.state.loggedOffice.permissoes.usuario)}
                                                         disabled={true}
-                                                        autoFocus
                                                         margin='dense'
                                                         label='Status'
                                                         type='text'
@@ -910,8 +904,8 @@ class UsersRFID extends Component {
                             </DialogContentText>
                         </DialogContent>
                         <DialogActions>
-                            <Button onClick={this.handleUpdateUser} autoFocus style={{ backgroundColor: 'green', color: '#FFF' }}>Salvar</Button>
-                            <Button onClick={this.modalClose} style={{ backgroundColor: 'red', color: '#FFF' }} autoFocus>
+                            <Button onClick={this.handleUpdateUser} style={{ backgroundColor: 'green', color: '#FFF' }}>Salvar</Button>
+                            <Button onClick={this.modalClose} style={{ backgroundColor: 'red', color: '#FFF' }}>
                                 Cancelar
                             </Button>
                         </DialogActions>

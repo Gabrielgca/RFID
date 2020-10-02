@@ -185,7 +185,7 @@ class Sectors extends Component {
                 .catch(error => {
                     console.log(error)
                 });
-                console.log(params)
+            console.log(params)
         }
         else {
             alert("Dados inválidos. Revise o formulário");
@@ -281,8 +281,12 @@ class Sectors extends Component {
                             <ClearIcon />
                         </IconButton>
 
-                        <IconButton type="button" onClick={() => { this.props.history.push("/sectors/new") }}>
-                            <AddIcon style={{ color: 'green' }} />
+                        <IconButton
+                            disabled={!utils.checkSpecificPermission('Cadastrar', this.state.loggedOffice.permissoes.setor)}
+                            type="button"
+                            onClick={() => { this.props.history.push("/sectors/new") }}
+                        >
+                            <AddIcon style={{ color: 'green', opacity: utils.checkSpecificPermission('Cadastrar', this.state.loggedOffice.permissoes.setor) === true ? 1 : 0.25 }} />
                         </IconButton>
                     </Paper>
 
@@ -303,24 +307,27 @@ class Sectors extends Component {
 
                                     <div className="sectors-options">
                                         <Button
+                                            disabled={!utils.checkSpecificPermission('Editar', this.state.loggedOffice.permissoes.setor)}
                                             endIcon={<DescriptionIcon />}
                                             onClick={() => { this.handleConfirmModalOpen(item) }}
-                                            style={{ backgroundColor: 'green', color: '#FFF', width: '80%', height: '35%', marginBottom: '1%' }}
+                                            style={{ backgroundColor: 'green', color: '#FFF', width: '80%', height: '35%', marginBottom: '1%', opacity: utils.checkSpecificPermission('Editar', this.state.loggedOffice.permissoes.setor) === true ? 1 : 0.25 }}
                                         >
                                             Detalhes
                                         </Button>
 
                                         {item.status === 'I' ? (
                                             <Button
+                                                disabled={!utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.setor)}
                                                 endIcon={<CheckCircleOutlineIcon />}
-                                                style={{ backgroundColor: 'red', color: '#FFF', width: '80%', height: '35%' }}
+                                                style={{ backgroundColor: 'red', color: '#FFF', width: '80%', height: '35%', opacity: utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.setor) === true ? 1 : 0.25 }}
                                             >
                                                 Reativar
                                             </Button>
                                         ) : (
                                                 <Button
+                                                    disabled={!utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.setor)}
                                                     endIcon={<BlockIcon />}
-                                                    style={{ backgroundColor: 'red', color: '#FFF', width: '80%', height: '35%' }}
+                                                    style={{ backgroundColor: 'red', color: '#FFF', width: '80%', height: '35%', opacity: utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.setor) === true ? 1 : 0.25 }}
                                                 >
                                                     Desativar
                                                 </Button>

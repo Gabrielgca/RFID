@@ -67,7 +67,7 @@ class Dashboard extends Component {
         imgPerfil: ''
       },
       selectedRoom: {
-        idSala: 0,
+        id_disp: -1,
         nomeSala: '',
         imgMapaSala: '',
         ocupantes: [],
@@ -282,17 +282,37 @@ class Dashboard extends Component {
     // onde cada alteração, será enviada do servidor para a aplicação em tempo real
     socket.emit("rooms");
     socket.on("rooms_update", response => {
+      console.log(response);
       this.setState({ rooms: response.salas });
     });
   }
 
   getRoomDetails = async (roomId) => {
+    var socket = io.connect(ENDPOINT, {
+      reconnection: true
+    });
+
     const params = {
-      idSala: roomId //Aqui vai o ID da sala que desejamos obter os detalhes
+      id_disp: roomId //Aqui vai o ID da sala que desejamos obter os detalhes
+    }
+
+    socket.emit("roominfo", params);
+    socket.on("news_from_roominfo", response => {
+      console.log("News From Room Info: ");
+      console.log(response);
+      this.setState({ selectedRoom: {} });
+      this.setState({ selectedRoom: response.salaSelecionada });
+      this.setState({ rooms: response.salas });
+    });
+  }
+
+  /* getRoomDetails = async (roomId) => {
+    const params = {
+      id_disp: roomId //Aqui vai o ID da sala que desejamos obter os detalhes
     }
     //alert("Room Id: " + roomId);
     let newSelectedRoom = {
-      idSala: -1,
+      id_disp: -1,
       nomeSala: '',
       imgMapaSala: '',
       ocupantes: [],
@@ -313,7 +333,7 @@ class Dashboard extends Component {
     //A linha abaixo o simula o retorno dos dados que virão do servidor, utilizando os dados do JSON local
     //this.setState({ selectedRoom: dataRoomDetails.selectedRoom[0] });
 
-  }
+  } */
 
   handleOpen = () => {
     this.setState({ open: true });
@@ -358,22 +378,20 @@ class Dashboard extends Component {
       alert("Você não possui permissão para visualizar os dados dos usuários!");
       return null;
     }
-    if (this.state.cargo !== 'Auxiliar') {
-      const { selectedRoom } = this.state;
-      selectedRoom.ocupantes.map((ocupante) => {
-        if (ocupante.idOcupante === personId) {
-          let newSelectedPerson = {
-            name: ocupante.nomeOcupante,
-            imgPerfil: ocupante.imgPerfil
-          }
-          this.setState({ selectedPerson: newSelectedPerson });
-          this.modalOpen();
+    const { selectedRoom } = this.state;
+    selectedRoom.ocupantes.map((ocupante) => {
+      if (ocupante.idOcupante === personId) {
+        let newSelectedPerson = {
+          ageOcupante: ocupante.ageOcupante,
+          cargoOcupante: ocupante.cargoOcupante,
+          idOcupante: ocupante.idOcupante,
+          nomeOcupante: ocupante.nomeOcupante,
+          imgPerfil: ocupante.imgPerfil
         }
-      });
-    }
-    else {
-      alert("Você não tem permissão para ver os dados dos usuários!");
-    }
+        this.setState({ selectedPerson: newSelectedPerson });
+        this.modalOpen();
+      }
+    });
   }
 
   render() {
@@ -405,6 +423,8 @@ class Dashboard extends Component {
               />
             ))}
           </SpeedDial>
+
+          <p>{JSON.stringify(this.state.selectedRoom.ocupantes)}</p>
         </div>
         <p style={{ color: "#FFF" }}>Email: {firebase.getCurrent()}</p>
         <p style={{ color: "#FFF" }}>Cargo: {this.state.cargo}</p><br />
@@ -416,10 +436,10 @@ class Dashboard extends Component {
             {rooms.length > 0 ? (
               rooms.map((room) => {
                 return (
-                  <article key={room.idSala}>
+                  <article key={room.id_disp}>
                     <strong>Nome: {room.nomeSala}</strong>
                     <p>Pessoas no Setor: {room.qtdOcupantes}</p>
-                    <button type="button" className="button-room-details" onClick={() => { this.getRoomDetails(room.idSala) }}><FaCaretRight style={{ fontSize: 20 }} /></button>
+                    <button type="button" className="button-room-details" onClick={() => { this.getRoomDetails(room.id_disp) }}><FaCaretRight style={{ fontSize: 20 }} /></button>
                   </article>
                 );
               })
@@ -441,7 +461,7 @@ class Dashboard extends Component {
           <div className="room-details">
 
             <div className="occupants">
-              {selectedRoom.idSala > 0 ? (
+              {selectedRoom.id_disp > 0 ? (
                 selectedRoom.ocupantes.map((person) => {
                   if (person.imgPerfil != "") {
                     return (
@@ -463,7 +483,7 @@ class Dashboard extends Component {
                   <div></div>
                 )}
 
-              {selectedRoom.idSala === -1 ? (
+              {selectedRoom.id_disp === -1 ? (
                 <div className="people-loading-div">
                   <Loader
                     type="Oval"
@@ -503,12 +523,15 @@ class Dashboard extends Component {
             <DialogContent>
               <DialogContentText id="alert-dialog-description">
                 {this.state.selectedPerson.imgPerfil !== '' ? (
-                  <img className="person-avatar" src={"data:image/png;base64, " + this.state.selectedPerson.imgPerfil} />
+                  <img className="person-avatar" src={this.state.selectedPerson.imgPerfil} />
                 ) : (
                     <img className="person-avatar" src="https://cdn.icon-icons.com/icons2/1879/PNG/512/iconfinder-3-avatar-2754579_120516.png"></img>
                   )}
                 <div className="person-details">
-                  <p><b>Nome: </b>{this.state.selectedPerson.name}</p>
+                  <p><b>ID: </b>{this.state.selectedPerson.idOcupante}</p>
+                  <p><b>Nome: </b>{this.state.selectedPerson.nomeOcupante}</p>
+                  <p><b>Idade: </b>{this.state.selectedPerson.ageOcupante}</p>
+                  <p><b>Cargo: </b>{this.state.selectedPerson.cargoOcupante}</p>
                 </div>
               </DialogContentText>
             </DialogContent>
