@@ -23,8 +23,8 @@
 String ssid = "Inst Brasilia de Tec e Inov 2G";
 String pass = "#ibti@2019";
 String strID = "";
-String servidor = "192.168.2.196";
-String port = "7000";
+String servidor = "192.168.2.211";
+String port = "4002";
 String uri = "/WiFiRFID?RFID=";
 String recebido = "";
 int passe = 0;
@@ -140,7 +140,7 @@ void loop ()
 
   if(!okay){
   Serial.println("Passou por dentro deste IF!!");
-  tried = tryagain("AT+CIPSTART=2,\"TCP\",\"" + servidor + "\",7000\r\n");
+  tried = tryagain("AT+CIPSTART=2,\"TCP\",\"" + servidor + "\",4002\r\n");
   if(!tried){
     return;
     }
@@ -199,7 +199,7 @@ void aproximaCartao(int freq = 1500, int bip = 2){
     long int time = millis();
 
     if (wait_response == true){
-      while(!(resposta(response,"success"))){
+      while(!(resposta(response,"}"))){
       while(wifi.available()){
         char c = wifi.read();
         response += c;
