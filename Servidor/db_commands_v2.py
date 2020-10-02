@@ -276,6 +276,7 @@ class RfidCommands():
             idPermHorario = [idPermHorario]
         return s.query(ph).filter(ph.idPermHorario.in_(idPermHorario)).all()
 
+
     # COMANDO RENATO
     def selPermHorarioByTime (self, idPermHorario, currentTime):
         ph = self.ph
@@ -723,6 +724,17 @@ class RfidCommands():
                         .scalar()
         s.add(cadastroUpdt)
         cadastroUpdt.edArquivoImagem = imgUrl
+        s.commit()
+
+
+    def updateCadastroImg_loc(self, idLocalizacaoDisp, imgUrl):
+        s = self.db.session
+        ld = self.ld
+        LocalizacaoDispUpdt = s.query(ld)\
+                        .filter(ld.idLocalizacaoDisp == idLocalizacaoDisp)\
+                        .scalar()
+        s.add(LocalizacaoDispUpdt)
+        LocalizacaoDispUpdt.edArquivoImagem = imgUrl
         s.commit()
 
     #COMANDO NOVO!

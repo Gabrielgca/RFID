@@ -8,6 +8,7 @@ from flask_socketio import SocketIO, emit, send
 import base64
 from flask_ngrok import run_with_ngrok
 import os
+from datetime import datetime
 
 
 # flask namespace
@@ -54,7 +55,7 @@ class Cadastro(db.Model):
 
     idCadastro = db.Column('id_cadastro', db.Integer, primary_key=True, unique=True, nullable=False, comment='''Indentificador do cadastro.''')
     noUsuario = db.Column('no_usuario', db.String(45), nullable=False, comment='''Nome do usuário cadastrado.''')
-    edArquivoImagem = db.Column('ed_arquivo_imagem', db.String(50), nullable=True, default=None, comment='''Endereço no servidor da imagem do usuário.''')
+    edArquivoImagem = db.Column('ed_arquivo_imagem', db.String(70), nullable=True, default=None, comment='''Endereço no servidor da imagem do usuário.''')
     vlIdade = db.Column('vl_idade', db.Integer, nullable=True,default=None, comment='''Idade em anos do usuário''')
     noAreaTrabalho = db.Column('no_area_trabalho', db.String(40), nullable=True,default=None, comment='''Área de trabalho do usuário''')
 
@@ -202,6 +203,7 @@ class LocalizacaoDisp(db.Model):
     idLocalizacaoDisp = db.Column('id_localizacao_disp', db.Integer, primary_key=True, unique=True, nullable=False, comment='''Identificação da localização do dispositivo''')
     noEmpresa = db.Column('no_empresa', db.String(40), nullable = False, comment='''Nome da empresa em que se encontra a localização.''')
     noLocalizacao = db.Column('no_localizacao', db.String(40), nullable=False, comment='''Nome da localização do dispositivo''')
+    edArquivoImagem = db.Column('ed_arquivo_imagem', db.String(70), nullable=True, default=None, comment='''Endereço no servidor da imagem do setor.''')
     vlAndar = db.Column('vl_andar', db.Integer, nullable=True, default=None, comment='''Indicação do andar da localização''')
     vlArea = db.Column('vl_area', db.Integer, nullable=False, comment='''Quantidade de pessoas na localização''')
     vlQtdeLampadas = db.Column('vl_qtde_lampadas', db.Integer, nullable=False, comment='''Quantidade de lâmpadas instaladas na localização.''')
@@ -215,17 +217,19 @@ class LocalizacaoDisp(db.Model):
     (id_localizacao_disp='{}',
     no_empresa='{}',
     no_localizacao='{}',
+    ed_arquivo_imagem = '{}',
     vl_andar='{}',
     vl_area='{}',
     vl_qtde_lampadas='{}',
     vl_consumo_lamp='{}',
-st_status='{}')>'''.format(self.idLocalizacaoDisp, self.noEmpresa, self.noLocalizacao, self.vlAndar, self.vlArea, self.vlQtdeLampadas, self.vlConsumoLamp, self.stStatus)
+st_status='{}')>'''.format(self.idLocalizacaoDisp, self.noEmpresa, self.noLocalizacao, self.edArquivoImagem,self.vlAndar, self.vlArea, self.vlQtdeLampadas, self.vlConsumoLamp, self.stStatus)
 
     def getDict(self):
         self.dictionary = {}
         self.dictionary['idLocalizacaoDisp'] = self.idLocalizacaoDisp
         self.dictionary['noEmpresa'] = self.noEmpresa
         self.dictionary['noLocalizacao'] = self.noLocalizacao
+        self.dictionary['edArquivoImagem'] = self.edArquivoImagem
         self.dictionary['vlAndar'] = self.vlAndar
         self.dictionary['vlArea'] = self.vlArea
         self.dictionary['vlQtdeLampadas'] = self.vlQtdeLampadas
@@ -469,7 +473,7 @@ def rooms():
 @socketio.on('roominfo')   
 def roominfo(data):
     global id_sala, flag_roominfo
-    id_sala = data['idSala']
+    id_sala = data['id_disp']
     flag_roominfo = True
     print(f'O ID da sala recebido foi: {id_sala}')
     room = fuc_roominfo(id_sala)
@@ -500,6 +504,7 @@ def WiFIRFID ():
     if flag_roominfo:
         flag_roominfo = False
     else:
+        print('ENTREI AQUI PARA MUDAR O VALOR DE ID_SALA')
         id_sala = 0
     #try:
     locDisp = request.args.get('LOC')
@@ -680,56 +685,9 @@ def WiFIRFID ():
             newOcupacao.nrPessoas = cmd.selCountPessoasDispositivo(idDispositivo=locDisp)
             cmd.insertOcupacao(newOcupacao)
     
-    
-        
-        
-        
-        
-        '''
-        if ultOcorrencia is not None:
-            if ultOcorrencia.idDispositivo == int(locDisp):
-                if ultOcorrencia.stOcorrencia == 'E':
-                    stOc = 'S'
-                else:
-                    stOc = 'E'
-                cmd.insertOcorrencia(Ocorrencia (idDispositivo=locDisp,
-                                                    idCadastro=cadastroCartao.idCadastro,
-                                                    dtOcorrencia=db.func.current_date(),
-                                                    hrOcorrencia=db.func.current_time(),
-                                                    stOcorrencia=stOc))
-                
-            else:
-                if ultOcorrencia.stOcorrencia == 'E':
-                    cmd.insertOcorrencia(Ocorrencia (idDispositivo=ultOcorrencia.idDispositivo,
-                                                        idCadastro=cadastroCartao.idCadastro,
-                                                        dtOcorrencia=db.func.current_date(),
-                                                        hrOcorrencia=db.func.current_time(),
-                                                        stOcorrencia='S'))
-                cmd.insertOcorrencia(Ocorrencia (idDispositivo=locDisp,
-                                                    idCadastro=cadastroCartao.idCadastro,
-                                                    dtOcorrencia=db.func.current_date(),
-                                                    hrOcorrencia=db.func.current_time(),
-                                                    stOcorrencia='E'))
-                
-        else:
-            cmd.insertOcorrencia(Ocorrencia (idDispositivo=locDisp,
-                                                idCadastro=cadastroCartao.idCadastro,
-                                                dtOcorrencia=db.func.current_date(),
-                                                hrOcorrencia=db.func.current_time(),
-                                                stOcorrencia='E'))
-        '''   
-
 
 #------------------------------------------------------------#
-
-                
-
-
-
-
-
-
-            
+ 
         ##Atualiza a quantidade de pessoas nas salas
         rooms_updates = findrooms()
         print('EMITI')
@@ -737,6 +695,7 @@ def WiFIRFID ():
         socketio.emit('rooms_update', rooms_updates)
         #Verifica se atualização na sala selecionada
         if int(locDisp) == int(id_sala):
+            print('Entrei aqui quando as salas são iguais!!')
             rooms = fuc_roominfo(locDisp)
             socketio.emit('news_from_roominfo', rooms)
         return jsonify (success = True)
@@ -747,7 +706,7 @@ def WiFIRFID ():
 
     #except Exception as e:
         #print(e)
-       # return jsonify(answer = 'cannot read any ID')
+       # return jsonify(F% = 'cannot read any ID')
 
 @app.route ('/register', methods = ['GET','POST'])
 def register():
@@ -774,6 +733,8 @@ def register():
         cadastroCartao = CadastroCartao (stEstado = 'A')
         cartao = Cartao (noCartao = str_card)
         usuario = Cadastro (noUsuario = str_user, vlIdade = str_age, noAreaTrabalho = str_trab)
+        #RECEBENDO A DATA ATUAL
+        dt_atual = datetime.now().strftime('%y%m%d%H%M%S')
         try:
             if cmd.selnoCartao(str_card) != None:
                 #CARTAO JÁ TINHA SIDO CADASTRADO
@@ -783,7 +744,7 @@ def register():
                 cadastroCartao = CadastroCartao(idCadastro = usuario.idCadastro, idCartao = id_cartao, stEstado = 'A')
                 cmd.insertCadastroCartao_byid(cadastroCartao, refresh=True)
                 cmd.updateCadastroImg(idCadastro = cadastroCartao.idCadastro,
-                                 imgUrl = url_for("static",filename = "imagens/"+str(cadastroCartao.idCadastro)+".png",_external = True))
+                                 imgUrl = url_for("static",filename = "imagens",_external = True)+ "/"+str(cadastroCartao.idCadastro) + ".png?"+ dt_atual,)
             else:
                 #CARTAO NÃO TINHA SIDO CADASTRADO
                 cmd.insertCadastroCartao(cadastroCartao = cadastroCartao,
@@ -791,12 +752,13 @@ def register():
                                         cartao = cartao,
                                         refresh = True)
             cmd.updateCadastroImg(idCadastro = cadastroCartao.idCadastro,
-                                 imgUrl = url_for("static",filename = "imagens/"+str(cadastroCartao.idCadastro)+".png",_external = True))
+                                 imgUrl = url_for("static",filename = "imagens",_external = True)+ "/"+str(cadastroCartao.idCadastro) + ".png?"+ dt_atual,)
         except Exception as e:
             print(e)
             return jsonify(success = False)
 
         #VERIFICAR CAMINHO NA RASP
+        
         with open(os.getcwd().replace("\\","/")+"/static/imagens/{}.png".format(str(cadastroCartao.idCadastro)),"wb") as png2:
             png2.write(base64.b64decode(str_img))
 
@@ -886,7 +848,7 @@ def userInfo():
         dict_user["office"] = i.noAreaTrabalho
 
         #VERIFICAR SE O ARQUIVO DE IMAGEM DE PERFIL EXISTE
-        if os.path.exists(os.getcwd().replace("\\","/")+"/static/imagens/"+ str(i.idCadastro) +".png"):
+        if os.path.exists(os.getcwd().replace("\\","/")+"/static/imagens/"+ str(i.idCadastro) + ".png"):
             dict_user['imgPerfil'] = i.edArquivoImagem
 
         if len(cmd.selCadastroCartao(i.idCadastro)) > 0:
@@ -947,8 +909,8 @@ def updateUser():
         try:
             data = request.get_json ()
         except (KeyError, TypeError, ValueError):
-            return jsonify (success = False)
-
+            resp = jsonify (success = False)
+            return answer (app, 204, resp)
         update_user = Cadastro()
 
         id_user = data['id_user']
@@ -1010,9 +972,17 @@ def updateUser():
             return jsonify(success = False)
             
         if data['imgPerfil'] != None:
+            dt_atual = datetime.now().strftime('%y%m%d%H%M%S')
+
             str_img = data['imgPerfil']
-            with open(os.getcwd().replace("\\","/")+"/static/imagens/{}.png".format(id_user),"wb") as png2:
+            #ATUALIZANDO ENDEREÇO DA IMAGEM NO BANCO
+            cmd.updateCadastroImg(idCadastro = id_user,
+                                 imgUrl = url_for("static",filename = "imagens",_external = True)+ "/"+str(id_user) + ".png?"+ dt_atual)
+            
+            #ATUALIZANDO IMAGEM
+            with open(os.getcwd().replace("\\","/")+"/static/imagens/{}.png".format(str(id_user)),"wb") as png2:
                 png2.write(base64.b64decode(str_img))
+
 
         count = 0
         if "perm" in data:
@@ -1167,7 +1137,6 @@ def updateDisp():
             data = request.get_json ()
         except (KeyError, TypeError, ValueError):
             return jsonify (success = False)
-
         update_disp = Dispositivo()
         idLoc = 0
         for key in data:
@@ -1219,7 +1188,6 @@ def statusDisp():
             data = request.get_json ()
         except (KeyError, TypeError, ValueError):
             return jsonify (success = False)
-
         update_disp = Dispositivo()
         id_disp = 0
         for key in data:
@@ -1286,8 +1254,9 @@ def registerLoc():
         str_loc = data['roomName']
         str_andar = data['floor']
         str_area = data['area']
-        
+
         try:
+
             andar = int(str_andar)
             area = int(str_area)
             insereLocDisp = LocalizacaoDisp(noEmpresa = str_emp,noLocalizacao = str_loc, vlAndar = andar, vlArea = area, vlQtdeLampadas = 20,vlConsumoLamp = 40, stStatus = 'A')
@@ -1295,10 +1264,12 @@ def registerLoc():
             cmd.insertLocalizacaoDisp(insereLocDisp, refresh = True)
            
             if data['img'] != None:
+                dt_atual = datetime.now().strftime('%y%m%d%H%M%S')
                 str_img = data['img']
-                with open(os.getcwd().replace("\\","/")+"/static/setores/{}_{}.png".format(str_emp.replace(" ", "_"), insereLocDisp.idLocalizacaoDisp),"wb") as png2:
+                with open(os.getcwd().replace("\\","/")+"/static/setores/{}.png".format(insereLocDisp.idLocalizacaoDisp),"wb") as png2:
                     png2.write(base64.b64decode(str_img))
-            
+
+                cmd.updateCadastroImg_loc(idLocalizacaoDisp = insereLocDisp.idLocalizacaoDisp, imgUrl = url_for("static",filename = "setores" ,_external = True)+ "/{}.png?".format(insereLocDisp.idLocalizacaoDisp)+ dt_atual,)
             return jsonify(success = True)
             
 
@@ -1313,7 +1284,8 @@ def updateLoc():
         try:
             data = request.get_json ()
         except (KeyError, TypeError, ValueError):
-            return jsonify (success = False)
+            resp = jsonify (success = False)
+            return answer (app, 204, resp)
         
 
         id_loc = data['id_loc']
@@ -1326,10 +1298,11 @@ def updateLoc():
         update_loc_disp.vlArea = data['area']
 
         if data['img'] != None:
+            dt_atual = datetime.now().strftime('%y%m%d%H%M%S')
             str_img = data['img']
-            with open(os.getcwd().replace("\\","/")+"/static/setores/{}_{}.png".format(data['companyName'].replace(" ","_"), id_loc),"wb") as png2:
+            with open(os.getcwd().replace("\\","/")+"/static/setores/{}.png".format(id_loc),"wb") as png2:
                 png2.write(base64.b64decode(str_img))
-
+            cmd.updateCadastroImg_loc(idLocalizacaoDisp = id_loc, imgUrl = url_for("static",filename = "setores",_external = True)+ "/{}.png?".format(id_loc)+ dt_atual)
         #STATUS NOVO
         try:
             update_loc_disp.stStatus = data['status']
@@ -1353,6 +1326,10 @@ def locInfo():
         dict_loc_disp["floor"] = i.vlAndar
         dict_loc_disp["area"] = i.vlArea
 
+        #VERIFICAR SE O ARQUIVO DE IMAGEM DE PERFIL EXISTE
+        if os.path.exists(os.getcwd().replace("\\","/")+"/static/setores/"+ str(i.idLocalizacaoDisp) +".png"):
+            dict_loc_disp['img'] = i.edArquivoImagem
+        
         #NOVO COMANDO STATUS
         dict_loc_disp["status"] = i.stStatus
         dict_loc_disp["maxOccupation"] = int(i.vlArea/2)
@@ -1382,7 +1359,7 @@ def findrooms():
     for i in cmd.selAllDispositivos():
         full_dict_disp = i.getDict()
         dict_disp = {}
-        dict_disp['idSala'] = full_dict_disp['idDispositivo']
+        dict_disp['id_disp'] = full_dict_disp['idDispositivo']
         #SELECIONA A SALA QUE O DISPOSITIVO ESTÁ RELACIONADO
         loc_disp = cmd.selLocalizacaoDispByDisp(full_dict_disp['idDispositivo'], all_disp = True)
         no_loc_disp = loc_disp[-1].noLocalizacao
@@ -1396,13 +1373,13 @@ def findrooms():
 
 def validateRoom(room,idSala):
     for sala in room['salas']:
-        if int(idSala) == int(sala['idSala']):
+        if int(idSala) == int(sala['id_disp']):
             return True
     return False
 
-def fuc_roominfo(app_id_sala):
+def fuc_roominfo(app_id_disp):
     global id_sala
-    id_sala = app_id_sala
+    id_sala = app_id_disp
 
     print(id_sala)
   
@@ -1411,7 +1388,7 @@ def fuc_roominfo(app_id_sala):
 
     loc_disp = cmd.selLocalizacaoDispByDisp(id_sala, all_disp = True)
     no_empresa = loc_disp[-1].noEmpresa
-    id_loc_disp = loc_disp[-1].idLocalizacao
+    id_loc_disp = loc_disp[-1].idLocalizacaoDisp
 
     
     
@@ -1421,12 +1398,15 @@ def fuc_roominfo(app_id_sala):
         info_users = []
         img_users = []
         users_inside = []
-
         #Verifica o id dos usuários dentro da 'id_sala'
         #Verifica o nome da pessoa que está dentro da 'id_sala'
         for i in cmd.selPessoasSala(id_sala):
             users_inside.append(i.idCadastro)
-            info_users.append(i.noUsuario)
+            dict_info_users = {}
+            dict_info_users['name'] = i.noUsuario
+            dict_info_users["age"] = i.vlIdade
+            dict_info_users["office"] = i.noAreaTrabalho
+            info_users.append(dict_info_users)
             img_users.append(i.edArquivoImagem)
 
         users_inside.sort()
@@ -1439,15 +1419,15 @@ def fuc_roominfo(app_id_sala):
         for i in range(len(users_inside)):
             #VERIFICAR SE O ARQUIVO DE IMAGEM DE PERFIL EXISTE
             if os.path.exists(os.getcwd().replace("\\","/")+"/static/imagens/"+str(users_inside[i])+".png"):
-                dict_ocupante = dict (nomeOcupante = info_users[i], idOcupante = users_inside[i], imgPerfil = img_users[i])
+                dict_ocupante = dict (nomeOcupante = info_users[i]['name'], ageOcupante = info_users[i]['age'], cargoOcupante = info_users[i]['office'],idOcupante = users_inside[i], imgPerfil = img_users[i])
                 lista_ocupantes.append(dict_ocupante)
             else:
                 dict_ocupante = dict (nomeOcupante = info_users[i], idOcupante = users_inside[i], imgPerfil = '')
                 lista_ocupantes.append(dict_ocupante)
         #VERIFICAR SE O ARQUIVO DE IMAGEM DE SALA EXISTE
-        if os.path.exists(os.getcwd().replace("\\","/")+"/static/setores/{}_{}.png".format(no_empresa.replace(" ","_"), id_loc_disp)):
-            img_sala = url_for("static",filename = "imagens/{}_{}.png".format(no_empresa.replace(" ","_"), id_loc_disp),_external = True)
-            sala = dict( idSala = id_sala, nomeSala = room['salas'][int(id_sala)-1]['nomeSala'], imgMapaSala = img_sala ,ocupantes = lista_ocupantes)
+        if os.path.exists(os.getcwd().replace("\\","/")+"/static/setores/{}.png".format(id_loc_disp)):
+            img_sala = url_for("static",filename = "setores/{}.png".format(id_loc_disp),_external = True)
+            sala = dict( id_disp = id_sala, nomeSala = room['salas'][int(id_sala)-1]['nomeSala'], imgMapaSala = img_sala ,ocupantes = lista_ocupantes)
             room['salaSelecionada'] = sala
 
         return room
