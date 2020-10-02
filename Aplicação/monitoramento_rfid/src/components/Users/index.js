@@ -313,9 +313,10 @@ class Users extends Component {
                                     <div className="user-options">
                                         {/* <button className="addButton" onClick={() => { this.handleClickOpen(item) }}>Editar</button> */}
                                         <Button
+                                            disabled={!utils.checkSpecificPermission('Editar', this.state.loggedOffice.permissoes.conta)}
                                             endIcon={<EditIcon />}
                                             onClick={() => { this.handleClickOpen(item) }}
-                                            style={{ backgroundColor: 'green', color: '#FFF', width: '80%', height: '35%', marginBottom: '1%' }}
+                                            style={{ backgroundColor: 'green', color: '#FFF', width: '80%', height: '35%', marginBottom: '1%', opacity: utils.checkSpecificPermission('Editar', this.state.loggedOffice.permissoes.conta) === true ? 1 : 0.25 }}
                                         >
                                             Editar
                                     </Button>
@@ -325,15 +326,16 @@ class Users extends Component {
                                                 disabled={!utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.conta)}
                                                 endIcon={<BlockIcon />}
                                                 onClick={() => { this.handleDeactivateUserOpen(item) }}
-                                                style={{ backgroundColor: 'red', color: '#FFF', width: '80%', height: '35%', }}
+                                                style={{ backgroundColor: 'red', color: '#FFF', width: '80%', height: '35%', opacity: utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.conta) === true ? 1 : 0.25 }}
                                             >
                                                 Desativar
                                             </Button>
                                         ) : (
                                                 <Button
+                                                    disabled={!utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.conta)}
                                                     endIcon={<CheckCircleOutlineIcon />}
                                                     onClick={() => { this.handleReactivateUser(item) }}
-                                                    style={{ backgroundColor: 'blue', color: '#FFF', width: '80%', height: '35%', }}
+                                                    style={{ backgroundColor: 'blue', color: '#FFF', width: '80%', height: '35%', opacity: utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.conta) === true ? 1 : 0.25 }}
                                                 >
                                                     Reativar
                                                 </Button>

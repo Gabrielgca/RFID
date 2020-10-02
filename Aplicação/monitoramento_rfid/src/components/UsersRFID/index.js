@@ -361,7 +361,7 @@ class UsersRFID extends Component {
             await axios.post(baseURL + 'updateUser', params)
                 .then(response => {
                     alert(JSON.stringify(response.data))
-                    console.log(response)
+                    console.log(response);
                     this.modalClose();
                 })
                 .catch(error => {
@@ -584,7 +584,7 @@ class UsersRFID extends Component {
                                             disabled={!utils.checkSpecificPermission("Editar", this.state.loggedOffice.permissoes.usuario)}
                                             endIcon={<EditIcon />}
                                             onClick={() => { this.modalOpen(item) }}
-                                            style={{ backgroundColor: 'green', color: '#FFF', width: '80%', height: '35%', marginBottom: '1%' }}
+                                            style={{ backgroundColor: 'green', color: '#FFF', width: '80%', height: '35%', marginBottom: '1%', opacity: utils.checkSpecificPermission('Editar', this.state.loggedOffice.permissoes.usuario) === true ? 1 : 0.25 }}
                                         >
                                             Editar
                                         </Button>
@@ -594,7 +594,7 @@ class UsersRFID extends Component {
                                                 disabled={!utils.checkSpecificPermission("Remover", this.state.loggedOffice.permissoes.usuario)}
                                                 endIcon={<EditIcon />}
                                                 onClick={() => { this.handleDeactivateUserOpen(item) }}
-                                                style={{ backgroundColor: 'red', color: '#FFF', width: '80%', height: '35%' }}
+                                                style={{ backgroundColor: 'red', color: '#FFF', width: '80%', height: '35%', opacity: utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.usuario) === true ? 1 : 0.25 }}
                                             >
                                                 Desativar
                                             </Button>
@@ -603,7 +603,7 @@ class UsersRFID extends Component {
                                                     disabled={!utils.checkSpecificPermission("Remover", this.state.loggedOffice.permissoes.usuario)}
                                                     endIcon={<EditIcon />}
                                                     onClick={() => { this.handleReactivateUserOpen(item) }}
-                                                    style={{ backgroundColor: 'blue', color: '#FFF', width: '80%', height: '35%' }}
+                                                    style={{ backgroundColor: 'blue', color: '#FFF', width: '80%', height: '35%', opacity: utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.usuario) === true ? 1 : 0.25 }}
                                                 >
                                                     Reativar
                                                 </Button>

@@ -137,8 +137,9 @@ class Offices extends Component {
             const { permissions } = this.state;
             const { key, nomeCargo, status } = this.state.selectedOffice;
             await firebase.updateOffice(key, nomeCargo, permissions, status);
-            this.handleClose();
-            this.getOffices();
+            //this.handleClose();
+            //this.getOffices();
+            window.location.reload();
         }
         else {
             alert("O campo nome não pode ser vazio, e é necessário que exista ao menos uma permissão para o cargo.")
@@ -436,8 +437,9 @@ class Offices extends Component {
             .then((response) => {
                 alert(response);
             });
-        this.getOffices();
+        //this.getOffices();
         this.handleCloseDeactivate();
+        window.location.reload();
     }
 
     reactivateOffice = async (key) => {
@@ -445,7 +447,8 @@ class Offices extends Component {
         /* await firebase.reactivateUser(key); */
         alert("Cargo reativado com sucesso!");
         this.handleCloseReactivate();
-        this.getUsers();
+        //this.getUsers();
+        window.location.reload();
     }
 
     searchOffice = () => {
@@ -612,26 +615,29 @@ class Offices extends Component {
 
                                     <div className="offices-options">
                                         <Button
+                                            disabled={!utils.checkSpecificPermission('Editar', this.state.loggedOffice.permissoes.cargo)}
                                             endIcon={<DescriptionIcon />}
                                             onClick={() => { this.handleClickOpen(item) }}
-                                            style={{ backgroundColor: 'green', color: '#FFF', width: '80%', height: '35%', marginBottom: '1%' }}
+                                            style={{ backgroundColor: 'green', color: '#FFF', width: '80%', height: '35%', marginBottom: '1%', opacity: utils.checkSpecificPermission('Editar', this.state.loggedOffice.permissoes.cargo) === true ? 1 : 0.25 }}
                                         >
                                             Detalhes
                                             </Button>
 
                                         {item.status === 'Ativo' ? (
                                             <Button
+                                                disabled={!utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.cargo)}
                                                 endIcon={<BlockIcon />}
                                                 onClick={() => { this.handleDeactivateOfficeOpen(item) }}
-                                                style={{ backgroundColor: 'red', color: '#FFF', width: '80%', height: '35%', }}
+                                                style={{ backgroundColor: 'red', color: '#FFF', width: '80%', height: '35%', opacity: utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.cargo) === true ? 1 : 0.25 }}
                                             >
                                                 Desativar
                                             </Button>
                                         ) : (
                                                 <Button
+                                                    disabled={!utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.cargo)}
                                                     endIcon={<CheckCircleOutlineIcon />}
                                                     onClick={() => { this.handleReactivateOfficeOpen(item) }}
-                                                    style={{ backgroundColor: 'blue', color: '#FFF', width: '80%', height: '35%', }}
+                                                    style={{ backgroundColor: 'blue', color: '#FFF', width: '80%', height: '35%', opacity: utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.cargo) === true ? 1 : 0.25 }}
                                                 >
                                                     Reativar
                                                 </Button>

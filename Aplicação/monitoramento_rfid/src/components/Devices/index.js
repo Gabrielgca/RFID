@@ -346,26 +346,29 @@ class Devices extends Component {
 
                                     <div className="devices-options">
                                         <Button
+                                            disabled={!utils.checkSpecificPermission('Editar', this.state.loggedOffice.permissoes.dispositivo)}
                                             endIcon={<EditIcon />}
                                             onClick={() => { this.modalOpen(item) }}
-                                            style={{ backgroundColor: 'green', color: '#FFF', width: '80%', height: '35%', marginBottom: '1%' }}
+                                            style={{ backgroundColor: 'green', color: '#FFF', width: '80%', height: '35%', marginBottom: '1%', opacity: utils.checkSpecificPermission('Editar', this.state.loggedOffice.permissoes.dispositivo) === true ? 1 : 0.25 }}
                                         >
                                             Editar
                                         </Button>
 
                                         {item.status === 'A' ? (
                                             <Button
+                                                disabled={!utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.dispositivo)}
                                                 endIcon={<EditIcon />}
                                                 onClick={() => { this.handleDeactiveDeviceOpen(item) }}
-                                                style={{ backgroundColor: 'red', color: '#FFF', width: '80%', height: '35%' }}
+                                                style={{ backgroundColor: 'red', color: '#FFF', width: '80%', height: '35%', opacity: utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.dispositivo) === true ? 1 : 0.25 }}
                                             >
                                                 Desativar
                                             </Button>
                                         ) : (
                                                 <Button
+                                                    disabled={!utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.dispositivo)}
                                                     endIcon={<EditIcon />}
                                                     onClick={() => { this.handleReactivateDeviceOpen(item) }}
-                                                    style={{ backgroundColor: 'blue', color: '#FFF', width: '80%', height: '35%' }}
+                                                    style={{ backgroundColor: 'blue', color: '#FFF', width: '80%', height: '35%', opacity: utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.dispositivo) === true ? 1 : 0.25 }}
                                                 >
                                                     Reativar
                                                 </Button>
