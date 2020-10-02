@@ -152,20 +152,6 @@ void loop ()
 
   
   recebido =  sendData(get, 2000, DEBUG, true);//3000
-   Serial.println(recebido);
-
-  passe = permitido(recebido);
-
-    Serial.println("Resultado");
-    Serial.println(passe);
-
-    if(passe==0)
-    {
-      accessDenied();
-    }else
-    {
-      accessGranted();
-    }
 
   tagID="";
   
@@ -176,7 +162,20 @@ void loop ()
   closeCommand+="\r\n";
   //envia os comandos de encerramento
   sendData(closeCommand, 2000,DEBUG);//foi alterado aqui para forma padrão que seria o DEBUG, aqui estava false 2000
-  
+
+
+  passe = permitido(recebido);
+
+  Serial.println("Resultado");
+  Serial.println(passe);
+
+  if(passe==0)
+  {
+    accessDenied();
+  }else
+  {
+    accessGranted();
+  }
 }
 
 void aproximaCartao(int freq = 1500, int bip = 2){
