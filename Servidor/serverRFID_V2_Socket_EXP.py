@@ -423,16 +423,6 @@ def uplinkCallback (msg, client):
         break
 '''
 
-#função que manda resposta para a aplicação
-def answer (app, http_code, json):
-    responseServer = app.response_class (
-        response = json,
-        status = http_code,
-        mimetype = 'application/json'
-    )
-    return responseServer
-
-
 def mqttClientSetup (handler):
     client = handler.data ()
     client.set_uplink_callback (uplinkCallback)
@@ -766,8 +756,7 @@ def register():
         try:
             data = request.get_json ()
         except (KeyError, TypeError, ValueError):
-            resp = jsonify (success = False)
-            return answer (app, 204, resp)
+            return jsonify (success = False)
 
         str_card = data['codigoRFIDCartao']
         str_user = data['nomeUsuario']
@@ -958,8 +947,8 @@ def updateUser():
         try:
             data = request.get_json ()
         except (KeyError, TypeError, ValueError):
-            resp = jsonify (success = False)
-            return answer (app, 204, resp)
+            return jsonify (success = False)
+
         update_user = Cadastro()
 
         id_user = data['id_user']
@@ -1136,8 +1125,7 @@ def registerDisp():
         try:
             data = request.get_json ()
         except (KeyError, TypeError, ValueError):
-            resp = jsonify (success = False)
-            return answer (app, 204, resp)
+            return jsonify (success = False)
     
         try:
             noDisp = data['desc']
@@ -1178,8 +1166,8 @@ def updateDisp():
         try:
             data = request.get_json ()
         except (KeyError, TypeError, ValueError):
-            resp = jsonify (success = False)
-            return answer (app, 204, resp)
+            return jsonify (success = False)
+
         update_disp = Dispositivo()
         idLoc = 0
         for key in data:
@@ -1230,8 +1218,8 @@ def statusDisp():
         try:
             data = request.get_json ()
         except (KeyError, TypeError, ValueError):
-            resp = jsonify (success = False)
-            return answer (app, 204, resp)
+            return jsonify (success = False)
+
         update_disp = Dispositivo()
         id_disp = 0
         for key in data:
@@ -1292,8 +1280,7 @@ def registerLoc():
         try:
             data = request.get_json ()
         except (KeyError, TypeError, ValueError):
-            resp = jsonify (success = False)
-            return answer (app, 204, resp)
+            return jsonify (success = False)
 
         str_emp = data['companyName']
         str_loc = data['roomName']
@@ -1301,7 +1288,6 @@ def registerLoc():
         str_area = data['area']
         
         try:
-
             andar = int(str_andar)
             area = int(str_area)
             insereLocDisp = LocalizacaoDisp(noEmpresa = str_emp,noLocalizacao = str_loc, vlAndar = andar, vlArea = area, vlQtdeLampadas = 20,vlConsumoLamp = 40, stStatus = 'A')
@@ -1327,8 +1313,7 @@ def updateLoc():
         try:
             data = request.get_json ()
         except (KeyError, TypeError, ValueError):
-            resp = jsonify (success = False)
-            return answer (app, 204, resp)
+            return jsonify (success = False)
         
 
         id_loc = data['id_loc']
