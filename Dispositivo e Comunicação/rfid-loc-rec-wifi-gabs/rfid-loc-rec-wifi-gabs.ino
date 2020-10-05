@@ -23,8 +23,8 @@
 String ssid = "Inst Brasilia de Tec e Inov 2G";
 String pass = "#ibti@2019";
 String strID = "";
-String servidor = "192.168.2.211";
-String port = "4002";
+String servidor = "192.168.2.196";
+String port = "7000";
 String uri = "/WiFiRFID?RFID=";
 String recebido = "";
 int passe = 0;
@@ -42,7 +42,6 @@ bool resposta (String resp, String esperado);
 int permitido (String perm);
 
 String tagID = ""; //Variável que armazenará o ID da Tag
-bool access = false; //Variável que verifica a permissão 
 
 
 
@@ -140,18 +139,18 @@ void loop ()
 
   if(!okay){
   Serial.println("Passou por dentro deste IF!!");
-  tried = tryagain("AT+CIPSTART=2,\"TCP\",\"" + servidor + "\",4002\r\n");
+  tried = tryagain("AT+CIPSTART=2,\"TCP\",\"" + servidor + "\",7000\r\n");
   if(!tried){
     return;
     }
   }
   
   //envia primeiro o tamanho dos dados, e depois os dados
-  sendData(cipSend, 2000, DEBUG);//3000
+  sendData(cipSend, 1000, DEBUG);//3000
   
 
   
-  recebido =  sendData(get, 2000, DEBUG, true);//3000
+  recebido =  sendData(get, 10000, DEBUG, true);//3000
 
   tagID="";
   
@@ -161,10 +160,10 @@ void loop ()
   closeCommand+=2;
   closeCommand+="\r\n";
   //envia os comandos de encerramento
-  sendData(closeCommand, 2000,DEBUG);//foi alterado aqui para forma padrão que seria o DEBUG, aqui estava false 2000
+  sendData(closeCommand, 1000,DEBUG);//foi alterado aqui para forma padrão que seria o DEBUG, aqui estava false 2000
 
 
-  passe = permitido(recebido);
+  passe = resposta(recebido,"true");
 
   Serial.println("Resultado");
   Serial.println(passe);
@@ -263,24 +262,6 @@ void aproximaCartao(int freq = 1500, int bip = 2){
     }
    }
 
- 
-  int permitido (String perm){
-  
-  char * pch;
-  const char * suc;
-  int ascii;
-
-  suc = perm.c_str();
-  pch = strstr(suc,"true");
-  //Serial.print("Comparando String com true: "); Serial.println(pch);
-  ascii = pch;
-  if (ascii == 0){
-    return 0;
-    }
-  else{
-    return 1;
-    }
-   }
 
  void accessGranted ()
 {
@@ -298,7 +279,6 @@ void aproximaCartao(int freq = 1500, int bip = 2){
     digitalWrite (led_green, LOW);
     delay (100);
   }
-  access = false;  //Seta a variável access como false novamente
 }
 
 void accessDenied ()
