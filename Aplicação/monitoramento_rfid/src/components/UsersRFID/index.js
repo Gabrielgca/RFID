@@ -35,6 +35,8 @@ import EditIcon from '@material-ui/icons/Edit';
 import RemoveIcon from '@material-ui/icons/Remove';
 
 import { FormControlLabel, Checkbox } from '@material-ui/core';
+import io from 'socket.io-client';
+import ENDPOINT from '../../socketAPIService';
 
 const fileUpload = require('fuctbase64');
 
@@ -115,6 +117,7 @@ class UsersRFID extends Component {
         } */
         await this.getUsersRFID();
         console.log(this.state.users);
+        this.handleRFIDChange();
         //this.setState({ users: usuarios.usuarios });
     }
 
@@ -215,6 +218,23 @@ class UsersRFID extends Component {
         this.setState({ fileResult: '' });
         this.getUsersRFID();
     };
+
+    handleRFIDChange = () => {
+        var socket = io.connect(ENDPOINT, {
+            reconnection: true,
+            //timeout: 30000
+            // transports: ['websocket']
+        });
+
+        // Inicia os eventos que ficarão em estado de observação, 
+        // onde cada alteração, será enviada do servidor para a aplicação em tempo real
+        socket.on('register', response => {
+            let newSelectedUser = this.state.selectedUser;
+            newSelectedUser.RFID = response;
+            this.setState({ selectedUser: newSelectedUser });
+            console.log('Register: ' + response);
+        });
+    }
 
     /* reactivateUser = async (user) => { //Função que realiza o pedido de reativação do usuário ao Servidor
         let params = {
@@ -645,9 +665,9 @@ class UsersRFID extends Component {
                     >
                         <DialogTitle id="alert-dialog-title">{"Detalhes do usuário"}</DialogTitle>
                         <DialogContent>
-                            <DialogContentText id="alert-dialog-description">
+                            <DialogContentText style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
                                 {this.state.fileResult !== '' ?
-                                    <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+                                    <div style={{ display: "flex", flexDirection: "column", justifyContent: "flex-start", alignItems: "flex-start" }}>
                                         <img style={{ marginBottom: 10 }} className="img-perfil" src={"data:image/png;base64, " + this.state.fileResult} />
                                     </div>
                                     :

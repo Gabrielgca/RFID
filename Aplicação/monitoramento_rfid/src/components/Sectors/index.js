@@ -27,7 +27,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Avatar from '@material-ui/core/Avatar';
 
 import FlatList from 'flatlist-react';
-import { FormGroup, FormControlLabel } from '@material-ui/core';
+import { FormGroup, FormControlLabel, Typography } from '@material-ui/core';
 import axios from 'axios';
 import baseURL from '../../service';
 
@@ -54,6 +54,7 @@ class Sectors extends Component {
                 floor: 0,
                 maxOccupation: 0,
                 img: '',
+                status: 'A'
             },
             modalConfirmShow: false,
             loggedOffice: {
@@ -134,7 +135,8 @@ class Sectors extends Component {
             area: sector.area,
             floor: sector.floor,
             maxOccupation: sector.maxOccupation,
-            img: sector.img
+            img: sector.img,
+            status: 'A'
         }
 
         this.setState({ selectedSector: array });
@@ -191,6 +193,51 @@ class Sectors extends Component {
             alert("Dados inválidos. Revise o formulário");
         }
 
+    }
+
+    handleUpdateDispStatus = async (sector) => {
+        let message = "";
+        let array = {
+            id_loc: sector.id_loc,
+            companyName: sector.companyName,
+            roomName: sector.roomName,
+            area: sector.area,
+            floor: sector.floor,
+            maxOccupation: sector.maxOccupation,
+            img: sector.img,
+            status: sector.status
+        }
+        await this.setState({ selectedSector: array });
+        let newStatus;
+        if (this.state.selectedSector.status === "A") {
+            newStatus = "I";
+            message = "Usuário desativado com sucesso!";
+        }
+        else {
+            newStatus = "A";
+            message = "Usuário reativado com sucesso!";
+        }
+
+        let params = {
+            id_loc: this.state.selectedSector.id_loc,
+            companyName: sector.companyName,
+            roomName: sector.roomName,
+            area: sector.area,
+            floor: sector.floor,
+            maxOccupation: sector.maxOccupation,
+            img: null,
+            status: newStatus
+        }
+
+        axios.post(baseURL + "updateLoc", params)
+            .then(response => {
+                alert(message);
+                //window.location.reload();
+                this.getAllSectors();
+            })
+            .catch(error => {
+                alert(JSON.stringify(error));
+            });
     }
 
     async componentDidMount() {
@@ -319,7 +366,8 @@ class Sectors extends Component {
                                             <Button
                                                 disabled={!utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.setor)}
                                                 endIcon={<CheckCircleOutlineIcon />}
-                                                style={{ backgroundColor: 'red', color: '#FFF', width: '80%', height: '35%', opacity: utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.setor) === true ? 1 : 0.25 }}
+                                                style={{ backgroundColor: 'blue', color: '#FFF', width: '80%', height: '35%', opacity: utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.setor) === true ? 1 : 0.25 }}
+                                                onClick={() => { this.handleUpdateDispStatus(item) }}
                                             >
                                                 Reativar
                                             </Button>
@@ -328,6 +376,7 @@ class Sectors extends Component {
                                                     disabled={!utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.setor)}
                                                     endIcon={<BlockIcon />}
                                                     style={{ backgroundColor: 'red', color: '#FFF', width: '80%', height: '35%', opacity: utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.setor) === true ? 1 : 0.25 }}
+                                                    onClick={() => { this.handleUpdateDispStatus(item) }}
                                                 >
                                                     Desativar
                                                 </Button>

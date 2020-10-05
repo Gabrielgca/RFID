@@ -423,8 +423,6 @@ class Dashboard extends Component {
               />
             ))}
           </SpeedDial>
-
-          <p>{JSON.stringify(this.state.selectedRoom.ocupantes)}</p>
         </div>
         <p style={{ color: "#FFF" }}>Email: {firebase.getCurrent()}</p>
         <p style={{ color: "#FFF" }}>Cargo: {this.state.cargo}</p><br />

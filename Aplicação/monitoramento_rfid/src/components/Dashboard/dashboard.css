@@ -115,7 +115,7 @@ div#dashboard .rooms{
   background-color: #FFF;
   width: 100%;
   height: 500px;
-  /*border: 1px solid black;*/
+  /* border: 1px solid red; */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -123,15 +123,19 @@ div#dashboard .rooms{
 }
 
 .rooms .room-details .occupants{
-  width: 100px;
-  height: 90%;
-  /*border: 1px solid black;*/
+  display: flex;
+  flex-direction: column;
+  width: 15%;
+  height: 100%;
+  /* border: 1px solid black; */
+  align-items: center;
+  justify-content: center;
   overflow-y: scroll;
 }
 
 .rooms .room-details .people-loading-div{
   width: 100px;
-  height: 90%;
+  height: 85%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -142,18 +146,17 @@ div#dashboard .rooms{
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  height: 90%;
+  height: 100%;
   width: 90%;
 }
 
 .person-avatar{
   cursor: pointer;
-  width: 90px;
-  height: 90px;
+  width: 50px;
+  height: 50px;
   background-color: thistle;
   border-radius: 100%;
-  margin: 0.5em auto;
-  margin-bottom: 0.75em;
+  margin: 0 auto;
   border: 0;
 }
 
@@ -195,7 +198,7 @@ div#dashboard .rooms{
 
 .img-mapa-sala{
   height: 500px;
-  width: 99%;
+  width: 100%;
   border-radius: 0.5em;
   align-items: center;
   justify-content: center;
