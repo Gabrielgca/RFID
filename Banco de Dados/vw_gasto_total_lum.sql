@@ -144,6 +144,8 @@ RETURNS TIME
                TIMESTAMP(DATA_APAGADO,HORA_APAGADO)
             LIMIT 1);
 
+--Esta View seleciona todos os intervalos em que o dispositivo 2 
+--ficou com o status em 'aceso'.
 CREATE OR REPLACE VIEW vw_lum_tempo_aceso AS
     SELECT ED_ACESO.dt_ocorrencia AS DATA_ACESO, 
            ED_ACESO.hr_ocorrencia AS HORA_ACESO, 
@@ -157,6 +159,7 @@ CREATE OR REPLACE VIEW vw_lum_tempo_aceso AS
     AND ED_ACESO.st_estado = '1'
     GROUP BY ED_ACESO.dt_ocorrencia,ED_ACESO.hr_ocorrencia;   
 
+--Esta View seleciona os intervalos 'não-vazios' de todas as salas.
 CREATE OR REPLACE VIEW vw_loc_tempo_nao_vazio AS
     SELECT DISP_LOC.id_dispositivo AS DISPOSITIVO,
 		   OCP_NAO_VAZIO.dt_ocupacao AS DATA_NAO_VAZIO,
@@ -171,6 +174,7 @@ CREATE OR REPLACE VIEW vw_loc_tempo_nao_vazio AS
     WHERE OCP_NAO_VAZIO.nr_pessoas > 0
     GROUP BY DISPOSITIVO,DATA_VAZIO,HORA_VAZIO;
 
+--Esta View seleciona os intervalos 'vazios' de todas as salas.
 CREATE OR REPLACE VIEW vw_loc_tempo_vazio AS
     SELECT DISP_LOC.id_dispositivo AS DISPOSITIVO,
 		   OCP_VAZIO.dt_ocupacao AS DATA_VAZIO,
@@ -186,7 +190,7 @@ CREATE OR REPLACE VIEW vw_loc_tempo_vazio AS
     GROUP BY DISPOSITIVO,DATA_NAO_VAZIO,HORA_NAO_VAZIO;
 
 -- Esta View seleciona o tempo em que o laboratório ficou vazio e
--- com a seu status de luminosidade em 'aceso', e o gasto total,em Watts,
+-- com o seu status de luminosidade em 'aceso', e o gasto total,em Watts,
 -- nessa situação específica.
 CREATE OR REPLACE VIEW vw_gasto_total_lum_lab AS
     SELECT 	DISP.id_dispositivo AS DISPOSITIVO,
