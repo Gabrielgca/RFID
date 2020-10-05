@@ -482,6 +482,9 @@ def roominfo(data):
 #------------------------ROTAS------------------------#
 #-----------------------------------------------------#
 
+@app.route('/')
+def html_teste():
+        return render_template('index.html')
 
 
 @app.route('/teste')
@@ -501,6 +504,7 @@ def WiFIRFID ():
     global available
     global id_sala, flag_roominfo
 
+         
     if flag_roominfo:
         flag_roominfo = False
     else:
@@ -631,13 +635,13 @@ def WiFIRFID ():
                     cmd.insertOcupacao(newOcupacao)
                 newOcorrencia.idDispositivo = locDisp
                 newOcorrencia.stOcorrencia = stOc
-                cmd.insertOcorrencia(newOcorrencia)
+                cmd.insertOcorrencia(newOcorrencia, refresh = True)
             else:
                 ultRota = cmd.selUltRotaCadastro(idCadastro=cadastroCartao.idCadastro)
                 if ultOcorrencia.stOcorrencia == 'E':
                     newOcorrencia.idDispositivo = ultOcorrencia.idDispositivo
                     newOcorrencia.stOcorrencia = 'S'
-                    cmd.insertOcorrencia(ocorrencia=newOcorrencia, expunge=True, transient=True)
+                    cmd.insertOcorrencia(ocorrencia=newOcorrencia, expunge=True, transient=True, refresh = True)
                     if ultRota.idDispositivoOrigem is not None:
                         newRota.idDispositivoOrigem = ultRota.idDispositivoDestino
                         newRota.idDispositivoDestino = ultRota.idDispositivoOrigem
@@ -649,7 +653,7 @@ def WiFIRFID ():
                 newOcorrencia.hrOcorrencia = db.func.current_time()
                 newOcorrencia.idDispositivo = locDisp
                 newOcorrencia.stOcorrencia = 'E'
-                cmd.insertOcorrencia(newOcorrencia)
+                cmd.insertOcorrencia(newOcorrencia, refresh = True)
 
                 newRota.idCadastro = cadastroCartao.idCadastro
                 newRota.dtRota = db.func.current_date()
@@ -675,7 +679,7 @@ def WiFIRFID ():
         else:
             newOcorrencia.idDispositivo = locDisp
             newOcorrencia.stOcorrencia = 'E'
-            cmd.insertOcorrencia(newOcorrencia)
+            cmd.insertOcorrencia(newOcorrencia, refresh = True)
 
             newRota.idDispositivoOrigem = None
             newRota.idDispositivoDestino = locDisp
@@ -696,7 +700,8 @@ def WiFIRFID ():
         #Verifica se atualização na sala selecionada
         if int(locDisp) == int(id_sala):
             print('Entrei aqui quando as salas são iguais!!')
-            rooms = fuc_roominfo(locDisp)
+            rooms = fuc_roominfo(int(locDisp))
+            flag_roominfo = True
             socketio.emit('news_from_roominfo', rooms)
         return jsonify (success = True)
     else:
@@ -990,9 +995,9 @@ def updateUser():
             
             for i in list_perm:
 
-                if "dtini" not in list_perm[i] and "dtfim" not in list_perm[i]:
-                    list_perm[i]["dtini"] == None
-                    list_perm[i]["dtfim"] == None
+                if "dtini" not in list_perm[count] and "dtfim" not in list_perm[count]:
+                    list_perm[count]["dtini"] = None
+                    list_perm[count]["dtfim"] = None
                 
                 for p_key in i:
                     #CASO DE ATUALIZAR PERMISSÃO
@@ -1013,7 +1018,7 @@ def updateUser():
                                 hr_final = list_perm[count]['hr_final']
                                 permissao = list_perm[count]['permanente']
 
-                                if list_perm[i]["dtini"] == None or list_perm[i]["dtfim"] == None:
+                                if list_perm[count]["dtini"] == None or list_perm[count]["dtfim"] == None:
                                     #CASO NÃO EXISTA DATA ESPECÍFICA
                                     try:
                                         perm_horario = PermHorario(hrInicial = hr_inicio, hrFinal = hr_final, stPermanente = permissao)
@@ -1381,7 +1386,7 @@ def fuc_roominfo(app_id_disp):
     global id_sala
     id_sala = app_id_disp
 
-    print(id_sala)
+    print(f'id da sala: {id_sala}')
   
     
     #Considerando que o id_sala será o id_dispositivo
@@ -1410,9 +1415,9 @@ def fuc_roominfo(app_id_disp):
             img_users.append(i.edArquivoImagem)
 
         users_inside.sort()
-        print(users_inside)
+        print(f'usuários dentro da sala: {users_inside}.')
 
-        print(info_users)
+        print(f'informações dos usuários: {info_users}')
     
         lista_ocupantes = []
 
