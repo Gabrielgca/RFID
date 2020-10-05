@@ -521,9 +521,9 @@ class Dashboard extends Component {
             <DialogContent>
               <DialogContentText id="alert-dialog-description">
                 {this.state.selectedPerson.imgPerfil !== '' ? (
-                  <img className="person-avatar" src={this.state.selectedPerson.imgPerfil} />
+                  <img className="person-avatar" src={this.state.selectedPerson.imgPerfil} style={{marginRight:'60%', marginBottom:30}}/>
                 ) : (
-                    <img className="person-avatar" src="https://cdn.icon-icons.com/icons2/1879/PNG/512/iconfinder-3-avatar-2754579_120516.png"></img>
+                    <img className="person-avatar" src="https://cdn.icon-icons.com/icons2/1879/PNG/512/iconfinder-3-avatar-2754579_120516.png" style={{marginRight:'60%', marginBottom:30}}></img>
                   )}
                 <div className="person-details">
                   <p><b>ID: </b>{this.state.selectedPerson.idOcupante}</p>

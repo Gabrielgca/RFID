@@ -181,6 +181,7 @@ div#dashboard .rooms{
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
+  margin-left: 30%;
 }
 
 #alert-dialog-description p{
@@ -215,4 +216,7 @@ div#dashboard .rooms{
 
 .person-details p{
   text-align: center;
+  display: flex;
+  align-items: center;
+  flex: column;
 }
