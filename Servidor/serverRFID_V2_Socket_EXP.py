@@ -526,7 +526,7 @@ def WiFIRFID ():
     
         
     if cmd.selDispLocalizacaoByDisp (locDisp) != None:
-        cadastroCartao = cmd.selCadastroCartaoByRfid (idrfid)
+        cadastroCartao = cmd.selCadastroCartaoAtivo(idrfid)
         ultOcorrencia = cmd.selUltOcorrenciaCadastro(cadastroCartao.idCadastro)
 
         disp_loc = cmd.selDispLocalizacaoByDisp (locDisp)
@@ -706,7 +706,7 @@ def WiFIRFID ():
         return jsonify (success = True)
     else:
         print('Dispositivo sem uma localização ativa.')
-        return 'Dispositivo sem uma localização ativa.'
+        return jsonify (success = False)
             
 
     #except Exception as e:
@@ -1328,6 +1328,7 @@ def locInfo():
         dict_loc_disp["id_loc"] = i.idLocalizacaoDisp
         dict_loc_disp["companyName"] = i.noEmpresa
         dict_loc_disp["roomName"] = i.noLocalizacao
+        dict_loc_disp["companyName"] = i.noEmpresa
         dict_loc_disp["floor"] = i.vlAndar
         dict_loc_disp["area"] = i.vlArea
 
@@ -1337,6 +1338,11 @@ def locInfo():
         
         #NOVO COMANDO STATUS
         dict_loc_disp["status"] = i.stStatus
+        if len(cmd.selDispLocalizacao(i.idLocalizacaoDisp))> 0:
+            dict_loc_disp["available"] = False
+        else:
+            dict_loc_disp["available"] = True
+
         dict_loc_disp["maxOccupation"] = int(i.vlArea/2)
         list_loc_disp.append(dict_loc_disp)
 
@@ -1368,7 +1374,9 @@ def findrooms():
         #SELECIONA A SALA QUE O DISPOSITIVO ESTÁ RELACIONADO
         loc_disp = cmd.selLocalizacaoDispByDisp(full_dict_disp['idDispositivo'], all_disp = True)
         no_loc_disp = loc_disp[-1].noLocalizacao
+        no_empresa = loc_disp[-1].noEmpresa
         dict_disp['nomeSala'] = no_loc_disp
+        dict_disp['companyName'] = no_empresa
         dict_disp["qtdOcupantes"] = cmd.selCountPessoasSala(i.idDispositivo)
         dispositivo.append(dict_disp)
   
