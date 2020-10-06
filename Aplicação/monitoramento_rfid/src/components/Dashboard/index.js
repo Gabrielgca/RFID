@@ -213,13 +213,13 @@ class Dashboard extends Component {
 
     if (utils.checkCategory(this.state.loggedOffice.permissoes.conta) === true) {
       let newActions = this.state.actions;
-      newActions.unshift({ icon: <AccountCircleIcon />, name: 'Gerenciar Usuários', action: 1 })
+      newActions.unshift({ icon: <AccountCircleIcon />, name: 'Gerenciar Contas', action: 1 })
       this.setState({ actions: newActions });
     }
 
     if (utils.checkCategory(this.state.loggedOffice.permissoes.cargo) === true) {
       let newActions = this.state.actions;
-      newActions.unshift({ icon: <HowToRegIcon />, name: 'Gerenciar Permissões', action: 3 })
+      newActions.unshift({ icon: <HowToRegIcon />, name: 'Gerenciar Cargos', action: 3 })
       this.setState({ actions: newActions });
     }
 
@@ -435,7 +435,7 @@ class Dashboard extends Component {
               rooms.map((room) => {
                 return (
                   <article key={room.id_disp}>
-                    <strong>Nome: {room.nomeSala}</strong>
+                    <strong>Sala: {room.companyName} - {room.nomeSala}</strong>
                     <p>Pessoas no Setor: {room.qtdOcupantes}</p>
                     <button type="button" className="button-room-details" onClick={() => { this.getRoomDetails(room.id_disp) }}><FaCaretRight style={{ fontSize: 20 }} /></button>
                   </article>
@@ -521,9 +521,9 @@ class Dashboard extends Component {
             <DialogContent>
               <DialogContentText id="alert-dialog-description">
                 {this.state.selectedPerson.imgPerfil !== '' ? (
-                  <img className="person-avatar" src={this.state.selectedPerson.imgPerfil} style={{marginRight:'60%', marginBottom:30}}/>
+                  <img className="person-avatar" src={this.state.selectedPerson.imgPerfil} style={{marginRight:'60%', marginBottom:30}} />
                 ) : (
-                    <img className="person-avatar" src="https://cdn.icon-icons.com/icons2/1879/PNG/512/iconfinder-3-avatar-2754579_120516.png" style={{marginRight:'60%', marginBottom:30}}></img>
+                    <img className="person-avatar" src="https://cdn.icon-icons.com/icons2/1879/PNG/512/iconfinder-3-avatar-2754579_120516.png"></img>
                   )}
                 <div className="person-details">
                   <p><b>ID: </b>{this.state.selectedPerson.idOcupante}</p>

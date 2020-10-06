@@ -195,9 +195,9 @@ class NewDevices extends Component {
                                 label="Localização"
                             >
                                 {this.state.localization.map((loc) => {
-                                    if (loc.status === "A") {
+                                    if ((loc.status === "A" && loc.available) === true) {
                                         return (
-                                            <MenuItem value={loc.id_loc}>{loc.id_loc} - {loc.roomName}</MenuItem>
+                                            <MenuItem value={loc.id_loc}>{loc.companyName} - {loc.roomName}</MenuItem>
                                         )
                                     }
                                 })}

@@ -238,6 +238,39 @@ class Sectors extends Component {
         this.setState({ fileResult: event.target.value })
     }
 
+    handleSectorStatusChange = async (sector) => {
+        let message;
+        let newStatus;
+        if (sector.status === "A") {
+            newStatus = "I";
+            message = "Setor desativado com sucesso!";
+        }
+        else {
+            newStatus = "A";
+            message = "Setor reativado com sucesso!";
+        }
+
+        let params = {
+            id_loc: sector.id_loc,
+            companyName: sector.companyName,
+            roomName: sector.roomName,
+            area: sector.area,
+            floor: sector.floor,
+            maxOccupation: sector.maxOccupation,
+            img: null,
+            status: newStatus,
+        }
+
+        axios.post(baseURL + "updateLoc", params)
+            .then(response => {
+                alert(message);
+                this.getAllSectors();
+            })
+            .catch(error => {
+                alert(error);
+            });
+    }
+
 
 
     render() {
@@ -299,9 +332,9 @@ class Sectors extends Component {
                                 <div className="sectors-item">
                                     <div style={{ display: "flex", flexDirection: 'row', justifyContent: 'flex-start' }} className={item.status === 'A' ? "sectors-item-info" : "sectors-item-info-disabled"} key={item.id_loc}>
                                         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }} >
-                                            <img className='person-avatar' src={item.img}/>
+                                            <img className='person-avatar' src={item.img} />
                                         </div>
-                                        <div style={{display:'flex', flexDirection:'column', justifyContent:'center'}}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                                             <p><b>Nome da Empresa: </b>{item.companyName}</p>
                                             <p><b>Sala: </b>{item.roomName}</p>
                                             <p><b>Área: </b>{item.area}</p>
@@ -321,14 +354,16 @@ class Sectors extends Component {
 
                                         {item.status === 'I' ? (
                                             <Button
+                                                onClick={() => { this.handleSectorStatusChange(item) }}
                                                 disabled={!utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.setor)}
                                                 endIcon={<CheckCircleOutlineIcon />}
-                                                style={{ backgroundColor: 'red', color: '#FFF', width: '80%', height: '35%', opacity: utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.setor) === true ? 1 : 0.25 }}
+                                                style={{ backgroundColor: 'blue', color: '#FFF', width: '80%', height: '35%', opacity: utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.setor) === true ? 1 : 0.25 }}
                                             >
                                                 Reativar
                                             </Button>
                                         ) : (
                                                 <Button
+                                                    onClick={() => { this.handleSectorStatusChange(item) }}
                                                     disabled={!utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.setor)}
                                                     endIcon={<BlockIcon />}
                                                     style={{ backgroundColor: 'red', color: '#FFF', width: '80%', height: '35%', opacity: utils.checkSpecificPermission('Remover', this.state.loggedOffice.permissoes.setor) === true ? 1 : 0.25 }}

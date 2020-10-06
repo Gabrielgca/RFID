@@ -42,7 +42,7 @@ class Home extends Component {
           rooms.map((room) => {
             return (
               <article key={room.idSala}>
-                <strong>Nome: {room.nomeSala}</strong>
+                <strong>Nome: {room.companyName} - {room.nomeSala}</strong>
                 <p>Ocupantes: {room.qtdOcupantes}</p>
               </article>
             );

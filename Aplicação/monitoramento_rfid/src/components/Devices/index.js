@@ -119,7 +119,7 @@ class Devices extends Component {
             selectedDevice: {
                 key: user.id_disp,
                 nameDevice: user.desc,
-                localization: user.id_disp,
+                localization: user.id_loc_disp,
                 status: user.status,
             }
         })
@@ -234,7 +234,8 @@ class Devices extends Component {
     getDevices = async () => {
         await axios.get(baseURL + 'dispInfo')
             .then(response => {
-                console.log(response.data.dispinfo)
+                console.log("DISPINFO")
+                console.log(response.data.dispinfo);
                 this.setState({ devices: response.data.dispinfo });
             })
             .catch(error => {
@@ -410,7 +411,7 @@ class Devices extends Component {
                         <DialogTitle id="alert-dialog-title">{"Detalhes do dispositivo"}</DialogTitle>
                         <DialogContent>
 
-                            <FormControl disabled style={{ marginBottom: 25 }}>
+                            <FormControl disabled style={{ marginBottom: 25, alignItems: "center", justifyContent: "center" }}>
                                 <InputLabel>ID</InputLabel>
                                 <Input value={this.state.selectedDevice.key} />
                             </FormControl>
@@ -428,10 +429,12 @@ class Devices extends Component {
                                     onChange={(event) => { this.localizationDevice(event) }}
                                 >
                                     {this.state.localization.map((loc) => {
-                                        return (
-                                            //Alterar para enviar id_loc em vez de roomName
-                                            <MenuItem value={loc.id_loc}>{loc.id_loc} - {loc.roomName} </MenuItem>
-                                        )
+                                        if ((loc.status == "A" && loc.available === true) || loc.id_loc === this.state.selectedDevice.localization) {
+                                            return (
+                                                //Alterar para enviar id_loc em vez de roomName
+                                            <MenuItem value={loc.id_loc}>{loc.id_loc} - {loc.companyName} - {loc.roomName} </MenuItem>
+                                            )
+                                        }
                                     })}
 
 

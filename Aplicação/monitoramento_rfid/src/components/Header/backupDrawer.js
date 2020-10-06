@@ -18,6 +18,16 @@ import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
 
+import ExitToApp from '@material-ui/icons/ExitToApp';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import HowToRegIcon from '@material-ui/icons/HowToReg';
+import TapAndPlayIcon from '@material-ui/icons/TapAndPlay';
+import ApartmentIcon from '@material-ui/icons/Apartment';
+import QueuePlayNextIcon from '@material-ui/icons/QueuePlayNext';
+
+import utils from '../../utils';
+import firebase from '../../firebase';
+
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -86,11 +96,29 @@ const useStyles = makeStyles((theme) => ({
 export default function Header() {
   const classes = useStyles();
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const [actions, setActions] = useState([{ icon: <ExitToApp />, name: 'Sair', action: 2 }]);
+  const [cargo, setCargo] = useState(localStorage.cargo);
+  const [isMounted, setIsMounted] = useState(false);
+  const [loggedOffice, setLoggedOffice] = useState(
+    {
+      key: '',
+      nomeCargo: '',
+      status: '',
+      permissoes: {
+        cargo: [],
+        conta: [],
+        dispositivo: [],
+        setor: [],
+        usuario: [],
+        dashboard: []
+      }
+    }
+  );
 
-  useEffect(() => {
-
-  }, [])
+  const handleIsMounted = () => {
+    setIsMounted(!isMounted);
+  }
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -125,6 +153,7 @@ export default function Header() {
           <Typography variant="h6" noWrap>
             IBTI - Monitoramento
           </Typography>
+          <Typography> {isMounted.toString()}</Typography>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -147,10 +176,10 @@ export default function Header() {
         </div>
         <Divider />
         <List>
-          {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-              <ListItemText primary={text} />
+          {actions.map((action, index) => (
+            <ListItem button key={action.name}>
+              <ListItemIcon>{index < (actions.length - 1) ? action.icon : ""}</ListItemIcon>
+              <ListItemText primary={action.name} />
             </ListItem>
           ))}
         </List>
