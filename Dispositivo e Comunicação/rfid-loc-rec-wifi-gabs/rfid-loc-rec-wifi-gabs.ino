@@ -26,7 +26,6 @@ String strID = "";
 String servidor = "192.168.2.196";
 String port = "7000";
 String uri = "/WiFiRFID?RFID=";
-String recebido = "";
 int passe = 0;
 
 //ID do dispositivo no Banco de dados
@@ -88,6 +87,7 @@ void loop ()
 	//Inicialmente tagID deve estar vazia.
 	tagID = "";
   String success;
+  String recebido;
 
   bool okay,tried;
 	
