@@ -58,7 +58,7 @@ class NewRFID extends Component {
       localizations: [],
       hrini: '',
       hrfim: '',
-      perm: true,
+      permanente: true,
       loggedOffice: {
         key: '',
         nomeCargo: '',
@@ -239,7 +239,7 @@ class NewRFID extends Component {
         roomName: this.state.roomName,
         hrini: this.state.hrini === "" ? null : this.state.hrini,
         hrfim: this.state.hrfim === "" ? null : this.state.hrfim,
-        permanente: this.state.perm === true ? "S" : "N"
+        permanente: this.state.permanente === true ? "S" : "N"
       });
       this.setState({ permissions: newPermissions });
     }
@@ -271,7 +271,7 @@ class NewRFID extends Component {
 
   handleCheck = async (event) => {
     this.setState({
-      perm: event.target.checked
+      permanente: event.target.checked
     })
   }
 
@@ -385,7 +385,7 @@ class NewRFID extends Component {
                 value={this.state.hrfim} onChange={(e) => this.setState({ hrfim: e.target.value })}
               />
               <Button onClick={this.handleAddPermission} variant='contained' style={{ marginLeft: '2%', background: 'green', height: 54 }} ><AddIcon /></Button>
-              <FormControlLabel control={<CheckBox checked={this.state.perm} onChange={(e) => { this.handleCheck(e) }} />} label='Manter horário direto' />
+              <FormControlLabel control={<CheckBox checked={this.state.permanente} onChange={(e) => { this.handleCheck(e) }} />} label='Manter horário direto' />
               <div className='flatScroll'>
                 <FlatList
                   renderWhenEmpty={() => <div></div>}
@@ -393,11 +393,10 @@ class NewRFID extends Component {
                   renderItem={(item) => (
                     <div>
                       <div className='usersList'>
-                        <p><b>Localização:</b> {item.roomName}</p>
-                        <p><b>Hora de inicio:</b> {item.hrini}</p>
-                        <p><b>Hora fim:</b> {item.hrfim}</p>
-                        {item.perm == true ? (<p><b>Diario:</b>Sim</p>) : (<p></p>)}
-                        {item.perm == false ? (<p><b>Diario:</b>Não</p>) : (<p></p>)}
+                        <p><b>Localização: </b> {item.roomName}</p>
+                        <p><b>Hora de inicio: </b> {item.hrini}</p>
+                        <p><b>Hora fim: </b> {item.hrfim}</p>
+                        <p><b>Diario: </b>{item.permanente === "S" ? "Sim" : "Não"}</p>
                       </div>
                       <div>
                         <Button onClick={() => (this.removeEntrada(this.state.permissions.indexOf(item)))} variant='contained' style={{ background: 'red', marginLeft: '90%', marginTop: '-10%' }} ><RemoveIcon /></Button>
