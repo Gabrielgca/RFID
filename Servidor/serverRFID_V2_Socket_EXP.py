@@ -526,7 +526,7 @@ def WiFIRFID ():
     
         
     if cmd.selDispLocalizacaoByDisp (locDisp) != None:
-        cadastroCartao = cmd.selCadastroCartaoAtivo(idrfid)
+        cadastroCartao = cmd.selCadastroCartaoByRfid (idrfid)
         ultOcorrencia = cmd.selUltOcorrenciaCadastro(cadastroCartao.idCadastro)
 
         disp_loc = cmd.selDispLocalizacaoByDisp (locDisp)

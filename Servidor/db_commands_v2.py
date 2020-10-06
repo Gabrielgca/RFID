@@ -21,7 +21,7 @@ class RfidCommands():
             return Function("CONVERTE_MES",self.date_format(col,"%m"))
 
     def __init__(self,database=None):
-        from serverRFID_V2_Socket import Cadastro, Cartao, Dispositivo, Rota \
+        from serverRFID_V2_Socket_EXP import Cadastro, Cartao, Dispositivo, Rota \
                                                , Ocorrencia, CadastroCartao, LocalizacaoDisp \
                                                , DispLocalizacao, PermHorario, PermissaoDisp, PermUsuDisp
                                                
@@ -324,6 +324,14 @@ class RfidCommands():
         cadastroCartao = s.query(cdct).join(ct,cdct.idCartao == ct.idCartao)\
                           .filter(ct.noCartao == rfid,cdct.stEstado == 'A').scalar()
         return cadastroCartao
+
+    # Comando adicionado em 6/10/2020 por Renato Reis
+    def selCadastroCartaoByRfid (self,rfid):
+        ct = self.ct
+        cdct = self.cdct
+        s = self.db.session
+
+        return s.query (cdct).join (ct, cdct.idCartao == ct.idCartao).filter (ct.noCartao == rfid).scalar ()
 
     #-----------COMANDO GABRIEL-----------#
     def selCadastroCartao (self,idCadastro):
