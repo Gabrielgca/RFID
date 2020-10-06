@@ -141,7 +141,7 @@ class RfidCommands():
         s = self.db.session
         if all_disp == True:
             return s.query(ld).join(dl,ld.idLocalizacaoDisp == dl.idLocalizacaoDisp)\
-                            .filter(dl.idDispositivo == idDispositivo, dl.stSituacao == 'A').all()
+                            .filter(dl.idDispositivo == idDispositivo).all()
         else:
             return s.query(ld).join(dl,ld.idLocalizacaoDisp == dl.idLocalizacaoDisp)\
                             .filter(dl.idDispositivo == idDispositivo, dl.stSituacao == 'A').scalar()
