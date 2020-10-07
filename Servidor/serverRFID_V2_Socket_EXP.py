@@ -951,9 +951,19 @@ def updateUser():
             else:
                 try:
                     #TENTA ATUALIZAR O CADASTRO DO USUÁRIO COM AQUELE RFID, CASO EXISTA
-                    if vl_user_card == 'A' and vl_status != 'A':
+                    if vl_user_card == 'A' and vl_status == 'I':
                         print('2')
                         cmd.updateStEstadoCadastroCartao(id_user_card, 'I')
+                        #CASO O USUÁRIO ESTEJA EM ALGUMA SALA, TIRÁ-LO
+                        entrada = cmd.selUltEntradaCadastro(id_user)
+                        ocorr_entrada = entrada.idOcorrencia
+                        ocorr_saida = cmd.selUltSaidaCadastro(id_user).idOcorrencia
+                        if ocorr_entrada > ocorr_saida:
+                            id_disp_entrada = entrada.idDispositivo
+                            newOcorrencia = Ocorrencia(idDispositivo = id_disp_entrada, idCadastro = id_user,
+                                dtOcorrencia=db.func.current_date(), hrOcorrencia=db.func.current_time()
+                                , stOcorrencia = "S")
+                            cmd.insertOcorrencia(newOcorrencia)
                     else:    
                         print('3')
                         cartao = cmd.selnoCartao(noRFID)
