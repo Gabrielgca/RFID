@@ -30,6 +30,7 @@ class RfidCommands():
         self.ct = self.db.aliased(Cartao, name='CT')
         self.dp = self.db.aliased(Dispositivo, name='DP')
         self.oc = self.db.aliased(Ocorrencia, name='OC')
+        self.ocp = self.db.aliased(Ocupacao, name='OCP')
         self.cdct = self.db.aliased(CadastroCartao, name='CDCT')
         self.rt = self.db.aliased(Rota, name='RT')
         self.ld = self.db.aliased(LocalizacaoDisp, name='LD')
