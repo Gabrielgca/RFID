@@ -23,13 +23,13 @@
 String ssid = "Inst Brasilia de Tec e Inov 2G";
 String pass = "#ibti@2019";
 String strID = "";
-String servidor = "192.168.2.196";
-String port = "7000";
+String servidor = "192.168.1.70";
+String port = "4002";
 String uri = "/WiFiRFID?RFID=";
 int passe = 0;
 
 //ID do dispositivo no Banco de dados
-String loc = "1";
+String loc = "2";
 
 //Número de tentativas de reconexão
 unsigned int N = 7;
@@ -139,7 +139,7 @@ void loop ()
 
   if(!okay){
   Serial.println("Passou por dentro deste IF!!");
-  tried = tryagain("AT+CIPSTART=2,\"TCP\",\"" + servidor + "\",7000\r\n");
+  tried = tryagain("AT+CIPSTART=2,\"TCP\",\"" + servidor + "\",4002\r\n");
   if(!tried){
     return;
     }
