@@ -20,7 +20,7 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 CREATE TABLE IF NOT EXISTS `tb_cadastro` (
   `id_cadastro` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Indentificador do cadastro.',
   `no_usuario` VARCHAR(45) NOT NULL COMMENT 'Nome do usuário cadastrado.',
-  `ed_arquivo_imagem` VARCHAR(50) NULL COMMENT 'Endereço no servidor da imagem do usuário.',
+  `ed_arquivo_imagem` VARCHAR(70) NULL COMMENT 'Endereço no servidor da imagem do usuário.',
   `vl_idade` INT NOT NULL COMMENT 'Idade, em anos, do usuário.',
   `no_area_trabalho` VARCHAR(40) NOT NULL,
   PRIMARY KEY (`id_cadastro`))
@@ -125,6 +125,7 @@ CREATE TABLE IF NOT EXISTS `tb_localizacao_disp` (
   `vl_area` INT NOT NULL COMMENT 'Tamanho em metros quadrados da localização.',
   `vl_qtde_lampadas` INT NOT NULL COMMENT 'Quantidade de lâmpadas instaladas na localização.',
   `vl_consumo_lamp` INT NOT NULL COMMENT 'Consumo total por lâmpada instalada, em watts.',
+  `ed_arquivo_imagem` VARCHAR(70) NULL COMMENT 'Endereço no servidor da imagem da localização.',
   `st_status` CHAR(1) NOT NULL DEFAULT 'A',
   PRIMARY KEY (`id_localizacao_disp`))
 ENGINE = InnoDB;
