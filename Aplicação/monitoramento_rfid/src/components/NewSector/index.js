@@ -31,7 +31,7 @@ class NewSectors extends Component {
             cargo: localStorage.cargo,
             companyName: '',
             roomName: '',
-            fileResult:'',
+            fileResult: '',
             imgStatus: false,
             area: 0,
             floor: 0,
@@ -63,12 +63,13 @@ class NewSectors extends Component {
         fileUpload(e).then(result => {
             //this.fileResult = result;
             this.setState({ fileResult: result.base64 });
-            this.setState({ imgStatus: true})
+            this.setState({ imgStatus: true })
             //alert("Result: " + JSON.stringify(result));
         });
     }
 
     handleAddSector = async () => {
+        alert('Entrou')
         /* alert(this.state.companyName);
         alert(this.state.roomName);
         alert(this.state.area);
@@ -77,32 +78,35 @@ class NewSectors extends Component {
         if ((this.state.companyName !== '')
             && (this.state.roomName !== '')
             && (this.state.floor !== '')
-            && (this.state.fileResult !== '')) {
-        }
-        else {
-            alert('Os campos precisam ser preenchidos!')
-            return null
-        }
-        let params = {
-            companyName: this.state.companyName,
-            roomName: this.state.roomName,
-            floor: this.state.floor,
-            area: this.state.area,
-            img: this.state.fileResult
-        }
-        await axios.post(baseURL + "registerLoc", params)
-            .then(response => {
-                console.log(response.data);
-            })
-            .catch(error => {
-                console.log(error);
-            })
+            && (this.state.fileResult !== '')
+            && (this.state.area !== '')) {
+            let params = {
+                companyName: this.state.companyName,
+                roomName: this.state.roomName,
+                floor: this.state.floor,
+                area: this.state.area,
+                img: this.state.fileResult
+            }
+            await axios.post(baseURL + "registerLoc", params)
+                .then(response => {
+                    alert(response.data);
+                    console.log(response.data);
+                })
+                .catch(error => {
+                    alert(error);
+                    console.log(error);
+                })
 
             console.log(params)
 
 
 
-        this.handleCloseConfirmModal();
+            this.handleCloseConfirmModal();
+        }
+        else {
+            alert('Os campos precisam ser preenchidos!')
+            return null
+        }
     }
 
     handleOpenConfirmModal = () => {
@@ -115,7 +119,7 @@ class NewSectors extends Component {
 
     async componentDidMount() {
         this.setState({ isMounted: true });
-        
+
 
         if (!firebase.getCurrent()) {
             this.props.history.replace('/');
@@ -125,7 +129,7 @@ class NewSectors extends Component {
         let result = await utils.getOffice(localStorage.cargo);
         if (this.state.isMounted === true) {
             this.setState({ loggedOffice: result });
-            
+
         }
 
         if (utils.checkSpecificPermission("Cadastrar", this.state.loggedOffice.permissoes.setor) !== true) {
@@ -171,7 +175,7 @@ class NewSectors extends Component {
                         </Button>
                     </header>
                     <h1 style={{ color: '#FFF', marginTop: 10, marginBottom: 25 }}>Cadastrar Novo Setor</h1>
-                    <FormControl  style={{ backgroundColor: '#FFF', padding: 20, borderRadius: 5, width:'50%' }}>
+                    <FormControl style={{ backgroundColor: '#FFF', padding: 20, borderRadius: 5, width: '50%' }}>
                         <div className="check-area">
                             <div className="empty-check">
                                 {this.state.fileResult !== '' ?

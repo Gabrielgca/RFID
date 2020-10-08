@@ -182,21 +182,31 @@ class UsersRFID extends Component {
     handleUserStatusChange = async (user) => { //Função que realiza o pedido de desativação/ativação do usuário ao Servidor
         console.log("SelectedUser antes: ");
         console.log(user);
+        user.imgPerfil = null;
+        let message;
         if (user.status === "A") {
             user.status = "I";
+            message = "Usuário desativado com sucesso!";
+
         }
         else {
             user.status = "A";
+            message = "Usuário ativado com sucesso!";
         }
 
-        axios.post(baseURL + "updateUser", user)
+        let params = {
+            id_user: user.id_user,
+            name: user.name,
+            status: user.status,
+            imgPerfil: user.imgPerfil,
+            age: user.age,
+            office: user.office,
+            RFID: user.RFID,
+        }
+
+        axios.post(baseURL + "updateUser", params)
             .then(response => {
-                if (user.status === "A") {
-                    alert("Usuário reativado com sucesso!");
-                }
-                else {
-                    alert("Usuário desabilitado com sucesso!");
-                }
+                alert(JSON.stringify(params));
             })
             .catch(error => {
                 console.log(error);
@@ -375,7 +385,7 @@ class UsersRFID extends Component {
             }
 
             console.log("JSON QUE IRÁ PARA O SERVIDOR")
-            console.log(params);
+            alert(JSON.stringify(params));
             //alert(JSON.stringify(params))
 
             await axios.post(baseURL + 'updateUser', params)
@@ -588,7 +598,7 @@ class UsersRFID extends Component {
                                             <img className="person-avatar" src={item.imgPerfil} ></img>
                                         </div>
                                         <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
-                                            <p><b>ID:</b> {item.id_user}</p>
+                                            {/* <p><b>ID:</b> {item.id_user}</p> */}
                                             <p><b>Nome:</b> {item.name}</p>
                                             <p><b>Idade:</b> {item.age}</p>
                                             <p><b>Cargo:</b> {item.office}</p>

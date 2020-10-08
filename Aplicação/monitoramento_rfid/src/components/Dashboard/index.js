@@ -170,6 +170,10 @@ class Dashboard extends Component {
 
   async componentDidMount() {
     this.setState({ isMounted: true });
+    if (localStorage.mustBeReloaded === "Sim") {
+      localStorage.mustBeReloaded = "Não";
+      window.location.reload();
+    }
 
     if (!firebase.getCurrent()) {
       this.props.history.replace('/login');
@@ -256,7 +260,7 @@ class Dashboard extends Component {
         console.log(error);
       });
     localStorage.removeItem("nome");
-    this.props.history.push('/');
+    // this.props.history.push('/');
 
   }
 
@@ -404,7 +408,7 @@ class Dashboard extends Component {
           { /* <Link to="/dashboard/new"><FaPlus style={{ marginRight: 10 }} /> RFID</Link> */}
           {/* <button style={{ backgroundColor: "red" }} className="sign-out-button" onClick={() => this.logout()}><FaSignOutAlt style={{ marginRight: 10 }} /> Sair</button> */}
 
-          <SpeedDial
+          {/* <SpeedDial
             ariaLabel="SpeedDial tooltip example"
             hidden={false}
             icon={<SpeedDialIcon />}
@@ -422,7 +426,8 @@ class Dashboard extends Component {
                 tooltipPlacement={"bottom"}
               />
             ))}
-          </SpeedDial>
+          </SpeedDial> */}
+
         </div>
         <p style={{ color: "#FFF" }}>Email: {firebase.getCurrent()}</p>
         <p style={{ color: "#FFF" }}>Cargo: {this.state.cargo}</p><br />
@@ -521,7 +526,7 @@ class Dashboard extends Component {
             <DialogContent>
               <DialogContentText id="alert-dialog-description">
                 {this.state.selectedPerson.imgPerfil !== '' ? (
-                  <img className="person-avatar" src={this.state.selectedPerson.imgPerfil} style={{marginRight:'60%', marginBottom:30}} />
+                  <img className="person-avatar" src={this.state.selectedPerson.imgPerfil} style={{ marginRight: '60%', marginBottom: 30 }} />
                 ) : (
                     <img className="person-avatar" src="https://cdn.icon-icons.com/icons2/1879/PNG/512/iconfinder-3-avatar-2754579_120516.png"></img>
                   )}

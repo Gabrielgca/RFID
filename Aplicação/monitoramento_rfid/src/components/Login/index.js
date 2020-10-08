@@ -42,6 +42,7 @@ class Login extends Component {
             return null;
           }
         });
+      localStorage.mustBeReloaded = "Sim";
       this.props.history.replace('/dashboard');
 
     } catch (error) {

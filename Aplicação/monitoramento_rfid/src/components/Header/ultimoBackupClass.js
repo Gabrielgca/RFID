@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Component } from 'react';
 import clsx from 'clsx';
-import { makeStyles, useTheme, withTheme } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -24,9 +24,11 @@ import HowToRegIcon from '@material-ui/icons/HowToReg';
 import TapAndPlayIcon from '@material-ui/icons/TapAndPlay';
 import ApartmentIcon from '@material-ui/icons/Apartment';
 import QueuePlayNextIcon from '@material-ui/icons/QueuePlayNext';
+import HomeIcon from '@material-ui/icons/Home';
 
 import utils from '../../utils';
 import firebase from '../../firebase';
+import { Link, Redirect } from 'react-router-dom';
 
 const drawerWidth = 240;
 
@@ -150,10 +152,9 @@ export default function Header() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap>
+          <Typography variant="h6" noWrap style={{color: "#FFF"}}>
             IBTI - Monitoramento
           </Typography>
-          <Typography> {isMounted.toString()}</Typography>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -175,24 +176,160 @@ export default function Header() {
           </IconButton>
         </div>
         <Divider />
-        <List>
-          {actions.map((action, index) => (
-            <ListItem button key={action.name}>
-              <ListItemIcon>{index < (actions.length - 1) ? action.icon : ""}</ListItemIcon>
-              <ListItemText primary={action.name} />
-            </ListItem>
-          ))}
-        </List>
-        <Divider />
-        <List>
-          {['All mail', 'Trash', 'Spam'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
-        </List>
+        <MenuList></MenuList>
       </Drawer>
     </div>
   );
 }
+
+class MenuList extends Component {
+  state = {
+    isMounted: false,
+    actions: [],
+    cargo: localStorage.cargo,
+    loggedOffice: {
+      key: '',
+      nomeCargo: '',
+      status: '',
+      permissoes: {
+        cargo: [],
+        conta: [],
+        dispositivo: [],
+        setor: [],
+        usuario: [],
+        dashboard: []
+      }
+    }
+  }
+
+  async componentDidMount() {
+    this.setState({ isMounted: true });
+
+    /* if (!firebase.getCurrent()) {
+      //this.props.history.replace('/login');
+      return null;
+    } */
+
+    /* await firebase.getUserName((info) => {
+      localStorage.nome = info.val().nome;
+      this.setState({ nome: localStorage.nome });
+    }); */
+
+    if()
+
+    await firebase.getUserPerfil((info) => {
+      localStorage.cargo = info.val();
+      this.setState({ cargo: localStorage.cargo });
+      //console.log("Valor recebido: " + info.val());
+    });
+
+    //await this.getOffice();
+    let result = await utils.getOffice(this.state.cargo);
+    if (this.state.isMounted === true) {
+      this.setState({ loggedOffice: result });
+    }
+
+    if (utils.checkCategory(this.state.loggedOffice.permissoes.usuario) === true) {
+      let newActions = this.state.actions;
+      newActions.unshift({ icon: <TapAndPlayIcon />, name: 'Gerenciar Usuários RFID', action: 4 })
+      this.setState({ actions: newActions });
+    }
+
+    if (utils.checkCategory(this.state.loggedOffice.permissoes.setor) === true) {
+      let newActions = this.state.actions;
+      newActions.unshift({ icon: <ApartmentIcon />, name: "Gerenciar Setores", action: 5 })
+      this.setState({ actions: newActions });
+    }
+
+    if (utils.checkCategory(this.state.loggedOffice.permissoes.dispositivo) === true) {
+      let newActions = this.state.actions;
+      newActions.unshift({ icon: <QueuePlayNextIcon />, name: 'Gerenciar Dispositivos', action: 6 })
+      this.setState({ actions: newActions });
+    }
+
+    if (utils.checkCategory(this.state.loggedOffice.permissoes.conta) === true) {
+      let newActions = this.state.actions;
+      newActions.unshift({ icon: <AccountCircleIcon />, name: 'Gerenciar Contas', action: 1 })
+      this.setState({ actions: newActions });
+    }
+
+    if (utils.checkCategory(this.state.loggedOffice.permissoes.cargo) === true) {
+      let newActions = this.state.actions;
+      newActions.unshift({ icon: <HowToRegIcon />, name: 'Gerenciar Cargos', action: 3 })
+      this.setState({ actions: newActions });
+    }
+
+    let newActions = this.state.actions;
+    newActions.push({ icon: <ExitToApp />, name: 'Sair', action: 2 });
+    this.setState({ actions: newActions });
+
+    newActions = this.state.actions;
+    newActions.unshift({ icon: <HomeIcon />, name: 'Dashboard', action: 7 });
+    this.setState({ actions: newActions });
+
+  }
+
+  handleNavigate = (action) => {
+    //alert(JSON.stringify(action));
+    if (action === 1) {
+      this.setState({ open: false });
+      //      this.props.history.push("/users");
+      window.location.replace("/users");
+      //alert("Função Novo RFID");
+    }
+    else {
+      if (action === 2) {
+        this.logout();
+        //alert("Função Sair");
+      }
+      else {
+        if (action === 3) {
+          window.location.replace("/offices");
+          //this.props.history.push("/offices");
+        }
+        else {
+          if (action === 4) {
+            window.location.replace("/usersRFID");
+            //this.props.history.push("/usersRFID");
+          }
+          else {
+            if (action === 5) {
+              window.location.replace("/sectors");
+              //this.props.history.push("/sectors");
+            }
+            else {
+              if (action === 6) {
+                window.location.replace("/devices");
+                //this.props.history.push("/devices");
+              }
+              else {
+                if (action === 7) {
+                  window.location.replace("/dashboard");
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  };
+
+  render() {
+    //const UsersRFIDRoute = props => <Link to="/users" route {...props} />;
+
+    return (
+      <div>
+        {this.state.actions.map((action) => {
+          return (
+            <ListItem button key={action.name} onClick={() => { this.handleNavigate(action.action) }}>
+              <ListItemIcon>{action.icon}</ListItemIcon>
+              <ListItemText primary={action.name} />
+            </ListItem>
+          );
+        })}
+      </div>
+    );
+  }
+}
+
+//const CustomLink = props => <Link to="/users" {...props} />;

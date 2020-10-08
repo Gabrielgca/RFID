@@ -1,5 +1,5 @@
 div#dashboard{
-  width: 100%;
+  width: 90%;
   margin: 20px auto;
   padding: 0 30px;
 }
@@ -42,11 +42,12 @@ div#dashboard .rooms{
   flex-direction: row;
   justify-content: center;
   align-items: "center";
-  max-height: 500px;
+  max-height: 450px;
+  height: 450px;
   width: 100%;
   display: flex;
   justify-content: space-between;
-  /*border: 1px solid black;*/
+  /* border: 1px solid black; */
   margin: 0 auto;
 }
 
@@ -114,7 +115,7 @@ div#dashboard .rooms{
 .rooms .room-details{
   background-color: #FFF;
   width: 100%;
-  height: 500px;
+  height: 100%;
   /* border: 1px solid red; */
   display: flex;
   align-items: center;

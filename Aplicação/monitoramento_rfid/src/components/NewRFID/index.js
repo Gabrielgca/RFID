@@ -4,6 +4,7 @@ import firebase from '../../firebase';
 import utils from '../../utils';
 import axios from 'axios';
 import './index.css';
+import ENDPOINT from '../../socketAPIService';
 
 
 import Button from '@material-ui/core/Button';
@@ -118,7 +119,6 @@ class NewRFID extends Component {
       this.setState({ pageLoading: false });
     }
 
-    var ENDPOINT = 'http://192.168.2.196:7000';
     this.socket = io.connect(ENDPOINT, {
       reconnection: true
     })
@@ -202,7 +202,7 @@ class NewRFID extends Component {
         imgPerfil: this.state.fileResult,
         permissoes: this.state.permissions
       }
-      alert(JSON.stringify(params));
+      //alert(JSON.stringify(params));
 
       //Se todos os dados necessários existirem, envia os dados para o servidor salvar no banco
       await axios.post(baseURL + "register", params)
