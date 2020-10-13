@@ -29,7 +29,7 @@ String uri = "/WiFiRFID?RFID=";
 int passe = 0;
 
 //ID do dispositivo no Banco de dados
-String loc = "2";
+String loc = "3";
 
 //Número de tentativas de reconexão
 unsigned int N = 7;
