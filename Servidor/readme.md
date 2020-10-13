@@ -49,3 +49,7 @@
    * https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
  * Download biblioteca flask_cors
    * https://pypi.org/project/Flask-Cors/1.10.3/
+ * Documentação flask-socketIO
+   * https://flask-socketio.readthedocs.io/en/latest/
+ * Documentação flask-SQLAlchemy
+   * https://flask-sqlalchemy.palletsprojects.com/en/2.x/
