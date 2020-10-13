@@ -12,6 +12,12 @@
   * Saulo, Gabriel e Renato (Auxiliar)
 
 ---------------------------------
+### Visão geral
+---------------------------------
+    O servidor será o responsável por fazer a comunicação entre a aplicação, dispostivo e banco de dados. Nele, requisições são recebidas e transmitidas tanto para a aplicação quanto para o dispositivo. Isso se dá por meio de requisições por métodos HTTP e também por meio do uso de eventos socket quanto os dados do servidor precisam ser o mais atual possível.
+    O servidor é o meio utlizado para que a aplicação tenha acesso aos dados no banco de dados, fazendo com que as informações sejam dispostas a ela de forma clara e legível com o uso de JSON's como forma de troca de dados.
+
+---------------------------------
 ### Pontes de comunicação
 ---------------------------------
  * Aplicação
