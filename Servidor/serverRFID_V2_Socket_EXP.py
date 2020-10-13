@@ -10,6 +10,7 @@ from flask_ngrok import run_with_ngrok
 import os
 from datetime import datetime
 
+#VERSÃO RASP
 
 # flask namespace
 app = Flask (__name__)
@@ -19,7 +20,7 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 app.config['JSON_AS_ASCII'] = True
 
 #Inicializando o banco de dados
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:@localhost/db_rfid_v2'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:#IBTI@2019@localhost/db_rfid_v2'
 db = SQLAlchemy(app)
 CORS(app)
 #Mapeamentos dos objetos Flask-SQLAlchemy.
@@ -252,10 +253,10 @@ class DispLocalizacao(db.Model):
 
     def __repr__(self):
         return '''<Disp_localizacao
-	(id_disp_localizacao='{}',
-	id_dispositivo='{}',
-	id_localizacao_disp='{}',
-	st_situacao='{}')>'''.format(self.idDispLocalizacao, self.idDispositivo, self.idLocalizacaoDisp, self.stSituacao)
+    (id_disp_localizacao='{}',
+    id_dispositivo='{}',
+    id_localizacao_disp='{}',
+    st_situacao='{}')>'''.format(self.idDispLocalizacao, self.idDispositivo, self.idLocalizacaoDisp, self.stSituacao)
 
     def getDict(self):
         self.dictionary = {}
@@ -526,7 +527,11 @@ def WiFIRFID ():
     
         
     if cmd.selDispLocalizacaoByDisp (locDisp) != None:
-        cadastroCartao = cmd.selCadastroCartaoAtivo(idrfid)
+        try:
+            cadastroCartao = cmd.selCadastroCartaoAtivo(idrfid)
+        except:
+            print('Algo de errado ao buscar Usuário com RFID. Provável mais de um usuário com o mesmo RFID.')
+            return jsonify(successs = False)
         ultOcorrencia = cmd.selUltOcorrenciaCadastro(cadastroCartao.idCadastro)
 
         disp_loc = cmd.selDispLocalizacaoByDisp (locDisp)
@@ -635,13 +640,13 @@ def WiFIRFID ():
                     cmd.insertOcupacao(newOcupacao)
                 newOcorrencia.idDispositivo = locDisp
                 newOcorrencia.stOcorrencia = stOc
-                cmd.insertOcorrencia(newOcorrencia, refresh = True)
+                cmd.insertOcorrencia(newOcorrencia)
             else:
                 ultRota = cmd.selUltRotaCadastro(idCadastro=cadastroCartao.idCadastro)
                 if ultOcorrencia.stOcorrencia == 'E':
                     newOcorrencia.idDispositivo = ultOcorrencia.idDispositivo
                     newOcorrencia.stOcorrencia = 'S'
-                    cmd.insertOcorrencia(ocorrencia=newOcorrencia, expunge=True, transient=True, refresh = True)
+                    cmd.insertOcorrencia(ocorrencia=newOcorrencia, expunge=True, transient=True)
                     if ultRota.idDispositivoOrigem is not None:
                         newRota.idDispositivoOrigem = ultRota.idDispositivoDestino
                         newRota.idDispositivoDestino = ultRota.idDispositivoOrigem
@@ -653,7 +658,7 @@ def WiFIRFID ():
                 newOcorrencia.hrOcorrencia = db.func.current_time()
                 newOcorrencia.idDispositivo = locDisp
                 newOcorrencia.stOcorrencia = 'E'
-                cmd.insertOcorrencia(newOcorrencia, refresh = True)
+                cmd.insertOcorrencia(newOcorrencia)
 
                 newRota.idCadastro = cadastroCartao.idCadastro
                 newRota.dtRota = db.func.current_date()
@@ -679,7 +684,7 @@ def WiFIRFID ():
         else:
             newOcorrencia.idDispositivo = locDisp
             newOcorrencia.stOcorrencia = 'E'
-            cmd.insertOcorrencia(newOcorrencia, refresh = True)
+            cmd.insertOcorrencia(newOcorrencia)
 
             newRota.idDispositivoOrigem = None
             newRota.idDispositivoDestino = locDisp
@@ -752,9 +757,10 @@ def register():
                                  imgUrl = url_for("static",filename = "imagens",_external = True)+ "/"+str(cadastroCartao.idCadastro) + ".png?"+ dt_atual,)
             else:
                 #CARTAO NÃO TINHA SIDO CADASTRADO
+                cmd.insertCadastro(usuario, refresh = True)
+                cmd.insertCartao(cartao,refresh = True)
+                cadastroCartao = CadastroCartao(idCadastro = usuario.idCadastro, idCartao = cartao.idCartao, stEstado = 'A')
                 cmd.insertCadastroCartao(cadastroCartao = cadastroCartao,
-                                        cadastro = usuario,
-                                        cartao = cartao,
                                         refresh = True)
             cmd.updateCadastroImg(idCadastro = cadastroCartao.idCadastro,
                                  imgUrl = url_for("static",filename = "imagens",_external = True)+ "/"+str(cadastroCartao.idCadastro) + ".png?"+ dt_atual,)
@@ -785,8 +791,8 @@ def register():
 
 
                 if "dtini" not in list_perm[i] and "dtfim" not in list_perm[i]:
-                    list_perm[i]["dtini"] == None
-                    list_perm[i]["dtfim"] == None
+                    list_perm[i]["dtini"] = None
+                    list_perm[i]["dtfim"] = None
 
                 
                 if list_perm[i]["dtini"] == None or list_perm[i]["dtfim"] == None:
@@ -949,38 +955,46 @@ def updateUser():
                 cmd.insertCadastroCartao_byid(cadastro_cartao)
 
             else:
-                try:
-                    #TENTA ATUALIZAR O CADASTRO DO USUÁRIO COM AQUELE RFID, CASO EXISTA
-                    if vl_user_card == 'A' and vl_status == 'I':
-                        print('2')
-                        cmd.updateStEstadoCadastroCartao(id_user_card, 'I')
-                        #CASO O USUÁRIO ESTEJA EM ALGUMA SALA, TIRÁ-LO
-                        entrada = cmd.selUltEntradaCadastro(id_user)
-                        ocorr_entrada = entrada.idOcorrencia
-                        ocorr_saida = cmd.selUltSaidaCadastro(id_user).idOcorrencia
-                        if ocorr_entrada > ocorr_saida:
-                            id_disp_entrada = entrada.idDispositivo
-                            newOcorrencia = Ocorrencia(idDispositivo = id_disp_entrada, idCadastro = id_user,
-                                dtOcorrencia=db.func.current_date(), hrOcorrencia=db.func.current_time()
-                                , stOcorrencia = "S")
-                            cmd.insertOcorrencia(newOcorrencia)
-                    else:    
-                        print('3')
+                if vl_user_card != vl_status:
+                    try:
+                        #TENTA ATUALIZAR O CADASTRO DO USUÁRIO COM AQUELE RFID, CASO EXISTA
+                        if vl_user_card == 'A' and vl_status == 'I':
+                            print('2')
+                            cmd.updateStEstadoCadastroCartao(id_user_card, 'I')
+                            #CASO O USUÁRIO ESTEJA EM ALGUMA SALA, TIRÁ-LO
+                            entrada = cmd.selUltEntradaCadastro(id_user)
+                            
+                            try:
+                                ocorr_entrada = entrada.idOcorrencia
+                            except:
+                                ocorr_entrada = -1
+                            ocorr_saida = 0
+                            if cmd.selUltSaidaCadastro(id_user) != None:
+                                ocorr_saida = cmd.selUltSaidaCadastro(id_user).idOcorrencia
+                            if ocorr_entrada > ocorr_saida:
+                                id_disp_entrada = entrada.idDispositivo
+                                newOcorrencia = Ocorrencia(idDispositivo = id_disp_entrada, idCadastro = id_user,
+                                    dtOcorrencia=db.func.current_date(), hrOcorrencia=db.func.current_time()
+                                    , stOcorrencia = "S")
+                                cmd.insertOcorrencia(newOcorrencia)
+                        else:    
+                            print('3')
+                            cartao = cmd.selnoCartao(noRFID)
+                            id_cartao = cartao.idCartao
+                            if len(cmd.selidCadastroidCartao(id_user, id_cartao)) != 0:
+                                cmd.updateStEstadoCadastroCartao(id_user_card, 'I')
+                                cadastro_cartao = CadastroCartao(idCadastro = id_user, idCartao = id_cartao, stEstado = 'A')
+                                cmd.insertCadastroCartao(cadastro_cartao)
+                            else:
+                                cmd.updateStEstadoCadastroCartao(id_user_card, 'A')
+                    except Exception as e:
+                        print(e)
+                        #CASO NÃO HAJA O CADASTRO DO USUÁRIO COM AQUELE RFID, SERÁ INSERIDO
+                        print('4')
                         cartao = cmd.selnoCartao(noRFID)
                         id_cartao = cartao.idCartao
-                        if len(cmd.selidCadastroidCartao(id_user, id_cartao)) != 0:
-                            cmd.updateStEstadoCadastroCartao(id_user_card, 'I')
-                            cadastro_cartao = CadastroCartao(idCadastro = id_user, idCartao = id_cartao, stEstado = 'A')
-                            cmd.insertCadastroCartao(cadastro_cartao)
-                        else:
-                            cmd.updateStEstadoCadastroCartao(id_user_card, 'A')
-                except:
-                    #CASO NÃO HAJA O CADASTRO DO USUÁRIO COM AQUELE RFID, SERÁ INSERIDO
-                    print('4')
-                    cartao = cmd.selnoCartao(noRFID)
-                    id_cartao = cartao.idCartao
-                    cadastro_cartao = CadastroCartao(idCadastro = id_user, idCartao = id_cartao, stEstado = 'A')
-                    cmd.insertCadastroCartao_byid(cadastro_cartao)
+                        cadastro_cartao = CadastroCartao(idCadastro = id_user, idCartao = id_cartao, stEstado = 'A')
+                        cmd.insertCadastroCartao_byid(cadastro_cartao)
 
         else:
             print('Não foi encontrado um id_cadastro na tabela tb_cadastro_cartao.')
@@ -1450,7 +1464,14 @@ def fuc_roominfo(app_id_disp):
         #VERIFICAR SE O ARQUIVO DE IMAGEM DE SALA EXISTE
         if os.path.exists(os.getcwd().replace("\\","/")+"/static/setores/{}.png".format(id_loc_disp)):
             img_sala = url_for("static",filename = "setores/{}.png".format(id_loc_disp),_external = True)
-            sala = dict( id_disp = id_sala, nomeSala = room['salas'][int(id_sala)-1]['nomeSala'], imgMapaSala = img_sala ,ocupantes = lista_ocupantes)
+            
+            for i in room['salas']:
+                if int(id_sala) == i['id_disp']:
+                    count = room['salas'].index(i)
+                    break
+            
+            
+            sala = dict( id_disp = id_sala, nomeSala = room['salas'][count]['nomeSala'], imgMapaSala = img_sala ,ocupantes = lista_ocupantes)
             room['salaSelecionada'] = sala
 
         return room
@@ -1459,5 +1480,5 @@ def fuc_roominfo(app_id_disp):
 
 #-----------RODANDO------------#
 if __name__ == '__main__':
-    socketio.run(app, host = '0.0.0.0', port=7000)
+    socketio.run(app, host = '0.0.0.0', port=4002)
 
