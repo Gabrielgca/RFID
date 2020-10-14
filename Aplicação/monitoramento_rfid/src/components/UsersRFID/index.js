@@ -7,7 +7,7 @@ import Loader from 'react-loader-spinner';
 import axios from 'axios';
 import baseURL from '../../service';
 import './UsersRFID.css';
-import usuarios from '../../JSONs/updateUser.json';
+
 
 //pesquisa
 import Paper from '@material-ui/core/Paper';
@@ -906,9 +906,9 @@ class UsersRFID extends Component {
                                         renderWhenEmpty={() => <div></div>}
                                         list={this.state.permissoesAdicionadas}
                                         renderItem={(item) => (
-                                            <div style={{ display: "flex", flexDirection: "row", width: '100%' }}>
+                                            <div style={{ display: "flex", flexDirection: "row", width: '90%' }}>
                                                 <div className='usersList'>
-                                                    <p><b>Localização: </b>{item.no_loc}</p>
+                                                    <p><b>Localização: </b>{item.roomName}</p>
                                                     <p><b>Hora de inicio: </b>{item.hr_inicio}</p>
                                                     <p><b>Hora fim: </b>{item.hr_final}</p>
                                                     <p><b>Permanente: </b>{item.permanente === "S" ? "Sim" : "Não"}</p>
@@ -916,10 +916,10 @@ class UsersRFID extends Component {
 
                                                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
                                                     <Button
-                                                        startIcon={<RemoveIcon color={"#FFF"} />}
+                                                        
                                                         onClick={() => (this.handleRemovePermission(this.state.permissoesAdicionadas.indexOf(item)))}
                                                         variant='contained'
-                                                        style={{ background: 'red', color: "#FFF", marginLeft: '90%', marginTop: '-10%' }} />
+                                                        style={{ background: 'red', color: "#FFF", marginTop: '-10%', alignItems:'center' }}><RemoveIcon color={"#FFF"}/></Button>
                                                 </div>
                                             </div>
                                         )}
