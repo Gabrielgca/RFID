@@ -215,6 +215,7 @@ div.room-list {
 .flatScroll {
     overflow-y: scroll;
     max-height: 200px;
+    width: 80%;
 }
 
 .person-avatar {
