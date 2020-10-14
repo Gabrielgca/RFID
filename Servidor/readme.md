@@ -2,6 +2,7 @@
 ---------------------------------
 ### Responsáveis
 * Gabriel, Renato e Saulo
+
 ---------------------------------
 ### Overview
 * O servidor recebe dados dos dispositivos RFID e da aplicação, bem como envia dados para os mesmos e provém a comunicação entre estes e o banco de dados. Foi feito de forma que a comunicação com a aplicação seja ininterrupta e atualize assim que ocorrer qualquer disparo de sinal de qualquer dispositivo, transmitindo a informação o mais rápido possível. Além disso, o servidor é capaz de se comunicar com os dispositivos independentemente da conexão com a aplicação.
@@ -10,25 +11,22 @@
 ### Pontes de comunicação
  * Aplicação e Dispositivo WiFi
    * Flask
-     * Flask_cors
-     * Flask_ngrok
-   * Métodos HTTP
+     * Flask_CORS
+     * Flask_SocketIO
+   * Protocolo HTTP
  * Banco de dados
    * MySQL
    * SQLAlchemy
- * Dispositivo LoRa 
-   * The Things Network (ttn)
-     * Protocolo MTQQ
 
 <p align="center">
-  <img src="ServidorRFID.png" width="500" title="Servidor RFID">
+  <img src="ServidorRFIDV2.png" width="500" title="Servidor RFID">
 </p>
 
 ---------------------------------
 ### Arquivos desenvolvidos
  * serverRFID_sessionRefr.py
    * Servidor em si com as rotas de comunicação com o dispositivo e aplicação. Utilizando o SQLAlchemy para se comunicar com o banco de dados já mapeado. Código inclui rotina para lidar com o fechamento de sessões.
- * db_commands.py
+ * db_commands_v2.py
    * Biblioteca contendo todos os comandos do SQLAlchemy utilizados para a comunicação com o banco de dados.
  * db_control.py
    * Realizar o controle da comunicação com banco de dados MySql usando o orm SQLAlchemy. Código inclui rotina para lidar com o fechamento de sessões.
@@ -44,7 +42,7 @@
    * Arquivo de teste para o dicionário de informações do setor a ser enviado para a aplicação.
  * testeimagem.py
    * Arquivo de teste para imagem a ser enviada para a aplicação e armazenada no servidor.
- * rfid.sql
+ * rfid_v2.sql
    * Código em SQL do banco de dados princpal com as tabelas de cadastro, cadastro_cartao, cartao, dispositivo e ocorrencia
 
 ---------------------------------
