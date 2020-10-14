@@ -420,10 +420,10 @@ class Devices extends Component {
                             </DialogContentText>
 
                             <DialogContentText id="alert-dialog-description">
-                                <InputLabel>Localização</InputLabel>
+                                <InputLabel style={{marginRight:'162%'}}>Localização</InputLabel>
 
                                 <Select
-                                    style={{ width: 180 }}
+                                    style={{ width: 180, marginRight:'138%' }}
                                     label="localização"
                                     value={this.state.selectedDevice.localization}
                                     onChange={(event) => { this.localizationDevice(event) }}
