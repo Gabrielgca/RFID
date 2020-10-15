@@ -7,7 +7,13 @@
 
 body{
   height: 100vh;
-  background: linear-gradient(to bottom right, #03a63c, #00ab95);
+  /* background: linear-gradient(to bottom right, #03a63c, #00ab95); */
+  background-image: url("./Logo-IBTI2v.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-size: 100% 100%;
+  /* background-size: 150%; */
+  background-color: #D5D5D5;
   font: 14px sans-serif;
   -webkit-font-smoothing: antialiased !important;
 }
