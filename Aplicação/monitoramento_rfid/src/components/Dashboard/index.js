@@ -402,39 +402,17 @@ class Dashboard extends Component {
     const { rooms, selectedRoom } = this.state;
     return (
       <div id="dashboard">
+        <h1>Olá, {this.state.nome}</h1>
+        <br></br>
+        <h3>Email: {firebase.getCurrent()}</h3>
+        <h3>Cargo: {this.state.cargo}</h3><br />
         <div className="user-info">
-          <h1 style={{ color: "#FFF", marginRight: 20 }}>Olá, {this.state.nome}</h1>
-          {/* <p>{JSON.stringify(this.state.permissions)}</p> */}
-          { /* <Link to="/dashboard/new"><FaPlus style={{ marginRight: 10 }} /> RFID</Link> */}
-          {/* <button style={{ backgroundColor: "red" }} className="sign-out-button" onClick={() => this.logout()}><FaSignOutAlt style={{ marginRight: 10 }} /> Sair</button> */}
-
-          {/* <SpeedDial
-            ariaLabel="SpeedDial tooltip example"
-            hidden={false}
-            icon={<SpeedDialIcon />}
-            onClose={() => { this.setState({ open: false }) }}
-            onOpen={this.handleOpen}
-            open={this.state.open}
-            direction={"right"}
-          >
-            {this.state.actions.map((action) => (
-              <SpeedDialAction
-                key={action.name}
-                icon={action.icon}
-                tooltipTitle={action.name}
-                onClick={() => { this.handleClose(action.action) }}
-                tooltipPlacement={"bottom"}
-              />
-            ))}
-          </SpeedDial> */}
 
         </div>
-        <p style={{ color: "#FFF" }}>Email: {firebase.getCurrent()}</p>
-        <p style={{ color: "#FFF" }}>Cargo: {this.state.cargo}</p><br />
         <div className="rooms">
           <div className="rooms-list">
             <div style={{ display: "flex", flexDirection: "row" }}>
-              <h2 className="sector-title">Setores</h2>
+              <h2>Setores</h2>
             </div>
             {rooms.length > 0 ? (
               rooms.map((room) => {

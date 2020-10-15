@@ -1,25 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from "@material-ui/core/styles";
+import './header.css';
 
 //Importações
-import clsx from 'clsx';
-import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
 
 import ExitToApp from '@material-ui/icons/ExitToApp';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
@@ -29,87 +13,24 @@ import ApartmentIcon from '@material-ui/icons/Apartment';
 import QueuePlayNextIcon from '@material-ui/icons/QueuePlayNext';
 import HomeIcon from '@material-ui/icons/Home';
 
+import SpeedDial from '@material-ui/lab/SpeedDial';
+import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon';
+import SpeedDialAction from '@material-ui/lab/SpeedDialAction';
+import AddIcon from '@material-ui/icons/Add';
+import { FaHome, FaLaptop } from 'react-icons/fa';
+
 import utils from '../../utils';
 import firebase from '../../firebase';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import { Button, InputBase } from '@material-ui/core';
 
 const drawerWidth = 240;
-
-const styles = theme => ({
-  root: {
-    display: 'flex',
-    marginBottom: '75px'
-  },
-  appBar: {
-    zIndex: theme.zIndex.drawer + 1,
-    background: 'linear-gradient(-45deg, #F2E205 30%, #F28705 90%)',
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  appBarShift: {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  menuButton: {
-    marginRight: 36,
-    color: "#FFF"
-  },
-  hide: {
-    display: 'none',
-  },
-  drawer: {
-    width: drawerWidth,
-    flexShrink: 0,
-    whiteSpace: 'nowrap',
-  },
-  drawerOpen: {
-    background: 'linear-gradient(-45deg, #F2E205 30%, #F28705 90%)',
-    width: drawerWidth,
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  drawerClose: {
-    background: 'linear-gradient(-45deg, #F2E205 30%, #F28705 90%)',
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    overflowX: 'hidden',
-    width: theme.spacing(7) + 1,
-    [theme.breakpoints.up('sm')]: {
-      width: theme.spacing(9) + 1,
-    },
-  },
-  toolbar: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    padding: theme.spacing(0, 1),
-    // necessary for content to be below app bar
-    ...theme.mixins.toolbar,
-  },
-  content: {
-    flexGrow: 1,
-    padding: theme.spacing(3),
-  },
-});
 
 class Header extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      email: '',
-      password: '',
       isMounted: false,
       open: false,
       actions: [],
@@ -130,7 +51,6 @@ class Header extends Component {
       isLogged: false
     }
 
-    this.login = this.login.bind(this);
   }
 
   async componentDidMount() {
@@ -142,11 +62,11 @@ class Header extends Component {
     if (!firebase.getCurrent()) {
       //this.props.history.replace('/login');
       let newActions = this.state.actions;
-      newActions.unshift({ icon: <HomeIcon style={{ color: "#FFF" }} />, name: 'Home', action: "/" })
+      newActions.unshift({ icon: <HomeIcon style={{ color: "#000" }} />, name: 'Home', action: "/" })
       this.setState({ actions: newActions });
 
       newActions = this.state.actions;
-      newActions.push({ icon: <AccountCircleIcon style={{ color: "#FFF" }} />, name: 'Entrar', action: "/login" })
+      newActions.push({ icon: <AccountCircleIcon style={{ color: "#000" }} />, name: 'Entrar', action: "/login" })
       this.setState({ actions: newActions });
 
       //return null;
@@ -166,40 +86,40 @@ class Header extends Component {
 
       if (utils.checkCategory(this.state.loggedOffice.permissoes.usuario) === true) {
         let newActions = this.state.actions;
-        newActions.unshift({ icon: <TapAndPlayIcon style={{ color: "#FFF" }} />, name: 'Gerenciar Usuários RFID', action: "/usersRFID" })
+        newActions.unshift({ icon: <TapAndPlayIcon className="my-float" style={{ color: "#000" }} />, name: 'Gerenciar Usuários RFID', action: 4 })
         this.setState({ actions: newActions });
       }
 
       if (utils.checkCategory(this.state.loggedOffice.permissoes.setor) === true) {
         let newActions = this.state.actions;
-        newActions.unshift({ icon: <ApartmentIcon style={{ color: "#FFF" }} />, name: "Gerenciar Setores", action: "/sectors" })
+        newActions.unshift({ icon: <ApartmentIcon className="my-float" style={{ color: "#000" }} />, name: "Gerenciar Setores", action: 5 })
         this.setState({ actions: newActions });
       }
 
       if (utils.checkCategory(this.state.loggedOffice.permissoes.dispositivo) === true) {
         let newActions = this.state.actions;
-        newActions.unshift({ icon: <QueuePlayNextIcon style={{ color: "#FFF" }} />, name: 'Gerenciar Dispositivos', action: "/devices" })
+        newActions.unshift({ icon: <QueuePlayNextIcon className="my-float" style={{ color: "#000" }} />, name: 'Gerenciar Dispositivos', action: 6 })
         this.setState({ actions: newActions });
       }
 
       if (utils.checkCategory(this.state.loggedOffice.permissoes.conta) === true) {
         let newActions = this.state.actions;
-        newActions.unshift({ icon: <AccountCircleIcon style={{ color: "#FFF" }} />, name: 'Gerenciar Contas', action: "/users" })
+        newActions.unshift({ icon: <AccountCircleIcon className="my-float" style={{ color: "#000" }} />, name: 'Gerenciar Contas', action: 1 })
         this.setState({ actions: newActions });
       }
 
       if (utils.checkCategory(this.state.loggedOffice.permissoes.cargo) === true) {
         let newActions = this.state.actions;
-        newActions.unshift({ icon: <HowToRegIcon style={{ color: "#FFF" }} />, name: 'Gerenciar Cargos', action: "/offices" })
+        newActions.unshift({ icon: <HowToRegIcon className="my-float" style={{ color: "#000" }} />, name: 'Gerenciar Cargos', action: 3 })
         this.setState({ actions: newActions });
       }
 
       let newActions = this.state.actions;
-      newActions.push({ icon: <ExitToApp style={{ color: "#FFF" }} />, name: 'Sair', action: "/sair" })
+      newActions.push({ icon: <ExitToApp className="my-float" style={{ color: "#000" }} />, name: 'Sair', action: 2 })
       this.setState({ actions: newActions });
 
       newActions = this.state.actions;
-      newActions.unshift({ icon: <HomeIcon style={{ color: "#FFF" }} />, name: 'Dashboard', action: "/dashboard" })
+      newActions.unshift({ icon: <HomeIcon className="my-float" style={{ color: "#000" }} />, name: 'Dashboard', action: "/dashboard" })
       this.setState({ actions: newActions });
     }
 
@@ -209,6 +129,44 @@ class Header extends Component {
     }); */
 
   }
+
+  handleOpen = () => {
+    this.setState({ open: true });
+  };
+
+  handleClose = (action) => {
+    if (action === 1) {
+      this.setState({ open: false });
+      this.props.history.push("/users");
+      //alert("Função Novo RFID");
+    }
+    else {
+      if (action === 2) {
+        this.logout();
+        //alert("Função Sair");
+      }
+      else {
+        if (action === 3) {
+          this.props.history.push("/offices");
+        }
+        else {
+          if (action === 4) {
+            this.props.history.push("/usersRFID");
+          }
+          else {
+            if (action === 5) {
+              this.props.history.push("/sectors");
+            }
+            else {
+              if (action === 6) {
+                this.props.history.push("/devices");
+              }
+            }
+          }
+        }
+      }
+    }
+  };
 
   logout = async () => {
     await firebase.logout()
@@ -220,28 +178,6 @@ class Header extends Component {
     window.location.replace("/");
   }
 
-  login = async () => {
-    const { email, password } = this.state;
-
-    try {
-      await firebase.login(email, password)
-        .catch((error) => {
-          if (error.code === 'auth/user-not-found') {
-            alert('Este usuario não existe!');
-          } else {
-            alert('Codigo de erro:' + error.code);
-            return null;
-          }
-        });
-      //this.props.history.replace('/dashboard');
-      window.location.reload("/dashboard");
-
-    } catch (error) {
-      alert(error.message);
-    }
-
-  }
-
   handleDrawerOpen = () => {
     this.setState({ open: true });
   };
@@ -251,94 +187,57 @@ class Header extends Component {
   };
 
   render() {
-    const { classes } = this.props;
     return (
-      <div className={classes.root}>
-        <CssBaseline />
-        <AppBar
-          color={"green"}
-          position="fixed"
-          className={clsx(classes.appBar, {
-            [classes.appBarShift]: this.state.open,
-          })}
-        >
-          <Toolbar>
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              onClick={this.handleDrawerOpen}
-              edge="start"
-              className={clsx(classes.menuButton, {
-                [classes.hide]: this.state.open,
-              })}
+      <AppBar position="static" color={"transparent"} elevation={0}>
+        <header id="main-header">
+          <div className="header-content">
+            {/* <SpeedDial
+              className="speed-dial"
+              ariaLabel="SpeedDial tooltip example"
+              hidden={false}
+              icon={<SpeedDialIcon />}
+              onClose={() => { this.setState({ open: false }) }}
+              onOpen={this.handleOpen}
+              open={this.state.open}
+              direction={"down"}
             >
-              <MenuIcon />
-            </IconButton>
-            <Typography variant="h6" noWrap style={{ color: "#FFF" }}>
-              IBTI - Monitoramento
-            </Typography>
-          </Toolbar>
-        </AppBar>
-        <Drawer
-          variant="permanent"
-          className={clsx(classes.drawer, {
-            [classes.drawerOpen]: this.state.open,
-            [classes.drawerClose]: !this.state.open,
-          })}
-          classes={{
-            paper: clsx({
-              [classes.drawerOpen]: this.state.open,
-              [classes.drawerClose]: !this.state.open,
-            }),
-          }}
-        >
-          <div className={classes.toolbar}>
-            <IconButton onClick={this.handleDrawerClose}>
-              {/* {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />} */}
-              <ChevronLeftIcon style={{ color: "#FFF" }} />
+              {this.state.actions.map((action) => (
+                <SpeedDialAction
+                  className="speed-dial-action-button"
+                  key={action.name}
+                  icon={action.icon}
+                  tooltipTitle={action.name}
+                  onClick={() => { this.handleClose(action.action) }}
+                  tooltipPlacement={"right"}
+                />
+              ))}
+            </SpeedDial> */}
 
-            </IconButton>
+            <a href="#" class="float" id="menu-share">
+              <img src={require("../../logo.png")} />
+            </a>
+            <ul>
+              {this.state.actions.map((action) => {
+                return (
+                  <li>
+                    <a href="#">
+                      {action.icon}
+                    </a>
+                  </li>
+                )
+              })}
+            </ul>
+            <ul className="header-title">
+              <li>
+                <a href="#">
+                  Instituto Brasília de Tecnologia e Inovação
+                </a>
+              </li>
+
+            </ul>
           </div>
-          <Divider />
-          <List>
-            {firebase.getCurrent() !== null ? (
-              this.state.actions.map((action, index) => {
-                if (index < (this.state.actions.length - 1)) {
-                  return (
-                    <Link to={action.action} style={{ textDecoration: "none" }}>
-                      <ListItem button key={action.action} style={{ color: "#FFF" }}>
-                        <ListItemIcon>{action.icon}</ListItemIcon>
-                        {/* <ListItemIcon>{index < (this.state.actions.length - 1) ? action.icon : ""}</ListItemIcon> */}
-                        <ListItemText style={{ textDecoration: "none" }} primary={action.name} />
-                      </ListItem>
-                    </Link>
-                  );
-                }
-                else {
-                  return (
-                    <ListItem button onClick={() => { this.logout() }}>
-                      <ListItemIcon>{<ExitToApp style={{ color: "#FFF" }} />}</ListItemIcon>
-                      {/* <ListItemIcon>{index < (this.state.actions.length - 1) ? action.icon : ""}</ListItemIcon> */}
-                      <ListItemText style={{ color: "#FFF" }} primary="Sair" />
-                    </ListItem>
-                  );
-                }
-              })
-            ) : ""}
-          </List>
-          {firebase.getCurrent() === null ? (
-            <List>
-              <Link to={"/dashboard"} style={{ textDecoration: "none" }}>
-                <ListItem button>
-                  <ListItemIcon>{<HomeIcon />}</ListItemIcon>
-                  {/* <ListItemIcon>{index < (this.state.actions.length - 1) ? action.icon : ""}</ListItemIcon> */}
-                  <ListItemText style={{ color: "#FFF" }} primary={"Login"} />
-                </ListItem>
-              </Link>
-            </List>
-          ) : ""}
-        </Drawer>
-      </div>
+        </header>
+      </AppBar>
     );
   }
 }
@@ -347,4 +246,4 @@ Header.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Header);
+export default withRouter(Header);
