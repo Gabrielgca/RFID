@@ -13,7 +13,7 @@
 ### Requisitos Técnicos e escolhas
 
  <p>
-  Tínhamos como requisitos técnicos um servidor que poderia ter uma resposta rápida às requisições da aplicação. Além de ser capaz de se comunicar ao mesmo tempo a aplicação e os dispositivos WiFi. Pensou-se então em um método em comum a ser utilizado por ambas as partes, estes seriam os métodos HTTP. Partindo da premissa de utilizar a linguagem Python e tendo isso em vista, procurou-se frameworks para se trabalhar para o desenvolvimento de servidores. O "flask" se mostrou ser simples e eficaz, além de ter uma comunidade muito ativa, o que ajuda muito no desenvolvimento. Muitas das bibliotecas utilizadas são consideradas extensões para o "flask", com o intuito de não ocorrer conflito dos arquivos. Para que os dados da aplicação estejam atualizados a todo momento com os contidos no banco de dados, utilizou-se a biblioteca "flask-socketio". Esta biblioteca foi escolhida por ter uma documentação muito bem detalhada, ser uma extensão para o "flask" e ter uma comunidade ativa nos fóruns e relacionados.
+  Tínhamos como requisitos técnicos um servidor que poderia ter uma resposta rápida às requisições da aplicação. Além de ser capaz de se comunicar ao mesmo tempo com a aplicação e com os dispositivos WiFi. Pensou-se então em um método em comum a ser utilizado por ambas as partes, estes seriam os métodos HTTP. Tendo isso em vista e partindo da premissa de utilizar a linguagem Python, procurou-se frameworks para se trabalhar para o desenvolvimento de servidores. O "flask" se mostrou ser simples e eficaz, além de ter uma comunidade muito ativa, o que ajuda muito no desenvolvimento. Muitas das bibliotecas utilizadas são consideradas extensões para o "flask", com o intuito de não ocorrer conflito dos arquivos. Para que os dados da aplicação estejam atualizados a todo momento com os contidos no banco de dados, utilizou-se a biblioteca "flask-socketio". Esta biblioteca foi escolhida por se mostrar eficaz, ter uma documentação muito bem detalhada, ser uma extensão para o "flask" e ter uma comunidade ativa nos fóruns e relacionados.
   
   Para a comunicação com o banco de dados era necessário que se tivesse uma forma prática e que se pudesse automatizar algumas pesquisas, atualizações e inserções no banco, pois será necessário várias consultas em vários momentos. Uma solução encontrada foi o uso da biblioteca "flask-SQLAlchemy" que, novamente, é uma extensão para o "flask" que utiliza o SQLAlchemy, uma ferramenta muito poderosa para o uso de SQL no Python mapeando o banco de dados no servidor e a partir disso, utilizar de suas funções e métodos para se ter uma alta performance nas consultas no banco de dados.
   </p>
@@ -27,7 +27,6 @@
  * Dispositivo WiFi
    * Protocolo HTTP
  * Banco de dados
-   * MySQL
    * Flask-SQLAlchemy
 
 <p align="center">
