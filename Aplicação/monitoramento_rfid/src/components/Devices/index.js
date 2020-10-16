@@ -304,11 +304,11 @@ class Devices extends Component {
                 <div className="container">
                     <header id="new">
                         {/* <Link to="/dashboard">Voltar</Link> */}
-                        <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.push('/dashboard') }}>
+                        <Button startIcon={<ArrowBackIcon />} style={{marginTop:'15%', backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.push('/dashboard') }}>
                             Voltar
                         </Button>
                     </header>
-                    <h1 style={{ color: '#FFF' }}>Controle de Dispositivos</h1>
+                    <h1 style={{ color: '#FFF', textAlign:'center' }}>Controle de Dispositivos</h1>
                     <Paper style={{ marginTop: 50, marginBottom: 10 }}>
                         <InputBase
                             value={this.state.filter}

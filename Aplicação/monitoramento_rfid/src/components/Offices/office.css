@@ -1,48 +1,49 @@
-div .register-h1{
-    margin-top: 30px;
-    margin-bottom: 5px;
-    text-align: center;
-  }
+div .register-h1 {
+  margin-top: 30px;
+  margin-bottom: 5px;
+  text-align: center;
+}
 
-div .content{
+div .content {
   border: 1px solid white;
-    display: flex;
-    flex-direction: column;
-    width: 90%;
-    margin: 0 auto;
-    align-items: center;
-    justify-content: center;
-    overflow-y: scroll;
-  }
-
-div .card{
-    width: 90%;
-    border-radius: 0.5em;
-    padding: 1em;
-    background-color: #FFF; 
-    margin-top: 15px;
-}
-div .card-disabled{
-    opacity: 0.25;
-    width: 90%;
-    border-radius: 0.5em;
-    padding: 1em;
-    background-color: #FFF; 
-    margin-top: 15px;
-    z-index: 0;
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  margin: 0 auto;
+  align-items: center;
+  justify-content: center;
+  overflow-y: scroll;
 }
 
-.permissions-container{
+div .card {
+  width: 90%;
+  border-radius: 0.5em;
+  padding: 1em;
+  background-color: #FFF;
+  margin-top: 15px;
+}
+
+div .card-disabled {
+  opacity: 0.25;
+  width: 90%;
+  border-radius: 0.5em;
+  padding: 1em;
+  background-color: #FFF;
+  margin-top: 15px;
+  z-index: 0;
+}
+
+.permissions-container {
   display: flex;
   flex-direction: row;
 }
 
-.div-permissions{
+.div-permissions {
   display: flex;
   flex-direction: row;
 }
 
-.div-offices{
+.div-offices {
   overflow-y: scroll;
   max-height: 300px;
   width: 100%;
@@ -52,65 +53,65 @@ div .card-disabled{
   align-items: center;
 }
 
-.loader{
+.loader {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.resultado-pesquisa{
+.resultado-pesquisa {
   padding-left: 1%;
   color: #FFF;
 }
 
-.offices-list{
+.offices-list {
   width: 90%;
   height: 25em;
   overflow-y: scroll;
   border-radius: 0.5em;
 }
 
-.offices-item{
+.offices-item {
   width: 100%;
-    display: flex;
-    height: 7.5em;
-    align-items: center;
-    justify-content: center;
-    flex-direction: row;
-    margin-bottom: 1em;
-}
-
-.offices-item-info{
   display: flex;
-    flex-direction: column;
-    background-color: #FFF;
-    height: 100%;
-    width: 85%;
-    border-radius: 0.5em;
-    justify-content: center;
-    padding-left: 1%;
+  height: 7.5em;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  margin-bottom: 1em;
 }
 
-.offices-item-info-disabled{
+.offices-item-info {
+  display: flex;
+  flex-direction: column;
+  background-color: #FFF;
+  height: 100%;
+  width: 85%;
+  border-radius: 0.5em;
+  justify-content: center;
+  padding-left: 1%;
+}
+
+.offices-item-info-disabled {
   opacity: 0.25;
-    display: flex;
-    flex-direction: column;
-    background-color: #FFF;
-    height: 100%;
-    width: 85%;
-    border-radius: 0.5em;
-    justify-content: center;
-    padding-left: 1%;
+  display: flex;
+  flex-direction: column;
+  background-color: #FFF;
+  height: 100%;
+  width: 85%;
+  border-radius: 0.5em;
+  justify-content: center;
+  padding-left: 1%;
 }
 
-.offices-options{
+.offices-options {
   display: flex;
-    flex-direction: column;
-    background-color: #FFF;
-    height: 100%;
-    width: 14%;
-    border-radius: 0.5em;
-    justify-content: space-evenly;
-    align-items: center;
-    margin-left: 1%;
+  flex-direction: column;
+  background-color: #FFF;
+  height: 100%;
+  width: 14%;
+  border-radius: 0.5em;
+  justify-content: space-evenly;
+  align-items: center;
+  margin-left: 1%;
 }

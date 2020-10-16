@@ -574,11 +574,11 @@ class Offices extends Component {
                 <div className="container">
                     <header id="new">
                         {/* <Link to="/dashboard">Voltar</Link> */}
-                        <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.push('/dashboard') }}>
+                        <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', marginTop:'15%', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.push('/dashboard') }}>
                             Voltar
                         </Button>
                     </header>
-                    <h1 style={{ color: '#FFF' }}>Controle de Cargos</h1>
+                    <h1 style={{ color: '#FFF', textAlign:'center' }}>Controle de Cargos</h1>
                     <Paper style={{ marginTop: 50, marginBottom: 10 }}>
                         <InputBase
                             value={this.state.filter}

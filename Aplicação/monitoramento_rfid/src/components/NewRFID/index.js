@@ -3,7 +3,7 @@ import { Link, withRouter } from 'react-router-dom';
 import firebase from '../../firebase';
 import utils from '../../utils';
 import axios from 'axios';
-import './index.css';
+import './newRFID.css';
 import ENDPOINT from '../../socketAPIService';
 
 
@@ -297,7 +297,7 @@ class NewRFID extends Component {
         <div className="new-rfid-body">
           <header id="new">
             {/* <Link to="/offices">Voltar</Link> */}
-            <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.goBack() }}>
+            <Button startIcon={<ArrowBackIcon />} style={{marginTop:'15%', backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.goBack() }}>
               Voltar
                     </Button>
           </header>
@@ -386,13 +386,13 @@ class NewRFID extends Component {
               />
               <Button onClick={this.handleAddPermission} variant='contained' style={{ marginLeft: '2%', background: 'green', height: 54 }} ><AddIcon /></Button>
               <FormControlLabel control={<CheckBox checked={this.state.permanente} onChange={(e) => { this.handleCheck(e) }} />} label='Manter horário direto' />
-              <div className='flatScroll'>
+              <div id='flatScroll'>
                 <FlatList
                   renderWhenEmpty={() => <div></div>}
                   list={this.state.permissions}
                   renderItem={(item) => (
                     <div>
-                      <div className='usersList'>
+                      <div id='usersList'>
                         <p><b>Localização: </b> {item.roomName}</p>
                         <p><b>Hora de inicio: </b> {item.hrini}</p>
                         <p><b>Hora fim: </b> {item.hrfim}</p>

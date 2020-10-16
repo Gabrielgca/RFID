@@ -5,7 +5,7 @@
 }
 
 #formRFID {
-    background-color: aliceblue;
+    background-color: #FFF;
     width: 100%;
     max-width: 680px;
     flex-direction: column;
@@ -28,7 +28,3 @@ form#formRFID h1 {
     margin-bottom: 20px;
 }
 
-#inputsForm {
-    
-    
-}
