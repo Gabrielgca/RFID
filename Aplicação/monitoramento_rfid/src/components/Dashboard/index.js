@@ -403,6 +403,9 @@ class Dashboard extends Component {
     return (
       <div id="dashboard">
         <h1>Olá, {this.state.nome}</h1>
+        {/* <div style={{border: "1px solid black", height: "50px"}}>
+
+        </div> */}
         <br></br>
         <h3>Email: {firebase.getCurrent()}</h3>
         <h3>Cargo: {this.state.cargo}</h3><br />
@@ -466,14 +469,14 @@ class Dashboard extends Component {
 
               {selectedRoom.id_disp === -1 ? (
                 <div className="people-loading-div">
-                  <Loader
+                  {/* <Loader
                     type="Oval"
                     //color="#ffa200"
                     color="#000"
                     height={50}
                     width={50}
                   //timeout={3000} //3 secs
-                  />
+                  /> */}
                 </div>
               ) : (
                   <div></div>

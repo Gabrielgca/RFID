@@ -36,7 +36,7 @@ class Home extends Component {
     return (
       <section id="rooms">
         <div style={{ display: "flex", flexDirection: "row" }}>
-          <h1 style={{ width: "100%" }}>Salas</h1>
+          <h1 style={{ width: "100%", color: "#008C35", textAlign: "left" }}>Salas</h1>
         </div>
         {rooms.length > 0 ? (
           rooms.map((room) => {

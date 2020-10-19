@@ -69,7 +69,6 @@ class NewSectors extends Component {
     }
 
     handleAddSector = async () => {
-        alert('Entrou')
         /* alert(this.state.companyName);
         alert(this.state.roomName);
         alert(this.state.area);
@@ -104,8 +103,8 @@ class NewSectors extends Component {
             this.handleCloseConfirmModal();
         }
         else {
-            alert('Os campos precisam ser preenchidos!')
-            return null
+            alert('Todos campos precisam ser preenchidos!');
+            return null;
         }
     }
 
@@ -115,6 +114,7 @@ class NewSectors extends Component {
 
     handleCloseConfirmModal = () => {
         this.setState({ modalConfirmVisible: false });
+        this.props.history.push("/sectors");
     }
 
     async componentDidMount() {
@@ -169,12 +169,17 @@ class NewSectors extends Component {
         else {
             return (
                 <div className="container">
-                    <header id="new">
+                    {/* <header id="new">
                         <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.goBack() }}>
                             Voltar
                         </Button>
-                    </header>
-                    <h1 style={{ color: '#FFF', marginTop: 10, marginBottom: 25 }}>Cadastrar Novo Setor</h1>
+                    </header> */}
+                    <div style={{ display: "flex", flexDirection: "row", width: '80%', margin: "0 auto", marginTop: 20, }}>
+                        <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize", width: "7.5%" }} type="button" onClick={() => { this.props.history.goBack() }}>
+                            Voltar
+                        </Button>
+                        <h1 style={{ color: '#008C35', textAlign: "center", width: "92.5%", paddingRight: "7.5%" }}>Cadastrar Novo Setor</h1>
+                    </div>
                     <FormControl style={{ backgroundColor: '#FFF', padding: 20, borderRadius: 5, width: '50%' }}>
                         <div className="check-area">
                             <div className="empty-check">

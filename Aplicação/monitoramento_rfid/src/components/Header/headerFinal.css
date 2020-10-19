@@ -1,0 +1,314 @@
+.label-container {
+    border: 1px solid black;
+    position: fixed;
+    bottom: 48px;
+    right: 105px;
+    display: table;
+    visibility: hidden;
+  }
+  
+  .label-text {
+    border: 1px solid black;
+    color: #FFF;
+    background: rgba(51, 51, 51, 0.5);
+    display: table-cell;
+    vertical-align: middle;
+    padding: 10px;
+    border-radius: 3px;
+  }
+  
+  .label-arrow {
+    border: 1px solid black;
+    display: table-cell;
+    vertical-align: middle;
+    color: #333;
+    opacity: 0.5;
+  }
+  
+  .float {
+    position: fixed;
+    width: 90px;
+    height: 90px;
+    /* border: 1px solid black; */
+    background-color: transparent;
+    color: #FFF;
+    border-radius: 50px;
+    text-align: center;
+    z-index: 1000;
+    transition: all 0.5s;
+    animation: bot-to-top 2s ease-out;
+  }
+  
+  .float:hover {
+    transform: rotate(360deg);
+    /* -webkit-transform: scale(1.25); */
+    /* transform: scale(1.25); */
+  }
+  
+  ul {
+    /* border: 1px solid black; */
+    position: fixed;
+    left: 15px;
+    padding-top: 30px;
+    top: 90px;
+    z-index: 100;
+  }
+  
+  ul li {
+    /* border: 1px solid black; */
+    list-style: none;
+    margin-bottom: 10px;
+  }
+  
+  ul li a {
+    /* border: 1px solid black; */
+    background-color: #FFF;
+    color: #FFF;
+    border-radius: 50px;
+    text-align: center;
+    box-shadow: 2px 2px 3px #999;
+    width: 60px;
+    height: 60px;
+    display: block;
+    -webkit-box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0.5);
+    box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0.5);
+  }
+  
+  ul:hover {
+    visibility: visible!important;
+    opacity: 1!important;
+  }
+  
+  .my-float {
+    font-size: 24px;
+    margin-top: 18px;
+  }
+  
+  a#menu-share{
+    left: 0px;
+  }
+  
+  a#menu-share+ul {
+    visibility: hidden;
+  }
+  
+  a#menu-share:hover+ul {
+    visibility: visible;
+    animation: scale-in 0.5s;
+  }
+  
+  a#menu-share i {
+    animation: rotate-in 0.5s;
+  }
+  
+  a#menu-share:hover>i {
+    animation: rotate-out 0.5s;
+  }
+  
+  @keyframes bot-to-top {
+    0% {
+      top: -20px
+    }
+    50% {
+      top: 20px
+    }
+  }
+  
+  @keyframes scale-in {
+    from {
+      transform: scale(0);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes rotate-in {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  @keyframes rotate-out {
+    from {
+      transform: rotate(360deg);
+    }
+    to {
+      transform: rotate(0deg);
+    }
+  }
+  
+  @keyframes zoom-in {
+    0% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(1.25);
+    }
+  }
+  
+  /* Testes com nome IBTI aparecendo na lateral */
+  
+  .label-container {
+    border: 1px solid black;
+    position: fixed;
+    bottom: 48px;
+    right: 105px;
+    display: table;
+    visibility: hidden;
+  }
+  
+  .label-text {
+    border: 1px solid black;
+    color: #FFF;
+    background: rgba(51, 51, 51, 0.5);
+    display: table-cell;
+    vertical-align: middle;
+    padding: 10px;
+    border-radius: 3px;
+  }
+  
+  .label-arrow {
+    border: 1px solid black;
+    display: table-cell;
+    vertical-align: middle;
+    color: #333;
+    opacity: 0.5;
+  }
+  
+  .float {
+    position: fixed;
+    width: 90px;
+    height: 90px;
+    top: 20px;
+    left: 20px;
+    background-color: transparent;
+    color: #FFF;
+    border-radius: 50px;
+    text-align: center;
+    z-index: 1000;
+    transition: all 0.5s;
+    animation: bot-to-top 2s ease-out;
+  }
+  
+  .float:hover {
+    transform: rotate(360deg);
+    /* -webkit-transform: scale(1.25); */
+    /* transform: scale(1.25); */
+  }
+  
+  .header-title {
+    /* border: 1px solid black; */
+    position: fixed;
+    left: 100px;
+    padding-top: 30px;
+    top: 25px;
+    z-index: 100;
+  }
+  
+  .header-title li {
+    /* border: 1px solid black; */
+    list-style: none;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .header-title li a {
+    /* border: 1px solid black; */
+    background-color: transparent;
+    color: #008C35;
+    border-radius: 50px;
+    text-align: left;
+    text-decoration: none;
+    /* box-shadow: 2px 2px 3px #999; */
+    width: 600px;
+    height: 100px;
+    display: block;
+    -webkit-box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.5);
+    font-size: 25px;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  }
+  
+  .header-title:hover {
+    visibility: visible!important;
+    opacity: 1!important;
+  }
+  
+  .my-float {
+    font-size: 24px;
+    margin-top: 18px;
+  }
+  
+  a#menu-share+.header-title {
+    visibility: hidden;
+  }
+  
+  a#menu-share:hover+.header-title {
+    visibility: visible;
+    animation: scale-in 0.5s;
+  }
+  
+  a#menu-share i {
+    animation: rotate-in 0.5s;
+  }
+  
+  a#menu-share:hover>i {
+    animation: rotate-out 0.5s;
+  }
+  
+  @keyframes bot-to-top {
+    0% {
+      top: -20px
+    }
+    50% {
+      top: 20px
+    }
+  }
+  
+  @keyframes scale-in {
+    from {
+      transform: scale(0);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes rotate-in {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  @keyframes rotate-out {
+    from {
+      transform: rotate(360deg);
+    }
+    to {
+      transform: rotate(0deg);
+    }
+  }
+  
+  @keyframes zoom-in {
+    0% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(1.25);
+    }
+  }

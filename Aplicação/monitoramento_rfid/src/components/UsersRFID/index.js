@@ -556,13 +556,18 @@ class UsersRFID extends Component {
         else {
             return (
                 <div className="container">
-                    <header id="new">
-                        {/* <Link to="/dashboard">Voltar</Link> */}
-                        <Button startIcon={<ArrowBackIcon />} style={{marginTop:'15%', backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.push('/dashboard') }}>
+                    {/* <header id="new">
+                        <Link to="/dashboard">Voltar</Link>
+                        <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.push('/dashboard') }}>
                             Voltar
                         </Button>
-                    </header>
-                    <h1 style={{ color: '#FFF', textAlign:'center' }}>Usuários RFID</h1>
+                    </header> */}
+                    <div style={{ display: "flex", flexDirection: "row", width: '90%', marginTop: 20 }}>
+                        <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize", width: "7.5%" }} type="button" onClick={() => { this.props.history.push('/dashboard') }}>
+                            Voltar
+                        </Button>
+                        <h1 style={{ color: '#008C35', textAlign: "center", width: "92.5%", paddingRight: "7.5%" }}>Usuários RFID</h1>
+                    </div>
                     <Paper style={{ marginTop: 50 }}>
                         <InputBase
                             value={this.state.filter}
@@ -916,10 +921,10 @@ class UsersRFID extends Component {
 
                                                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
                                                     <Button
-                                                        
+
                                                         onClick={() => (this.handleRemovePermission(this.state.permissoesAdicionadas.indexOf(item)))}
                                                         variant='contained'
-                                                        style={{ background: 'red', color: "#FFF", marginTop: '-10%', alignItems:'center' }}><RemoveIcon color={"#FFF"}/></Button>
+                                                        style={{ background: 'red', color: "#FFF", marginTop: '-10%', alignItems: 'center' }}><RemoveIcon color={"#FFF"} /></Button>
                                                 </div>
                                             </div>
                                         )}

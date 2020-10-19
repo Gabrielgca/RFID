@@ -302,13 +302,18 @@ class Devices extends Component {
         else {
             return (
                 <div className="container">
-                    <header id="new">
-                        {/* <Link to="/dashboard">Voltar</Link> */}
-                        <Button startIcon={<ArrowBackIcon />} style={{marginTop:'15%', backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.push('/dashboard') }}>
+                    {/* <header id="new">
+                        <Link to="/dashboard">Voltar</Link>
+                        <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.push('/dashboard') }}>
                             Voltar
                         </Button>
-                    </header>
-                    <h1 style={{ color: '#FFF', textAlign:'center' }}>Controle de Dispositivos</h1>
+                    </header> */}
+                    <div style={{ display: "flex", flexDirection: "row", width: '90%', marginTop: 20 }}>
+                        <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize", width: "7.5%" }} type="button" onClick={() => { this.props.history.push('/dashboard') }}>
+                            Voltar
+                        </Button>
+                        <h1 style={{ color: '#008C35', textAlign: "center", width: "92.5%", paddingRight: "7.5%" }}>Controle de Dispositivos</h1>
+                    </div>
                     <Paper style={{ marginTop: 50, marginBottom: 10 }}>
                         <InputBase
                             value={this.state.filter}
@@ -420,10 +425,10 @@ class Devices extends Component {
                             </DialogContentText>
 
                             <DialogContentText id="alert-dialog-description">
-                                <InputLabel style={{marginRight:'162%'}}>Localização</InputLabel>
+                                <InputLabel style={{ marginRight: '162%' }}>Localização</InputLabel>
 
                                 <Select
-                                    style={{ width: 180, marginRight:'138%' }}
+                                    style={{ width: 180, marginRight: '138%' }}
                                     label="localização"
                                     value={this.state.selectedDevice.localization}
                                     onChange={(event) => { this.localizationDevice(event) }}
@@ -432,7 +437,7 @@ class Devices extends Component {
                                         if ((loc.status == "A" && loc.available === true) || loc.id_loc === this.state.selectedDevice.localization) {
                                             return (
                                                 //Alterar para enviar id_loc em vez de roomName
-                                            <MenuItem value={loc.id_loc}>{loc.id_loc} - {loc.companyName} - {loc.roomName} </MenuItem>
+                                                <MenuItem value={loc.id_loc}>{loc.id_loc} - {loc.companyName} - {loc.roomName} </MenuItem>
                                             )
                                         }
                                     })}

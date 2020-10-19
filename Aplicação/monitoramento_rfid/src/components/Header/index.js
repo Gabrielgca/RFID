@@ -62,11 +62,11 @@ class Header extends Component {
     if (!firebase.getCurrent()) {
       //this.props.history.replace('/login');
       let newActions = this.state.actions;
-      newActions.unshift({ icon: <HomeIcon style={{ color: "#000" }} />, name: 'Home', action: "/" })
+      newActions.unshift({ icon: <HomeIcon className="my-float" style={{ color: "#008C35" }} />, name: 'Home', action: 7 })
       this.setState({ actions: newActions });
 
       newActions = this.state.actions;
-      newActions.push({ icon: <AccountCircleIcon style={{ color: "#000" }} />, name: 'Entrar', action: "/login" })
+      newActions.push({ icon: <AccountCircleIcon className="my-float" style={{ color: "#008C35" }} />, name: 'Entrar', action: 9 })
       this.setState({ actions: newActions });
 
       //return null;
@@ -86,40 +86,40 @@ class Header extends Component {
 
       if (utils.checkCategory(this.state.loggedOffice.permissoes.usuario) === true) {
         let newActions = this.state.actions;
-        newActions.unshift({ icon: <TapAndPlayIcon className="my-float" style={{ color: "#000" }} />, name: 'Gerenciar Usuários RFID', action: 4 })
+        newActions.unshift({ icon: <TapAndPlayIcon className="my-float" style={{ color: "#008C35" }} />, name: 'Gerenciar Usuários RFID', action: 4 })
         this.setState({ actions: newActions });
       }
 
       if (utils.checkCategory(this.state.loggedOffice.permissoes.setor) === true) {
         let newActions = this.state.actions;
-        newActions.unshift({ icon: <ApartmentIcon className="my-float" style={{ color: "#000" }} />, name: "Gerenciar Setores", action: 5 })
+        newActions.unshift({ icon: <ApartmentIcon className="my-float" style={{ color: "#008C35" }} />, name: "Gerenciar Setores", action: 5 })
         this.setState({ actions: newActions });
       }
 
       if (utils.checkCategory(this.state.loggedOffice.permissoes.dispositivo) === true) {
         let newActions = this.state.actions;
-        newActions.unshift({ icon: <QueuePlayNextIcon className="my-float" style={{ color: "#000" }} />, name: 'Gerenciar Dispositivos', action: 6 })
+        newActions.unshift({ icon: <QueuePlayNextIcon className="my-float" style={{ color: "#008C35" }} />, name: 'Gerenciar Dispositivos', action: 6 })
         this.setState({ actions: newActions });
       }
 
       if (utils.checkCategory(this.state.loggedOffice.permissoes.conta) === true) {
         let newActions = this.state.actions;
-        newActions.unshift({ icon: <AccountCircleIcon className="my-float" style={{ color: "#000" }} />, name: 'Gerenciar Contas', action: 1 })
+        newActions.unshift({ icon: <AccountCircleIcon className="my-float" style={{ color: "#008C35" }} />, name: 'Gerenciar Contas', action: 1 })
         this.setState({ actions: newActions });
       }
 
       if (utils.checkCategory(this.state.loggedOffice.permissoes.cargo) === true) {
         let newActions = this.state.actions;
-        newActions.unshift({ icon: <HowToRegIcon className="my-float" style={{ color: "#000" }} />, name: 'Gerenciar Cargos', action: 3 })
+        newActions.unshift({ icon: <HowToRegIcon className="my-float" style={{ color: "#008C35" }} />, name: 'Gerenciar Cargos', action: 3 })
         this.setState({ actions: newActions });
       }
 
       let newActions = this.state.actions;
-      newActions.push({ icon: <ExitToApp className="my-float" style={{ color: "#000" }} />, name: 'Sair', action: 2 })
+      newActions.push({ icon: <ExitToApp className="my-float" style={{ color: "#008C35" }} />, name: 'Sair', action: 1 })
       this.setState({ actions: newActions });
 
       newActions = this.state.actions;
-      newActions.unshift({ icon: <HomeIcon className="my-float" style={{ color: "#000" }} />, name: 'Dashboard', action: "/dashboard" })
+      newActions.unshift({ icon: <HomeIcon className="my-float" style={{ color: "#008C35" }} />, name: 'Dashboard', action: 8 })
       this.setState({ actions: newActions });
     }
 
@@ -160,6 +160,21 @@ class Header extends Component {
             else {
               if (action === 6) {
                 this.props.history.push("/devices");
+              }
+              else {
+                if (action === 7) {
+                  this.props.history.push("/");
+                }
+                else {
+                  if (action === 8) {
+                    this.props.history.push("/dashboard");
+                  }
+                  else{
+                    if(action === 9){
+                      this.props.replace("/login");
+                    }
+                  }
+                }
               }
             }
           }
@@ -220,20 +235,28 @@ class Header extends Component {
               {this.state.actions.map((action) => {
                 return (
                   <li>
-                    <a href="#">
-                      {action.icon}
-                    </a>
+                    {action.action === "sair" ? (
+                      <a href={action.action} onClick={() => { this.logout() }}>
+                        {action.icon}
+                      </a>
+                    ) : (
+                        /*  <a href={action.action}>
+                           {action.icon}
+                         </a> */
+                        <a style={{ cursor: "pointer" }} onClick={() => { this.handleClose(action.action) }}>
+                          {action.icon}
+                        </a>
+                      )}
                   </li>
                 )
               })}
             </ul>
             <ul className="header-title">
               <li>
-                <a href="#">
+                <a href="/">
                   Instituto Brasília de Tecnologia e Inovação
-                </a>
+                  </a>
               </li>
-
             </ul>
           </div>
         </header>

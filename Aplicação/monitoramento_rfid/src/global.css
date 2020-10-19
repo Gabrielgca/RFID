@@ -6,7 +6,7 @@
 }
 
 body{
-  height: 100vh;
+  min-height: 100vh;
   /* background: linear-gradient(to bottom right, #03a63c, #00ab95); */
   background-image: url("./Logo-IBTI2v.png");
   background-repeat: no-repeat;

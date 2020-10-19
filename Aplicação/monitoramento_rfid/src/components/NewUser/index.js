@@ -136,13 +136,18 @@ class NewUser extends Component {
     else {
       return (
         <div>
-          <header id="new">
-            {/* <Link to="/users">Voltar</Link> */}
-            <Button startIcon={<ArrowBackIcon />} style={{marginTop:'15%', backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.goBack() }}>
+          {/* <header id="new">
+            <Link to="/users">Voltar</Link>
+            <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.goBack() }}>
               Voltar
           </Button>
-          </header>
-          <h1 className="register-h1" style={{ color: '#FFF' }}>Novo Usuario</h1>
+          </header> */}
+          <div style={{ display: "flex", flexDirection: "row", width: '80%', margin: "0 auto", marginTop: 20, }}>
+            <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize", width: "7.5%" }} type="button" onClick={() => { this.props.history.goBack() }}>
+              Voltar
+            </Button>
+            <h1 style={{ color: '#008C35', textAlign: "center", width: "92.5%", paddingRight: "7.5%" }}>Novo Usuario</h1>
+          </div>
           <form onSubmit={this.register} id="register">
             <label>Nome:</label><br />
             <input type="text" value={this.state.nome} autoFocus autoComplete="off"

@@ -433,13 +433,13 @@ class Offices extends Component {
     }
 
     deactivateOffice = async (key) => {
-        firebase.disableOffice(this.state.selectedOffice.nome, key)
+        await firebase.disableOffice(this.state.selectedOffice.nome, key)
             .then((response) => {
                 alert(response);
+                this.handleCloseDeactivate();
+                window.location.reload();
             });
         //this.getOffices();
-        this.handleCloseDeactivate();
-        window.location.reload();
     }
 
     reactivateOffice = async (key) => {
@@ -572,13 +572,18 @@ class Offices extends Component {
         else {
             return (
                 <div className="container">
-                    <header id="new">
-                        {/* <Link to="/dashboard">Voltar</Link> */}
-                        <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', marginTop:'15%', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.push('/dashboard') }}>
+                    {/* <header id="new">
+                        <Link to="/dashboard">Voltar</Link>
+                        <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.push('/dashboard') }}>
                             Voltar
                         </Button>
-                    </header>
-                    <h1 style={{ color: '#FFF', textAlign:'center' }}>Controle de Cargos</h1>
+                    </header> */}
+                    <div style={{ display: "flex", flexDirection: "row", width: '90%', marginTop: 20 }}>
+                        <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize", width: "7.5%" }} type="button" onClick={() => { this.props.history.push('/dashboard') }}>
+                            Voltar
+                        </Button>
+                        <h1 style={{ color: '#008C35', textAlign: "center", width: "92.5%", paddingRight: "7.5%" }}>Controle de Cargos</h1>
+                    </div>
                     <Paper style={{ marginTop: 50, marginBottom: 10 }}>
                         <InputBase
                             value={this.state.filter}

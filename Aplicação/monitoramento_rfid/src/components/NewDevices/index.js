@@ -152,9 +152,10 @@ class NewDevices extends Component {
                     alert("Erro: " + JSON.stringify(error))
                 })
 
-            this.props.history.push('/dashboard')
+            this.props.history.push('/devices');
         } else {
-            this.setState({ alert: 'Preencha todos os campos!' })
+            //this.setState({ alert: 'Preencha todos os campos!' })
+            alert("Preencha todos os campos!");
         }
     }
 
@@ -177,15 +178,22 @@ class NewDevices extends Component {
         else {
             return (
                 <div className="formArea">
-                    <header id="new">
-                        {/* <Link to="/offices">Voltar</Link> */}
-                        <Button startIcon={<ArrowBackIcon />} style={{marginTop:'15%', backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.goBack() }}>
+                    {/* <header id="new">
+                        <Link to="/offices">Voltar</Link>
+                        <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.goBack() }}>
                             Voltar
                         </Button>
-                    </header>
+                    </header> */}
+
+                    <div style={{ display: "flex", flexDirection: "row", width: '80%', margin: "0 auto", marginTop: 20, }}>
+                        <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize", width: "7.5%" }} type="button" onClick={() => { this.props.history.goBack() }}>
+                            Voltar
+                        </Button>
+                        <h1 style={{ color: '#008C35', textAlign: "center", width: "92.5%", paddingRight: "7.5%" }}>Cadastro de Dispositivo RFID</h1>
+                    </div>
 
                     <form id="formRFID">
-                        <h1>Cadastro de dispositivo RFID</h1>
+                        {/* <h1>Cadastro de dispositivo RFID</h1> */}
                         <TextField label='Descrição do Dispositivo' variant='outlined' style={{ marginBottom: 20 }} onChange={(e) => this.setState({ nomeDispositivo: e.target.value })} />
                         <FormControl variant="outlined" style={{ marginBottom: 20 }}>
                             <InputLabel>Localização</InputLabel>
@@ -208,7 +216,6 @@ class NewDevices extends Component {
                             <InputLabel>Status</InputLabel>
                             <Select
                                 style={{ marginBottom: 20, width: 100 }}
-                                autoFocus
                                 margin='dense'
                                 label='Status'
                                 type='text'

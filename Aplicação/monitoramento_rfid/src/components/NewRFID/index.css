@@ -28,6 +28,7 @@ header#new{
     border-radius: 5px;
     display: flex;
     flex-direction: column;
+    /* border: 1px solid black; */
   }
   
   /* form#new-post input{
@@ -149,15 +150,16 @@ form#new-post button:disabled{
     color: #FFF;
   }
 
-  .check-area{
-    height: 20em;
+  .check-area-user-rfid{
+    /* border: 1px solid black; */
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    height: 20em;
   }
 
-  .check-area .check{
+  .check-area-user-rfid .check{
     height: 70%;
     width: 30%;
     background-color: green;
@@ -185,7 +187,7 @@ form#new-post button:disabled{
     border-bottom-right-radius: 1em;
   }
 
-  .empty-check svg{
+  .empty-check-user-rfid svg{
     margin-bottom: 5px;
   }
 
@@ -379,8 +381,8 @@ form#new-post h4{
   justify-content: center;
 }
 
-.empty-check{
-  border: 2px solid #FFF;
+.empty-check-user-rfid{
+  border: 20px solid #FFF;
   height: 70%;
   width: 30%;
   background-color: transparent;
@@ -395,17 +397,17 @@ form#new-post h4{
 
 /* ESTILIZAÇÃO DA MARCA DE ERRO  */
 
-.empty-check svg {
+.empty-check-user-rfid svg {
   width: 100px;
   display: block;
 }
 
-.empty-check .path {
+.empty-check-user-rfid .path {
   stroke-dasharray: 1000;
   stroke-dashoffset: 0;
 }
 
-.empty-check .circle {
+.empty-check-user-rfid .circle {
   stroke-dasharray: 1000;
   stroke-dashoffset: 0;
 
@@ -413,7 +415,7 @@ form#new-post h4{
   animation: dash .9s ease-in-out;
 }
 
-.empty-check .line {
+.empty-check-user-rfid .line {
   stroke-dasharray: 1000;
   stroke-dashoffset: 0;
 
@@ -422,7 +424,7 @@ form#new-post h4{
   animation: dash .9s .35s ease-in-out forwards;
 }
 
-.empty-check .check {
+.empty-check-user-rfid .check {
   stroke-dasharray: 1000;
   stroke-dashoffset: 0;
 
@@ -431,13 +433,13 @@ form#new-post h4{
   animation: dash-check .9s .35s ease-in-out forwards;
 }
 
-.empty-check p {
+.empty-check-user-rfid p {
   text-align: center;
   margin: 20px 0 60px;
   font-size: 1.25em;
 }
 
-.empty-check .success {
+.empty-check-user-rfid .success {
   text-align: center;
   margin: 20px 0 60px;
   font-size: 1.25em;
@@ -445,7 +447,7 @@ form#new-post h4{
   color: #73AF55;
 }
 
-.empty-check .error {
+.empty-check-user-rfid .error {
   text-align: center;
   margin: 20px 0 60px;
   font-size: 1.25em;

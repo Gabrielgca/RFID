@@ -16,7 +16,6 @@ import Sectors from './components/Sectors';
 import NewSector from './components/NewSector';
 import Devices from './components/Devices';
 import NewDevices from './components/NewDevices';
-import Hora from './components/Mask'
 
 import './global.css';
 import './App.css';
@@ -60,8 +59,6 @@ class App extends Component {
 
           <Route exact path="/devices" component={Devices} />
           <Route exact path="/devices/new" component={NewDevices} />
-
-          <Route exact path='/hora' component={Hora}/>
         </Switch>
       </BrowserRouter>
     ) : (

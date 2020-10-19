@@ -3,7 +3,7 @@ import { Link, withRouter } from 'react-router-dom';
 import firebase from '../../firebase';
 import utils from '../../utils';
 import axios from 'axios';
-import './newRFID.css';
+import './index.css';
 import ENDPOINT from '../../socketAPIService';
 
 
@@ -218,7 +218,8 @@ class NewRFID extends Component {
       this.props.history.push('/usersRFID');
     } else {
       //Caso algum campo não tenha sido preenchido, mostra mensagem de erro
-      this.setState({ alert: 'Preencha todos os campos!' });
+      //this.setState({ alert: 'Preencha todos os campos!' });
+      alert("Preencha todos os campos!");
     }
 
   }
@@ -295,16 +296,22 @@ class NewRFID extends Component {
     else {
       return (
         <div className="new-rfid-body">
-          <header id="new">
-            {/* <Link to="/offices">Voltar</Link> */}
-            <Button startIcon={<ArrowBackIcon />} style={{marginTop:'15%', backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.goBack() }}>
+          {/* <header id="new">
+            <Link to="/offices">Voltar</Link>
+            <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize" }} type="button" onClick={() => { this.props.history.goBack() }}>
               Voltar
-                    </Button>
-          </header>
+            </Button>
+          </header> */}
+          <div style={{ display: "flex", flexDirection: "row", width: '80%', margin: "0 auto", marginTop: 20, }}>
+            <Button startIcon={<ArrowBackIcon />} style={{ backgroundColor: '#FAFAFA', bordeRadius: '5px', color: '#272727', fontSize: '15px', textTransform: "capitalize", width: "7.5%" }} type="button" onClick={() => { this.props.history.goBack() }}>
+              Voltar
+            </Button>
+            <h1 style={{ color: '#008C35', textAlign: "center", width: "92.5%", paddingRight: "7.5%" }}>Usuários RFID</h1>
+          </div>
           <form onSubmit={this.register} id="new-post">
-            <h1>Cadastrar Novo Usuário</h1>
-            <div className="check-area">
-              <div className="empty-check">
+            {/* <h1>Cadastrar Novo Usuário</h1> */}
+            <div className="check-area-user-rfid">
+              <div className="empty-check-user-rfid" style={{ border: "1px solid black" }}>
                 {this.state.fileResult !== '' ?
                   <div className="div-img-perfil">
                     <img className="img-to-send" src={"data:image/png;base64, " + this.state.fileResult} />
@@ -386,13 +393,13 @@ class NewRFID extends Component {
               />
               <Button onClick={this.handleAddPermission} variant='contained' style={{ marginLeft: '2%', background: 'green', height: 54 }} ><AddIcon /></Button>
               <FormControlLabel control={<CheckBox checked={this.state.permanente} onChange={(e) => { this.handleCheck(e) }} />} label='Manter horário direto' />
-              <div id='flatScroll'>
+              <div className='flatScroll'>
                 <FlatList
                   renderWhenEmpty={() => <div></div>}
                   list={this.state.permissions}
                   renderItem={(item) => (
                     <div>
-                      <div id='usersList'>
+                      <div className='usersList'>
                         <p><b>Localização: </b> {item.roomName}</p>
                         <p><b>Hora de inicio: </b> {item.hrini}</p>
                         <p><b>Hora fim: </b> {item.hrfim}</p>
