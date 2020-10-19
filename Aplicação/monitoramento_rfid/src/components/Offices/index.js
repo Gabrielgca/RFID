@@ -674,13 +674,13 @@ class Offices extends Component {
                     </div>
 
                     {/* Modal para edição dos dados da conta selecionada */}
-                    <Dialog open={this.state.modalOpen} onClose={this.handleClose} aria-labelledby="form-dialog-title">
+                    <Dialog fullWidth={true} maxWidth="md" open={this.state.modalOpen} onClose={this.handleClose} aria-labelledby="form-dialog-title">
                         <DialogTitle id="form-dialog-title">Detalhes do Cargo</DialogTitle>
-                        <DialogContent style={{ width: 700 }}>
+                        <DialogContent>
                             <TextField
                                 value={this.state.selectedOffice.nomeCargo}
                                 onChange={(e) => { let array = this.state.selectedOffice; array.nomeCargo = e.target.value; this.setState({ selectedOffice: array }) }}
-                                style={{ width: 500 }}
+                                style={{ width: 700 }}
                                 autoFocus
                                 margin="dense"
                                 id="name"
@@ -690,7 +690,7 @@ class Offices extends Component {
                                 disabled={this.state.editDisable}
                             />
 
-                            <form onSubmit={this.register} className="form">
+                            <form onSubmit={this.register} className="form-permissions">
 
                                 <p>Cargo</p>
                                 <FormGroup row style={{ marginBottom: 10 }}>
@@ -698,7 +698,7 @@ class Offices extends Component {
                                         list={this.state.permissions.cargo}
                                         renderItem={(item) => (
                                             <FormControlLabel
-                                                style={{ width: '32.5%', paddingLeft: 5 }}
+                                                style={{ width: '32.5%' }}
                                                 control={<Checkbox color="primary" checked={item.status} onChange={(e) => { this.handlePermissionChange("cargo", e) }} name={item.key} />}
                                                 label={item.nomePermissao}
                                                 disabled={this.state.editDisable}
@@ -717,7 +717,7 @@ class Offices extends Component {
                                         list={this.state.permissions.conta}
                                         renderItem={(item) => (
                                             <FormControlLabel
-                                                style={{ width: '32.5%', paddingLeft: 5 }}
+                                                style={{ width: '32.5%' }}
                                                 control={<Checkbox color="primary" checked={item.status} onChange={(e) => { this.handlePermissionChange("conta", e) }} name={item.key} />}
                                                 label={item.nomePermissao}
                                                 disabled={this.state.editDisable}
@@ -734,7 +734,7 @@ class Offices extends Component {
                                         list={this.state.permissions.setor}
                                         renderItem={(item) => (
                                             <FormControlLabel
-                                                style={{ width: '32.5%', paddingLeft: 5 }}
+                                                style={{ width: '32.5%' }}
                                                 control={<Checkbox color="primary" checked={item.status} onChange={(e) => { this.handlePermissionChange("setor", e) }} name={item.key} />}
                                                 label={item.nomePermissao}
                                                 disabled={this.state.editDisable}
@@ -751,7 +751,7 @@ class Offices extends Component {
                                         list={this.state.permissions.dispositivo}
                                         renderItem={(item) => (
                                             <FormControlLabel
-                                                style={{ width: '32.5%', paddingLeft: 5 }}
+                                                style={{ width: '32.5%' }}
                                                 control={<Checkbox color="primary" checked={item.status} onChange={(e) => { this.handlePermissionChange("dispositivo", e) }} name={item.key} />}
                                                 label={item.nomePermissao}
                                                 disabled={this.state.editDisable}
@@ -768,7 +768,7 @@ class Offices extends Component {
                                         list={this.state.permissions.dashboard}
                                         renderItem={(item) => (
                                             <FormControlLabel
-                                                style={{ width: '32.5%', paddingLeft: 5 }}
+                                                style={{ width: '32.5%' }}
                                                 control={<Checkbox color="primary" checked={item.status} onChange={(e) => { this.handlePermissionChange("dashboard", e) }} name={item.key} />}
                                                 label={item.nomePermissao}
                                                 disabled={this.state.editDisable}
@@ -785,7 +785,7 @@ class Offices extends Component {
                                         list={this.state.permissions.usuario}
                                         renderItem={(item) => (
                                             <FormControlLabel
-                                                style={{ width: '32.5%', paddingLeft: 5 }}
+                                                style={{ width: '32.5%' }}
                                                 control={<Checkbox color="primary" checked={item.status} onChange={(e) => { this.handlePermissionChange("usuario", e) }} name={item.key} />}
                                                 label={item.nomePermissao}
                                                 disabled={this.state.editDisable}

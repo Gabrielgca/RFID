@@ -119,3 +119,7 @@ div .card-disabled{
     align-items: center;
     margin-left: 1%;
 }
+
+.form-permissions{
+  width: 925px;
+}
