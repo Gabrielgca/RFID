@@ -267,7 +267,7 @@ class UsersRFID extends Component {
     getLocalizations = async () => { //Função que obtém os dispositivos para os quais se pode adicionar uma permissão
         axios.get(baseURL + "dispInfo")
             .then(response => {
-                console.log("Responses");
+                console.log("DispInfo: ");
                 console.log(response.data.dispinfo);
                 this.setState({ setores: response.data.dispinfo });
                 this.setState({ selectedSector: response.data.dispinfo[0].id_disp_loc });
@@ -403,8 +403,10 @@ class UsersRFID extends Component {
     //AQUI VÃO AS FUNÇÕES DE EDIÇÃO DAS PERMISSÕES DO USUÁRIO RFID
     handleSelectedSectorChange = (e) => { //Função que altera o setor da nova permissão a ser cadastrada
         this.setState({ selectedSector: e.target.value });
+        /* this.setState({ roomName: }) */
         this.state.setores.map((setor) => {
-            if (setor.id_loc === e.target.value) {
+            if (setor.id_disp_loc === e.target.value) {
+                alert(setor.id_disp_loc + " é igual a " + e.target.value);
                 this.setState({ roomName: setor.no_loc });
             }
         });
