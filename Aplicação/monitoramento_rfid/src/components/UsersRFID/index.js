@@ -745,7 +745,7 @@ class UsersRFID extends Component {
                                         list={this.state.selectedUser.perm}
                                         renderItem={(permission) => (
                                             <div className="users-rfid-item">
-                                                <div className="users-rfid-item-info" style={{ backgroundColor: '#999', width: '100%', color: '#000' }}>
+                                                <div className="users-rfid-item-info" style={{ backgroundColor: '#dce0dd', width: '100%', color: '#000' }}>
                                                     <TextField
                                                         //disabled={!utils.checkSpecificPermission("Editar", this.state.loggedOffice.permissoes.usuario)}
                                                         disabled={true}
@@ -816,7 +816,7 @@ class UsersRFID extends Component {
                                                     <p><b>Status:</b> {permission.status}</p> */}
                                                 </div>
 
-                                                <div className="users-rfid-options" style={{ backgroundColor: '#999' }}>
+                                                <div className="users-rfid-options" style={{ backgroundColor: '#dce0dd' }}>
                                                     <Button
                                                         disabled={permission.status === "A" && utils.checkSpecificPermission("Editar", this.state.loggedOffice.permissoes.usuario) === true ? false : true}
                                                         endIcon={<EditIcon />}
