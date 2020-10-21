@@ -392,7 +392,7 @@ class NewRFID extends Component {
                 value={this.state.hrfim} onChange={(e) => this.setState({ hrfim: e.target.value })}
               />
               <Button onClick={this.handleAddPermission} variant='contained' style={{ marginLeft: '2%', background: 'green', height: 54 }} ><AddIcon style={{ color: "#FFF" }} /></Button>
-              <FormControlLabel control={<CheckBox checked={this.state.permanente} onChange={(e) => { this.handleCheck(e) }} />} label='Manter horário direto' color="primary" />
+              <FormControlLabel style={{display: "none"}} control={<CheckBox checked={this.state.permanente} onChange={(e) => { this.handleCheck(e) }} />} label='Manter horário direto' color="primary" />
               <div className='flatScroll'>
                 <FlatList
                   renderWhenEmpty={() => <div></div>}
