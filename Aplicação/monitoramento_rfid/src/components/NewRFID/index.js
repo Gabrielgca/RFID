@@ -311,7 +311,7 @@ class NewRFID extends Component {
           <form onSubmit={this.register} id="new-post">
             {/* <h1>Cadastrar Novo Usuário</h1> */}
             <div className="check-area-user-rfid">
-              <div className="empty-check-user-rfid" style={{ border: "1px solid black" }}>
+              <div className="empty-check-user-rfid" style={{ border: "2px solid white" }}>
                 {this.state.fileResult !== '' ?
                   <div className="div-img-perfil">
                     <img className="img-to-send" src={"data:image/png;base64, " + this.state.fileResult} />
@@ -391,8 +391,8 @@ class NewRFID extends Component {
               <TextField InputLabelProps={{ shrink: true }} type='time' label='Hora de fim' variant='outlined' style={{ background: '#FFF', borderRadius: 8, width: '20%', marginLeft: '2%', marginBottom: 10 }}
                 value={this.state.hrfim} onChange={(e) => this.setState({ hrfim: e.target.value })}
               />
-              <Button onClick={this.handleAddPermission} variant='contained' style={{ marginLeft: '2%', background: 'green', height: 54 }} ><AddIcon /></Button>
-              <FormControlLabel control={<CheckBox checked={this.state.permanente} onChange={(e) => { this.handleCheck(e) }} />} label='Manter horário direto' />
+              <Button onClick={this.handleAddPermission} variant='contained' style={{ marginLeft: '2%', background: 'green', height: 54 }} ><AddIcon style={{ color: "#FFF" }} /></Button>
+              <FormControlLabel control={<CheckBox checked={this.state.permanente} onChange={(e) => { this.handleCheck(e) }} />} label='Manter horário direto' color="primary" />
               <div className='flatScroll'>
                 <FlatList
                   renderWhenEmpty={() => <div></div>}
@@ -417,7 +417,7 @@ class NewRFID extends Component {
 
               <Button
                 onClick={this.register}
-                style={{ background: 'green', width: ' 100%' }}>
+                style={{ background: 'green', width: ' 100%', color: "#FFF" }}>
                 Cadastrar
             </Button>
               {/* <button type="submit" disabled={this.state.cardCodeRFID === '' ? true : false}>Cadastrar</button> */}

@@ -219,7 +219,6 @@ class NewSectors extends Component {
                         <TextField
                             //value={this.state.selectedOffice.nomeCargo}
                             onChange={(e) => { this.setState({ companyName: e.target.value }) }}
-                            style={{ width: 500 }}
                             autoFocus
                             margin="dense"
                             label="Nome da Empresa"
@@ -231,7 +230,6 @@ class NewSectors extends Component {
                         <TextField
                             //value={this.state.selectedOffice.nomeCargo}
                             onChange={(e) => { this.setState({ roomName: e.target.value }) }}
-                            style={{ width: 500 }}
                             margin="dense"
                             label="Nome/Nº Sala"
                             type="text"
@@ -242,7 +240,6 @@ class NewSectors extends Component {
                         <TextField
                             //value={this.state.selectedOffice.nomeCargo}
                             onChange={(e) => { this.handleAreaUpdate(e) }}
-                            style={{ width: 500 }}
                             margin="dense"
                             label="Área"
                             type="number"
@@ -253,7 +250,6 @@ class NewSectors extends Component {
                         <TextField
                             //value={this.state.selectedOffice.nomeCargo}
                             onChange={(e) => { this.setState({ floor: e.target.value }) }}
-                            style={{ width: 500 }}
                             margin="dense"
                             label="Andar"
                             type="number"
@@ -263,7 +259,6 @@ class NewSectors extends Component {
 
                         <TextField
                             value={this.state.maxOccupation}
-                            style={{ width: 500 }}
                             margin="dense"
                             label="Limite Máximo de Pessoas"
                             type="number"
