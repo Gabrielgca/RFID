@@ -80,6 +80,7 @@ class Users extends Component {
     handleClose = () => {
         this.setState({ modalOpen: false });
         this.setState({ selectedUser: { key: '', cargo: '', nome: '', status: '' } });
+        window.location.reload();
     };
 
     handleCloseDeactivate = () => {

@@ -206,7 +206,7 @@ class UsersRFID extends Component {
 
         axios.post(baseURL + "updateUser", params)
             .then(response => {
-                alert(JSON.stringify(params));
+                /* alert(JSON.stringify(params)); */
             })
             .catch(error => {
                 console.log(error);
@@ -385,12 +385,12 @@ class UsersRFID extends Component {
             }
 
             console.log("JSON QUE IRÁ PARA O SERVIDOR")
-            alert(JSON.stringify(params));
+            /* alert(JSON.stringify(params)); */
             //alert(JSON.stringify(params))
 
             await axios.post(baseURL + 'updateUser', params)
                 .then(response => {
-                    alert(JSON.stringify(response.data))
+                    /* alert(JSON.stringify(response.data)) */
                     console.log(response);
                     this.modalClose();
                 })
@@ -406,7 +406,7 @@ class UsersRFID extends Component {
         /* this.setState({ roomName: }) */
         this.state.setores.map((setor) => {
             if (setor.id_disp_loc === e.target.value) {
-                alert(setor.id_disp_loc + " é igual a " + e.target.value);
+                /* alert(setor.id_disp_loc + " é igual a " + e.target.value); */
                 this.setState({ roomName: setor.no_loc });
             }
         });

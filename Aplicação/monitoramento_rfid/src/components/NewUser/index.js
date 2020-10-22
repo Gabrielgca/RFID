@@ -48,7 +48,7 @@ class NewUser extends Component {
   }
 
   handleChange(event) {
-    alert("Cargo: " + event.target.value);
+    /* alert("Cargo: " + event.target.value); */
     this.setState({ cargo: event.target.value });
   }
 

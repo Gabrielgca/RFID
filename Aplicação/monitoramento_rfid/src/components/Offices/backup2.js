@@ -157,7 +157,7 @@ class Offices extends Component {
             return null;
         }
         else {
-            alert("Acesso autorizado");
+            /* alert("Acesso autorizado"); */
         }
 
         await firebase.getPermissions((allPermissions) => {

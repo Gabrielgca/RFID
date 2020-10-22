@@ -115,7 +115,7 @@ class Header extends Component {
       }
 
       let newActions = this.state.actions;
-      newActions.push({ icon: <ExitToApp className="my-float" style={{ color: "#008C35" }} />, name: 'Sair', action: 1 })
+      newActions.push({ icon: <ExitToApp className="my-float" style={{ color: "#008C35" }} />, name: 'Sair', action: 2 })
       this.setState({ actions: newActions });
 
       newActions = this.state.actions;
@@ -171,7 +171,7 @@ class Header extends Component {
                   }
                   else{
                     if(action === 9){
-                      this.props.replace("/login");
+                      this.props.history.replace("/login");
                     }
                   }
                 }

@@ -157,7 +157,7 @@ class Devices extends Component {
 
 
     handleUpdateDevice = async () => {
-        alert(JSON.stringify(this.state.selectedDevice));
+        /* alert(JSON.stringify(this.state.selectedDevice)); */
 
         let params = {
             id_disp: this.state.selectedDevice.key,
