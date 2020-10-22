@@ -457,7 +457,7 @@ class Users extends Component {
                         <DialogTitle id="form-dialog-title">Reativar Usuário</DialogTitle>
                         <DialogContent>
                             <DialogContentText>
-                                Tem certeza de que deseja reativar o <b> {this.state.selectedUser.cargo} {this.state.selectedUser.nome} </b> ?
+                                Tem certeza de que deseja reativar o <b> {this.state.selectedUser.nome} </b> ?
                             </DialogContentText>
 
 

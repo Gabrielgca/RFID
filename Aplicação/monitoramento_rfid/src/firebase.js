@@ -42,7 +42,8 @@ class Firebase {
     return app.database().ref('usuarios').child(uid).set({
       nome: nome,
       email: email,
-      cargo: cargo
+      cargo: cargo,
+      status: "Ativo"
       //cargo: cargo
       //tipoUsuario: 'Administrador' // Exemplo
     });
