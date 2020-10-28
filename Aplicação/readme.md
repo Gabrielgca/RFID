@@ -42,12 +42,14 @@
   + Log-out
 
 <div>
-<table style="justify-content:column">
+<table>
   <tbody>
+<tr>
 <td>
   <p>Monitoramento de Salas</p>
   <img src="https://user-images.githubusercontent.com/32252053/97478338-8d513980-192f-11eb-8119-335c803a42cb.png" width="700" height="400"/>
 </td>
+</tr>
 
 <td>
  <p>Login</p>
