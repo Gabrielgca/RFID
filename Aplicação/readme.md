@@ -46,7 +46,7 @@
   <tbody>
 <tr>
 <td>
-  <p>Monitoramento de Salas</p>
+  <p align="center">Monitoramento de Salas</p>
   <img src="https://user-images.githubusercontent.com/32252053/97478338-8d513980-192f-11eb-8119-335c803a42cb.png" width="700" height="400"/>
 </td>
 </tr>
@@ -56,6 +56,9 @@
  <p>Login</p>
  <img src="https://user-images.githubusercontent.com/32252053/97478712-0fd9f900-1930-11eb-95d9-39e7678afdf3.png" width="700" height="400"/>
 </td>
+</tr>
+
+<tr>
 <td>
  <p>Dashboard sem selecionar nenhuma sala</p>
  <img src="https://user-images.githubusercontent.com/32252053/97478993-7d862500-1930-11eb-9156-68b0fcee90ee.png" width="700" height="400"/>
