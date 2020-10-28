@@ -42,7 +42,7 @@
   + Log-out
 
 <div>
-<table>
+<table style="justify-content:column">
   <tbody>
 <th>
   <p>Monitoramento de Salas</p>
@@ -143,12 +143,16 @@
  <img src="https://user-images.githubusercontent.com/32252053/97479287-d229a000-1930-11eb-8caf-7fef00d73f2c.png" width="700" height="400"/>
 </th>
 
+<th>
  <p>Cadastrar novo usuário RFID recebido pela aplicação</p>
  <img src="https://user-images.githubusercontent.com/32252053/97479288-d229a000-1930-11eb-8c10-852e34aed178.png" width="700" height="400"/>
+</th>
 
+<th>
  <p>Menu com todas as permissões disponivel</p>
  <img src="https://user-images.githubusercontent.com/32252053/97479290-d2c23680-1930-11eb-96b8-371c40dfdcbc.png" width="90" height="400"/>
- </table>
+</th> 
+</table>
 </div>
 
 *Mais informações no arquivo 'Definições da Aplicação.txt'.*
