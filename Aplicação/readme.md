@@ -31,11 +31,10 @@
   * Log-out
 
 <div>
- <img src="Tela Inicial RFID.PNG" align="left" width="450" height="217"/>
- <img src="Tela Login RFID.png" align="right" width="450" height="217"/>
- <img src="Tela Cadastro RFID.png" align="left" width="450" height="217"/>
- <img src="Tela Monitoramento RFID.png" align="right" width="450" height="217"/>
- <img src="Tela Monitoramento RFID 2.PNG" align="bottom" width="450" height="217"/>
+  <p>Monitoramento de Salas</p>
+ <img src="https://user-images.githubusercontent.com/32252053/97478338-8d513980-192f-11eb-8119-335c803a42cb.png" width="700" height="400"/>
+ <p>Login</p>
+ <img src="https://user-images.githubusercontent.com/32252053/97478712-0fd9f900-1930-11eb-95d9-39e7678afdf3.png" width="700" height="400"/>
 </div>
 
 
