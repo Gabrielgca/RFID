@@ -8,23 +8,26 @@
 
 ### Overview:
 
-* Site desenvolvido para propiciar monitoramento de salas, bem como ferramenta administrativa contendo funções de gerenciamento de salas, usuários cadastrados, dispositivos e usuários do sistema em si.
+* Aplicação desenvolvido para propiciar monitoramento de salas e usuários, bem como ferramenta administrativa contendo funções de gerenciamento de salas, usuários cadastrados, dispositivos e usuários do sistema em si.
 
 ---
 
 ### Recursos Utilizados:
 
-* React: uma biblioteca de JavaScript para o desenvolvimento de UI. A escolha do uso desta biblioteca se deu por conta da praticidade da mesma, bem como a familiaridade com a linguagem utilizada e a facilidade de encontrar e desenvolver novas ferramentas para a mesma.
+* React JS: uma biblioteca de JavaScript para o desenvolvimento de UI. A escolha do uso desta biblioteca se deu por conta da praticidade da mesma, bem como a familiaridade com a linguagem utilizada e a facilidade de encontrar e desenvolver novas ferramentas para a mesma.
   + Axios: realiza requisições ao servidor; 
   + Material Design: linguagem de design desenvolvida pela Google, auxilia na criação dos layouts, fornecendo elementos já responsivos com uma estilização padrão que pode ser aproveitada ou redefinida; 
   + FuctBase64: realiza a conversão de imagens em Base64 e vice-versa; 
   + React Loader Spinner: componente de carregamento, literalmente. Um loading pronto com várias opções de design; 
   + React Router Dom: utilizada para realizar o controle da navegação do Web App, simulando uma navegação semelhante à dos apps mobile, facilitando assim o controle sobre a navegação e as propriedades de cada rota/tela.
+  + Socket.io: para fazer a atualizacão em tempo real dos dados.
+
 
   
 
 * Firebase: plataforma Google para criação de apps móveis e da Web; 
   + Auth: realiza a autenticação de usuários no sistema.
+  + Permissões: verifica se o usuário tem as permissões estabelecida pelas regras de negocio.
 
 ---
 
@@ -40,6 +43,76 @@
     - Informações de cadastro de cada pessoa
   + CADASTRAMENTO
   + Log-out
+* Controle de Cargos
+  + Editar dados
+    - Adicionar novos recursos
+  + Desativar cargo/reativar
+  + Pesquisar cargos
+  + Adicionar novo cargo
+* Cadastrar Novo cargo
+  + Nomear novo cargo
+  + Adicionar permissões ao novo cargo
+* Usuário cadastrados com seus cargos
+  + Editar usuário
+    - Nome
+    - Cargo
+  + Desativar usuário/reativar
+  + Pesquisar usuário
+  + Adicionar usuário
+* Novo Cargo
+  + Nome
+  + E-mail
+  + Senha 
+  + Cargo
+* Controle de dispositivo
+  + Editar
+    - Descrição do Dispositivo
+    - Localização
+  + Desativar/Reativar
+  + Pesquisar
+  + Adicionar
+* Cadastrar novo dispositivo
+  + Descrição - não obrigatorio
+  + Localização
+  + Status
+    - Ativo
+    - Inativo
+* Controle de Setores
+  + Editar
+    - Editar imagem do setor
+    - Nome do setor
+    - Área 
+    - Andar
+  + Desativar/Reativar
+  + Pesquisar
+  + Adicionar
+* Cadastrar novo setor
+  + Adicionar imagem
+  + Nome da empresa
+  + Área 
+  + Andar
+  + Limite de pessoas
+    - Limite de pessoas é feito o calculo de acordo com a área do local
+* Usuários RFID
+  + Editar
+    - Nome
+    - Cargo
+    - Status
+    - Horario de entrada e saída
+  + Desativar/Reativar
+  + Pesquisar
+  + Adcionar
+* Adcionar novo usuário RFID
+  + Foto do usuário 3x4
+  + Nome completo
+  + Codigo RFID enviado pelo dispositivo
+  + Idade
+  + Função
+  + Sala
+  + Horario de entrada
+    - opcional
+  + Horario de saída
+    - opcional
 
 <div>
 <table>
@@ -97,13 +170,6 @@
   <td>
     <p align="center">Cadastro de Novo Cargo</p>
     <img src="https://user-images.githubusercontent.com/32252053/97479259-cdfd8280-1930-11eb-8458-a8ed6aff0038.png" width="700" height="400"/>
-  </td>
-</tr>
-
-<tr>
-  <td>
-    <p align="center">Cadastro de Cargo</p>
-    <img src="https://user-images.githubusercontent.com/32252053/97479263-cf2eaf80-1930-11eb-886a-828944995b8f.png" width="700" height="400"/>
   </td>
 </tr>
 
