@@ -39,7 +39,7 @@
   <tbody>
 <tr>
   <td>
-    <h6 align="center">Monitoramento de Salas</h6>
+    <h5 align="center">Monitoramento de Salas</h5>
      <p>
      <ul>
       <li>Setores cadastrados</li>
@@ -52,7 +52,7 @@
 
 <tr>
   <td>
-    <h6 align="center">Login</h6>
+    <h5 align="center">Login</h5>
     <p>
     <ul>
       <li>Acesso a Dashboard</li>
@@ -65,7 +65,7 @@
 
 <tr>
   <td>
-    <h6 align="center">Dashboard sem selecionar nenhuma sala</h6>
+    <h5 align="center">Dashboard sem selecionar nenhuma sala</h5>
     <p>
     <ul>
       <li>Nome do usuário logado no canto superior direito</li>
@@ -80,7 +80,7 @@
 
 <tr>
   <td>
-    <h6 align="center">Dashboard com a sala selecionada</h6>
+    <h5 align="center">Dashboard com a sala selecionada</h5>
     <p>
       <ul>
         <li>Mostra a imagem quando clicado no setor</li>
@@ -92,7 +92,7 @@
 
 <tr>
   <td>
-    <h6 align="center">Informações do usuário que está na sala</h6>
+    <h5 align="center">Informações do usuário que está na sala</h5>
     <p>
       <ul>
         <li>Informações do usuário que está no setor/sala</li>
@@ -104,7 +104,7 @@
 
 <tr>
   <td>
-    <h6 align="center">Controle de Cargos</h6>
+    <h5 align="center">Controle de Cargos</h5>
     <p>
     <ul>
       <li>Editar</li>
@@ -122,14 +122,14 @@
 
 <tr>
   <td>
-    <h6 align="center">Detalhes do Cargo</h6>
+    <h5 align="center">Detalhes do Cargo</h5>
     <img src="https://user-images.githubusercontent.com/32252053/97479252-cd64ec00-1930-11eb-97fa-ef3696bc7d2e.png" width="1000" height="500"/>
   </td>
 </tr>
 
 <tr>
   <td>
-    <h6 align="center">Cadastro de Novo Cargo</h6>
+    <h5 align="center">Cadastro de Novo Cargo</h5>
     <ul>
       <li>Nome do novo cargo</li>
       <li>Propriedades do cargo</li>
@@ -140,7 +140,7 @@
 
 <tr>
   <td>
-    <h6 align="center">Usuário de Conta</h6>
+    <h5 align="center">Usuário de Conta</h5>
     <ul>
       <li>Editar</li>
         <ul>
@@ -157,14 +157,14 @@
 
 <tr>
   <td>
-    <h6 align="center">Editar Informações de Cargo</h6>
+    <h5 align="center">Editar Informações de Cargo</h5>
     <img src="https://user-images.githubusercontent.com/32252053/97479267-cfc74600-1930-11eb-9af3-bcccfbc61384.png" width="1000" height="500"/>
   </td>
 </tr>
 
 <tr>
   <td>
-    <h6 align="center">Novo Usuário</h6>
+    <h5 align="center">Novo Usuário</h5>
     <ul>
       <li>Nome</li>
       <li>E-mail</li>
@@ -177,7 +177,7 @@
 
 <tr>
   <td>
-    <h6 align="center">Controle de dispositivo</h6>
+    <h5 align="center">Controle de dispositivo</h5>
     <ul>
       <li>Editar</li>
         <ul>
@@ -194,14 +194,14 @@
 
 <tr>
   <td>
-    <h6 align="center">Detalhe do dispositivo</h6>
+    <h5 align="center">Detalhe do dispositivo</h5>
     <img src="https://user-images.githubusercontent.com/32252053/97479272-d05fdc80-1930-11eb-94f9-5752714bb3ec.png" width="1000" height="500"/>
   </td>
 </tr>
 
 <tr>
   <td>
-    <h6 align="center">Cadastro de dispositivo RFID</h6>
+    <h5 align="center">Cadastro de dispositivo RFID</h5>
     <ul>
       <li>Descrição do dispositivo</li>
       <li>Localização</li>
@@ -213,7 +213,7 @@
 
 <tr>
   <td>
-    <h6 align="center">Controle de setores</h6>
+    <h5 align="center">Controle de setores</h5>
     <ul>
       <li>Editar</li>
         <ul>
@@ -233,14 +233,14 @@
 
 <tr>
   <td>
-    <h6 align="center">Editar Setor</h6>
+    <h5 align="center">Editar Setor</h5>
     <img src="https://user-images.githubusercontent.com/32252053/97479278-d1910980-1930-11eb-8737-2b8712eb6bdf.png" width="500" height="500"/>
   </td>
 </tr>
 
 <tr>
   <td>
-    <h6 align="center">Cadastrar novo Setor</h6>
+    <h5 align="center">Cadastrar novo Setor</h5>
     <ul>
       <li>Imagem do Setor</li>
       <li>Nome da empresa</li>
@@ -254,7 +254,7 @@
 
 <tr>
   <td>
-    <h6 align="center">Usuário RFID</h6>
+    <h5 align="center">Usuário RFID</h5>
     <ul>
       <li>Editar</li>
         <ul>
@@ -274,7 +274,7 @@
 
 <tr>
   <td>
-    <h6 align="center">Cadastrar novo usuário</h6>
+    <h5 align="center">Cadastrar novo usuário</h5>
     <ul>
       <li>Código RFID</li>
       <li>Foto 3x4</li>
@@ -290,21 +290,21 @@
 
 <tr>
   <td>
-    <h6 align="center">Cadastrar novo usuário RFID recebido pela aplicação</h6>
+    <h5 align="center">Cadastrar novo usuário RFID recebido pela aplicação</h5>
     <img src="https://user-images.githubusercontent.com/32252053/97479288-d229a000-1930-11eb-8c10-852e34aed178.png" width="1000" height="500"/>
   </td>
 </tr>
 
 <tr>
   <td>
-    <h6 align="center">Menu com todas as permissões disponivel</h6>
+    <h5 align="center">Menu com todas as permissões disponivel</h5>
     <img src="https://user-images.githubusercontent.com/32252053/97479290-d2c23680-1930-11eb-96b8-371c40dfdcbc.png" width="90" height="500"/>
   </td>
 </tr> 
 
 <tr>
   <td>
-    <h6 align="center">Tabela de permissões por cargo relativa às contas de gerenciamento da aplicação.</h6>
+    <h5 align="center">Tabela de permissões por cargo relativa às contas de gerenciamento da aplicação.</h5>
     <img src="Permissões e Cargos.jpg" align="center"/>
   </td>
 </tr>
