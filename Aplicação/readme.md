@@ -121,7 +121,7 @@
     <h6>HOME</h6>
      <p>Setores cadastrados</p>
      <p>Número de pessoas em cada setor</p>
-    <img src="https://user-images.githubusercontent.com/32252053/97478338-8d513980-192f-11eb-8119-335c803a42cb.png" width="700" height="400"/>
+    <img align="center" src="https://user-images.githubusercontent.com/32252053/97478338-8d513980-192f-11eb-8119-335c803a42cb.png" width="700" height="400"/>
   </td>
 </tr>
 
