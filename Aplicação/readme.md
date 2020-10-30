@@ -33,9 +33,7 @@
 
 ### Layout:
 
-* HOME
-  + Setores cadastrados
-  + Número de pessoas em cada setor
+
 * DASHBOARD (Requer log-in)
   + Setores cadastrados
     - Imagem do setor
@@ -120,6 +118,9 @@
 <tr>
   <td>
     <p align="center">Monitoramento de Salas</p>
+      * HOME
+    + Setores cadastrados
+    + Número de pessoas em cada setor
     <img src="https://user-images.githubusercontent.com/32252053/97478338-8d513980-192f-11eb-8119-335c803a42cb.png" width="700" height="400"/>
   </td>
 </tr>
