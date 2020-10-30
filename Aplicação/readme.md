@@ -101,13 +101,11 @@
     <ul>
       <li>Editar</li>
         <ul>
-          <li>Nome</li>
-          <li></li>
+          <li>Cargo</li>
         </ul>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
+      <li>Desativa/Reativa cargo</li>
+      <li>Pesquisa cargo</li>
+      <li>Adiciona novo cargo</li>
     </ul>
     </p>
     <img src="https://user-images.githubusercontent.com/32252053/97479243-cc33bf00-1930-11eb-8d2e-325026c9395f.png" width="1000" height="500"/>
@@ -116,7 +114,7 @@
 
 <tr>
   <td>
-    <p align="center">Detlhes do Cargo</p>
+    <p align="center">Detalhes do Cargo</p>
     <img src="https://user-images.githubusercontent.com/32252053/97479252-cd64ec00-1930-11eb-97fa-ef3696bc7d2e.png" width="1000" height="500"/>
   </td>
 </tr>
@@ -124,13 +122,27 @@
 <tr>
   <td>
     <p align="center">Cadastro de Novo Cargo</p>
+    <ul>
+      <li>Nome do novo cargo</li>
+      <li>Propriedades do cargo</li>
+    </ul>
     <img src="https://user-images.githubusercontent.com/32252053/97479259-cdfd8280-1930-11eb-8458-a8ed6aff0038.png" width="1000" height="500"/>
   </td>
 </tr>
 
 <tr>
   <td>
-    <p align="center">Cadastro de Cargo</p>
+    <p align="center">Usuário de Conta</p>
+    <ul>
+      <li>Editar</li>
+        <ul>
+          <li>Nome</li>
+          <li>Cargo</li>
+        </ul>
+      <li>Desativar/Reativar usuário</li>
+      <li>Adicionar</li>
+      <li>Pesquisar</li>
+    </ul>
     <img src="https://user-images.githubusercontent.com/32252053/97479263-cf2eaf80-1930-11eb-886a-828944995b8f.png" width="1000" height="500"/>
   </td>
 </tr>
@@ -144,7 +156,13 @@
 
 <tr>
   <td>
-    <p align="center">Novo Cargo</p>
+    <p align="center">Novo Usuário</p>
+    <ul>
+      <li>Nome</li>
+      <li>E-mail</li>
+      <li>Senha</li>
+      <li>Cargo</li>
+    </ul>
     <img src="https://user-images.githubusercontent.com/32252053/97479269-cfc74600-1930-11eb-98c4-985c3935da99.png" width="1000" height="500"/>
   </td>
 </tr>
@@ -152,6 +170,16 @@
 <tr>
   <td>
     <p align="center">Controle de dispositivo</p>
+    <ul>
+      <li>Editar</li>
+        <ul>
+          <li>Descrição do dispositivo</li>
+          <li>Localização</li>
+        </ul>
+      <li>Desativar e Reativar</li>
+      <li>Cadastrar</li>
+      <li>Pesquisar</li>
+    </ul>
     <img src="https://user-images.githubusercontent.com/32252053/97479271-d05fdc80-1930-11eb-8482-720a3307f88d.png" width="1000" height="500"/>
   </td>
 </tr>
@@ -165,7 +193,12 @@
 
 <tr>
   <td>
-    <p align="center">Controle de dispositivo RFID</p>
+    <p align="center">Cadastro de dispositivo RFID</p>
+    <ul>
+      <li>Descrição do dispositivo</li>
+      <li>Localização</li>
+      <li>Status</li>
+    </ul>
     <img src="https://user-images.githubusercontent.com/32252053/97479273-d0f87300-1930-11eb-9111-6cad7d962503.png" width="1000" height="500"/>
   </td>
 </tr>
@@ -173,6 +206,19 @@
 <tr>
   <td>
     <p align="center">Controle de setores</p>
+    <ul>
+      <li>Editar</li>
+        <ul>
+          <li>Imagem</li>
+          <li>Nome da Empresa</li>
+          <li>Nome da Sala</li>
+          <li>Área</li>
+          <li>Andar</li>
+        </ul>
+      <li>Desativar/Reativar</li>
+      <li>Adicionar novo setor</li>
+      <li>Pesquisar</li>
+    </ul>
     <img src="https://user-images.githubusercontent.com/32252053/97479274-d0f87300-1930-11eb-9109-061f5535d7ed.png" width="1000" height="500"/>
   </td>
 </tr>
@@ -186,7 +232,14 @@
 
 <tr>
   <td>
-    <p>Cadastrar novo Setor</p>
+    <p align="center">Cadastrar novo Setor</p>
+    <ul>
+      <li>Imagem do Setor</li>
+      <li>Nome da empresa</li>
+      <li>Nome ou numero da sala</li>
+      <li>Área</li>
+      <li>Andar</li>
+    </ul>
     <img src="https://user-images.githubusercontent.com/32252053/97479281-d1910980-1930-11eb-951b-129cba5a1d16.png" width="1000" height="500"/>
   </td>
 </tr>
@@ -194,6 +247,19 @@
 <tr>
   <td>
     <p align="center">Usuário RFID</p>
+    <ul>
+      <li>Editar</li>
+        <ul>
+          <li>Imagem</li>
+          <li>Nome</li>
+          <li>Função</li>
+          <li>Permissões de entrada</li>
+          <li>Adicionar nova permissão</li>
+        </ul>
+      <li>Desativar/Reativar</li>
+      <li>Adicionar</li>
+      <li>Pesquisar</li>
+    </ul>
     <img src="https://user-images.githubusercontent.com/32252053/97479284-d229a000-1930-11eb-85a5-1820d263038d.png" width="1000" height="500"/>
   </td>
 </tr>
@@ -201,6 +267,15 @@
 <tr>
   <td>
     <p align="center">Cadastrar novo usuário</p>
+    <ul>
+      <li>Código RFID</li>
+      <li>Foto 3x4</li>
+      <li>Nome</li>
+      <li>Idade</li>
+      <li>Função</li>
+      <li>Sala</li>
+      <li>Horario de entrada e saída</li>
+    </ul>
     <img src="https://user-images.githubusercontent.com/32252053/97479287-d229a000-1930-11eb-8caf-7fef00d73f2c.png" width="1000" height="500"/>
   </td>
 </tr>
