@@ -224,14 +224,14 @@
 </tr>
 
 <tr>
-  <td align="center">
+  <td>
     <p align="center">Editar Setor</p>
     <img src="https://user-images.githubusercontent.com/32252053/97479278-d1910980-1930-11eb-8737-2b8712eb6bdf.png" width="400" height="400"/>
   </td>
 </tr>
 
 <tr>
-  <td align="center">
+  <td>
     <p>Cadastrar novo Setor</p>
     <img src="https://user-images.githubusercontent.com/32252053/97479281-d1910980-1930-11eb-951b-129cba5a1d16.png" width="700" height="400"/>
   </td>
@@ -266,7 +266,7 @@
 </tr> 
 
 <tr>
-  <td align"=center">
+  <td align="center">
     <p align="center">Tabela de permissões por cargo relativa às contas de gerenciamento da aplicação.</p>
     <img src="Permissões e Cargos.jpg" align="center"/>
   </td>
