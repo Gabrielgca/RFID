@@ -34,84 +34,6 @@
 ### Layout:
 
 
-* DASHBOARD (Requer log-in)
-  + Setores cadastrados
-    - Imagem do setor
-  + Número de pessoas em cada setor
-    - Informações de cadastro de cada pessoa
-  + CADASTRAMENTO
-  + Log-out
-* Controle de Cargos
-  + Editar dados
-    - Adicionar novos recursos
-  + Desativar cargo/reativar
-  + Pesquisar cargos
-  + Adicionar novo cargo
-* Cadastrar Novo cargo
-  + Nomear novo cargo
-  + Adicionar permissões ao novo cargo
-* Usuário cadastrados com seus cargos
-  + Editar usuário
-    - Nome
-    - Cargo
-  + Desativar usuário/reativar
-  + Pesquisar usuário
-  + Adicionar usuário
-* Novo Cargo
-  + Nome
-  + E-mail
-  + Senha 
-  + Cargo
-* Controle de dispositivo
-  + Editar
-    - Descrição do Dispositivo
-    - Localização
-  + Desativar/Reativar
-  + Pesquisar
-  + Adicionar
-* Cadastrar novo dispositivo
-  + Descrição - não obrigatorio
-  + Localização
-  + Status
-    - Ativo
-    - Inativo
-* Controle de Setores
-  + Editar
-    - Editar imagem do setor
-    - Nome do setor
-    - Área 
-    - Andar
-  + Desativar/Reativar
-  + Pesquisar
-  + Adicionar
-* Cadastrar novo setor
-  + Adicionar imagem
-  + Nome da empresa
-  + Área 
-  + Andar
-  + Limite de pessoas
-    - Limite de pessoas é feito o calculo de acordo com a área do local
-* Usuários RFID
-  + Editar
-    - Nome
-    - Cargo
-    - Status
-    - Horario de entrada e saída
-  + Desativar/Reativar
-  + Pesquisar
-  + Adcionar
-* Adcionar novo usuário RFID
-  + Foto do usuário 3x4
-  + Nome completo
-  + Codigo RFID enviado pelo dispositivo
-  + Idade
-  + Função
-  + Sala
-  + Horario de entrada
-    - opcional
-  + Horario de saída
-    - opcional
-
 <div>
 <table>
   <tbody>
@@ -128,6 +50,11 @@
 <tr>
   <td>
     <p align="center">Login</p>
+    <h6>Login</h6>
+    <p>
+      <li>Acesso a Dashboard</li>
+      <li>Campos de Login e Senha</li>
+    </p>
     <img src="https://user-images.githubusercontent.com/32252053/97478712-0fd9f900-1930-11eb-95d9-39e7678afdf3.png" width="1000" height="500"/>
   </td>
 </tr>
@@ -135,6 +62,13 @@
 <tr>
   <td>
     <p align="center">Dashboard sem selecionar nenhuma sala</p>
+    <h6>Dashboard<h6>
+    <p>
+      <li>Nome do usuário logado no canto superior direito</li>
+      <li>Setores cadastrados</li>
+      <li>Quantidade de pessoas nos setores</li>
+      <li>Imagem da sala</li>
+    </p>
     <img src="https://user-images.githubusercontent.com/32252053/97478993-7d862500-1930-11eb-9156-68b0fcee90ee.png" width="1000" height="500"/>
   </td>
 </tr>
@@ -142,6 +76,8 @@
 <tr>
   <td>
     <p align="center">Dashboard com a sala selecionada</p>
+    <h6>Sala selecionada</h6>
+    <p><li>Mostra a imagem quando clicado no setor</li></p>
     <img src="https://user-images.githubusercontent.com/32252053/97479000-7f4fe880-1930-11eb-8abc-173867eca167.png" width="1000" height="500"/>
   </td>
 </tr>
@@ -149,6 +85,10 @@
 <tr>
   <td>
     <p align="center">Informações do usuário que está na sala</p>
+    <h6>Detalhes do usuário</h6>
+    <p>
+      <li>Informações do usuário que está no setor/sala</li>
+    </p>
     <img src="https://user-images.githubusercontent.com/32252053/97479237-cb029200-1930-11eb-8a3a-c7e524e6daad.png" width="1000" height="500"/>
   </td>
 </tr>
@@ -156,6 +96,20 @@
 <tr>
   <td>
     <p align="center">Controle de Cargos</p>
+    <h6>Controle de Cargos</h6>
+    <p>
+    <ul>
+      <li>Editar</li>
+        <ul>
+          <li>Nome</li>
+          <li></li>
+        </ul>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+    </ul>
+    </p>
     <img src="https://user-images.githubusercontent.com/32252053/97479243-cc33bf00-1930-11eb-8d2e-325026c9395f.png" width="1000" height="500"/>
   </td>
 </tr>
