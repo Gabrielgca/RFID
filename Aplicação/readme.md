@@ -40,9 +40,12 @@
 <tr>
   <td>
     <p align="center">Monitoramento de Salas</p>
-    <h6>HOME</h6>
-     <p><li>Setores cadastrados</li>
-     <li>Número de pessoas em cada setor</li></p>
+     <p>
+     <ul>
+      <li>Setores cadastrados</li>
+      <li>Número de pessoas em cada setor</li>
+     </ul>
+     </p>
     <img src="https://user-images.githubusercontent.com/32252053/97478338-8d513980-192f-11eb-8119-335c803a42cb.png" width="1000" height="500"/>
   </td>
 </tr>
@@ -50,10 +53,11 @@
 <tr>
   <td>
     <p align="center">Login</p>
-    <h6>Login</h6>
     <p>
+    <ul>
       <li>Acesso a Dashboard</li>
       <li>Campos de Login e Senha</li>
+    </ul>
     </p>
     <img src="https://user-images.githubusercontent.com/32252053/97478712-0fd9f900-1930-11eb-95d9-39e7678afdf3.png" width="1000" height="500"/>
   </td>
@@ -62,12 +66,13 @@
 <tr>
   <td>
     <p align="center">Dashboard sem selecionar nenhuma sala</p>
-    <h6>Dashboard<h6>
     <p>
+    <ul>
       <li>Nome do usuário logado no canto superior direito</li>
       <li>Setores cadastrados</li>
       <li>Quantidade de pessoas nos setores</li>
       <li>Imagem da sala</li>
+    </ul>
     </p>
     <img src="https://user-images.githubusercontent.com/32252053/97478993-7d862500-1930-11eb-9156-68b0fcee90ee.png" width="1000" height="500"/>
   </td>
@@ -76,8 +81,11 @@
 <tr>
   <td>
     <p align="center">Dashboard com a sala selecionada</p>
-    <h6>Sala selecionada</h6>
-    <p><li>Mostra a imagem quando clicado no setor</li></p>
+    <p>
+      <ul>
+        <li>Mostra a imagem quando clicado no setor</li>
+      </ul>
+    </p>
     <img src="https://user-images.githubusercontent.com/32252053/97479000-7f4fe880-1930-11eb-8abc-173867eca167.png" width="1000" height="500"/>
   </td>
 </tr>
@@ -85,9 +93,10 @@
 <tr>
   <td>
     <p align="center">Informações do usuário que está na sala</p>
-    <h6>Detalhes do usuário</h6>
     <p>
-      <li>Informações do usuário que está no setor/sala</li>
+      <ul>
+        <li>Informações do usuário que está no setor/sala</li>
+      </ul>
     </p>
     <img src="https://user-images.githubusercontent.com/32252053/97479237-cb029200-1930-11eb-8a3a-c7e524e6daad.png" width="1000" height="500"/>
   </td>
@@ -96,7 +105,6 @@
 <tr>
   <td>
     <p align="center">Controle de Cargos</p>
-    <h6>Controle de Cargos</h6>
     <p>
     <ul>
       <li>Editar</li>
