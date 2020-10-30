@@ -224,7 +224,7 @@
 </tr>
 
 <tr>
-  <td>
+  <td align="center">
     <p align="center">Editar Setor</p>
     <img src="https://user-images.githubusercontent.com/32252053/97479278-d1910980-1930-11eb-8737-2b8712eb6bdf.png" width="400" height="400"/>
   </td>
@@ -259,12 +259,17 @@
 </tr>
 
 <tr>
-  <td>
+  <td align="center">
     <p align="center">Menu com todas as permissões disponivel</p>
     <img src="https://user-images.githubusercontent.com/32252053/97479290-d2c23680-1930-11eb-96b8-371c40dfdcbc.png" width="90" height="400"/>
   </td>
 </tr> 
+
+<tr>
+  <td align"=center">
+    <p align="center">Tabela de permissões por cargo relativa às contas de gerenciamento da aplicação.</p>
+    <img src="Permissões e Cargos.jpg" align="center"/>
+  </td>
+</tr>
 </table>
 </div>
-
-*Mais informações no arquivo 'Definições da Aplicação.txt'.*
